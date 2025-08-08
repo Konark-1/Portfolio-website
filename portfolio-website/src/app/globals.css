@@ -1,0 +1,235 @@
+@import "tailwindcss";
+
+@config "../../tailwind.config.ts";
+
+:root {
+  --background: #ffffff;
+  --foreground: #171717;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0a0a0a;
+    --foreground: #ededed;
+  }
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+/* Liquid glass animated background utility for groups */
+/* Stock index.css essentials for the liquid-glass component */
+@keyframes moveBackground {
+  from {
+    background-position: 0% 0%;
+  }
+  to {
+    background-position: 0% -1000%;
+  }
+}
+
+/* Our implementation using the stock keyframes */
+.liquid-animated .liquid-bg {
+  background: radial-gradient(1200px 600px at 10% 10%, rgba(0, 200, 255, 0.35), transparent 40%),
+              radial-gradient(1000px 500px at 80% 30%, rgba(180, 0, 255, 0.25), transparent 45%),
+              radial-gradient(1000px 500px at 20% 80%, rgba(255, 150, 0, 0.18), transparent 50%),
+              radial-gradient(1400px 700px at 60% 80%, rgba(255, 255, 255, 0.08), transparent 55%);
+  width: 200%;
+  height: 200%;
+  background-size: 100% 1000%;
+  animation: moveBackground 24s linear infinite;
+}
+
+/* Subtle zoom utility for header items */
+.zoom-on-hover {
+  transition: transform 220ms ease-out;
+  will-change: transform;
+}
+.zoom-on-hover:hover {
+  transform: scale(1.12);
+}
+
+/* Metallic Text Effect */
+.metallic-text {
+  background: linear-gradient(
+    135deg,
+    #c0c0c0 0%,
+    #ffffff 25%,
+    #e8e8e8 50%,
+    #ffffff 75%,
+    #c0c0c0 100%
+  );
+  background-size: 200% 200%;
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: metallic-shine 3s ease-in-out infinite;
+  text-shadow:
+    0 0 10px rgba(255, 255, 255, 0.3),
+    0 0 20px rgba(255, 255, 255, 0.2),
+    0 0 30px rgba(255, 255, 255, 0.1);
+}
+
+@keyframes metallic-shine {
+  0%, 100% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+}
+
+/* Enhanced Metallic Text with Chrome Effect */
+.chrome-text {
+  background: linear-gradient(
+    135deg,
+    #b8b8b8 0%,
+    #ffffff 15%,
+    #d4d4d4 30%,
+    #ffffff 45%,
+    #e8e8e8 60%,
+    #ffffff 75%,
+    #c0c0c0 90%,
+    #ffffff 100%
+  );
+  background-size: 300% 300%;
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: chrome-shine 4s ease-in-out infinite;
+  filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.4));
+}
+
+@keyframes chrome-shine {
+  0%, 100% {
+    background-position: 0% 0%;
+  }
+  25% {
+    background-position: 100% 0%;
+  }
+  50% {
+    background-position: 100% 100%;
+  }
+  75% {
+    background-position: 0% 100%;
+  }
+}
+
+/* Authentic Metallic Paint Effect for Header Name */
+.metallic-paint-text {
+  position: relative;
+  background: linear-gradient(
+    110deg,
+    #2a2a2a 0%,
+    #4a4a4a 10%,
+    #6a6a6a 20%,
+    #8a8a8a 30%,
+    #b0b0b0 40%,
+    #d0d0d0 50%,
+    #b0b0b0 60%,
+    #8a8a8a 70%,
+    #6a6a6a 80%,
+    #4a4a4a 90%,
+    #2a2a2a 100%
+  );
+  /* Pattern Scale: 2 - Controls the size of the gradient pattern */
+  background-size: 200% 100%;
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  /* Speed: 0.3 - Controls animation speed (converted to 3.33s duration) */
+  animation: metallic-paint-flow 3.33s ease-in-out infinite;
+
+  /* Pattern Blur: 0.011 - Subtle blur effect */
+  filter: blur(0.011px);
+
+  /* Refraction: 0.02 - Subtle displacement effect */
+  text-shadow:
+    0.02px 0.02px 0px rgba(255, 255, 255, 0.2),
+    -0.02px -0.02px 0px rgba(0, 0, 0, 0.3);
+
+  /* Edge: 0.5 - Subtle edge enhancement */
+  -webkit-text-stroke: 0.5px rgba(255, 255, 255, 0.05);
+}
+
+
+
+.metallic-paint-text::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  /* Liquid: 0.29 - Subtle liquid metal flow effect */
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    transparent 30%,
+    rgba(220, 220, 220, 0.1) 40%,
+    rgba(255, 255, 255, 0.15) 45%,
+    rgba(255, 255, 255, 0.29) 50%,
+    rgba(255, 255, 255, 0.15) 55%,
+    rgba(220, 220, 220, 0.1) 60%,
+    transparent 70%,
+    transparent 100%
+  );
+  /* Speed: 0.3 - Liquid flow animation speed (converted to 3.33s duration) */
+  animation: liquid-flow 3.33s ease-in-out infinite;
+  pointer-events: none;
+  /* Clip to text shape only */
+  background-clip: text;
+  -webkit-background-clip: text;
+  mix-blend-mode: multiply;
+}
+
+@keyframes metallic-paint-flow {
+  0%, 100% {
+    background-position: 0% 50%;
+    /* Pattern Blur: 0.011 - Subtle blur effect only */
+    filter: blur(0.011px);
+  }
+  33% {
+    /* Pattern Scale: 2 - Creates the flowing pattern movement */
+    background-position: 100% 0%;
+    filter: blur(0.011px);
+  }
+  66% {
+    background-position: 0% 100%;
+    filter: blur(0.011px);
+  }
+}
+
+@keyframes liquid-flow {
+  0% {
+    transform: translateX(-100%);
+    opacity: 0;
+  }
+  25% {
+    opacity: 0.05;
+  }
+  50% {
+    transform: translateX(0%);
+    /* Liquid: 0.29 - Subtle liquid flow visibility */
+    opacity: 0.15;
+  }
+  75% {
+    opacity: 0.05;
+  }
+  100% {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+}
+
+
