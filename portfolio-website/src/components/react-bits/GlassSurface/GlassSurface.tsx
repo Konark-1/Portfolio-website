@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useRef, useState, useId, useCallback } from "react";
+import React, { useEffect, useRef, useState, useId, useCallback, memo } from "react";
 
 export interface GlassSurfaceProps extends React.HTMLAttributes<HTMLDivElement> {
   children?: React.ReactNode;
@@ -409,4 +409,4 @@ const GlassSurface: React.FC<GlassSurfaceProps> = ({
   );
 };
 
-export default GlassSurface;
+export default memo(GlassSurface);

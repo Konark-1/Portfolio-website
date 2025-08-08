@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useRef, useEffect } from "react";
+import React, { useRef, useEffect, memo } from "react";
 import { Renderer, Program, Mesh, Triangle } from "ogl";
 
 interface LiquidChromeProps extends React.HTMLAttributes<HTMLDivElement> {
@@ -162,10 +162,19 @@ export const LiquidChrome: React.FC<LiquidChromeProps> = ({
     }
 
     let animationId: number;
+    let lastTime = 0;
+    const targetFPS = 60;
+    const frameInterval = 1000 / targetFPS;
+
     function update(t: number) {
       animationId = requestAnimationFrame(update);
-      program.uniforms.uTime.value = t * 0.001 * speed;
-      renderer.render({ scene: mesh });
+
+      // Throttle to target FPS for better performance
+      if (t - lastTime >= frameInterval) {
+        program.uniforms.uTime.value = t * 0.001 * speed;
+        renderer.render({ scene: mesh });
+        lastTime = t;
+      }
     }
     animationId = requestAnimationFrame(update);
 
@@ -199,4 +208,4 @@ export const LiquidChrome: React.FC<LiquidChromeProps> = ({
   );
 };
 
-export default LiquidChrome;
+export default memo(LiquidChrome);

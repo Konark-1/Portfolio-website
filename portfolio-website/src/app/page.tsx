@@ -1,32 +1,38 @@
 "use client";
 
-import LiquidChrome from "@/components/react-bits/LiquidChrome/LiquidChrome";
+import { lazy, Suspense } from 'react';
 import GlassSurface from "@/components/react-bits/GlassSurface/GlassSurface";
+import LoadingSkeleton from "@/components/ui/LoadingSkeleton";
 import Link from 'next/link';
+
+// Lazy load the heavy WebGL component
+const LiquidChrome = lazy(() => import("@/components/react-bits/LiquidChrome/LiquidChrome"));
 
 export default function HomePage() {
   return (
     <main className="relative min-h-screen overflow-hidden bg-gradient-to-br from-gray-900 via-black to-gray-800">
       {/* Background component positioned absolutely */}
       <div className="absolute inset-0 w-full h-full pointer-events-none">
-        <LiquidChrome
-          baseColor={[0, 0.05, 0.05]}
-          speed={0.85}
-          amplitude={0.3}
-          frequencyX={3}
-          frequencyY={2}
-          interactive={true}
-        />
+        <Suspense fallback={<LoadingSkeleton className="absolute inset-0" />}>
+          <LiquidChrome
+            baseColor={[0, 0.05, 0.05]}
+            speed={0.85}
+            amplitude={0.3}
+            frequencyX={3}
+            frequencyY={2}
+            interactive={true}
+          />
+        </Suspense>
       </div>
 
       {/* Content container with proper spacing from header */}
       <div className="relative z-10 flex flex-col items-center justify-center min-h-screen pt-24 lg:pt-28 px-4">
         {/* Main heading */}
         <div className="text-center max-w-7xl">
-          <h1 className="text-5xl font-bold md:text-6xl lg:text-7xl xl:text-8xl tracking-tight leading-tight chrome-text">
+          <h1 className="text-5xl font-bold md:text-6xl lg:text-7xl xl:text-8xl tracking-tight leading-tight hero-chrome-text min-h-[4rem] md:min-h-[5rem] lg:min-h-[6rem] xl:min-h-[7rem] flex items-center justify-center">
             Data Analyst & Business Intelligence Specialist
           </h1>
-          <p className="mt-8 max-w-4xl mx-auto text-lg text-gray-300 md:text-xl lg:text-2xl leading-relaxed font-medium">
+          <p className="mt-8 max-w-4xl mx-auto text-lg text-gray-300 md:text-xl lg:text-2xl leading-relaxed font-medium min-h-[3rem]">
             Specializing in transforming complex data into actionable insights with Power BI, SQL, and advanced Excel to drive business growth.
           </p>
         </div>

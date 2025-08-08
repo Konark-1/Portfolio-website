@@ -2,6 +2,16 @@
 
 @config "../../tailwind.config.ts";
 
+/* Reglia Monarch Font */
+@font-face {
+  font-family: 'Reglia Monarch';
+  src: url('/fonts/Regalia%20Monarch.otf?v=1') format('opentype'),
+       url('/fonts/Regalia%20Monarch.ttf?v=1') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
 :root {
   --background: #ffffff;
   --foreground: #171717;
@@ -54,9 +64,10 @@ body {
 .zoom-on-hover {
   transition: transform 220ms ease-out;
   will-change: transform;
+  transform: translateZ(0); /* Force hardware acceleration */
 }
 .zoom-on-hover:hover {
-  transform: scale(1.12);
+  transform: scale(1.12) translateZ(0);
 }
 
 /* Metallic Text Effect */
@@ -123,6 +134,30 @@ body {
   75% {
     background-position: 0% 100%;
   }
+}
+
+/* Hero Text with Reglia Monarch Font */
+.hero-chrome-text {
+  font-family: 'Reglia Monarch', 'Times New Roman', serif !important;
+  color: #ffffff !important;
+  text-shadow:
+    2px 2px 4px rgba(0, 0, 0, 0.5),
+    0 0 10px rgba(255, 255, 255, 0.2);
+  font-weight: normal !important;
+}
+
+/* Loading shimmer animation */
+@keyframes shimmer {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+.animate-shimmer {
+  animation: shimmer 2s infinite;
 }
 
 /* Authentic Metallic Paint Effect for Header Name */

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState, useCallback, memo } from "react";
 import MetallicPaint from "./MetallicPaint";
 
 interface MetallicPaintTextProps {
@@ -37,7 +37,7 @@ const MetallicPaintText: React.FC<MetallicPaintTextProps> = ({
   const [imageData, setImageData] = useState<ImageData | null>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
-  const generateTextImage = () => {
+  const generateTextImage = useCallback(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
 
@@ -46,7 +46,7 @@ const MetallicPaintText: React.FC<MetallicPaintTextProps> = ({
 
     // Set font properties
     ctx.font = `${fontWeight} ${fontSize}px ${fontFamily}`;
-    
+
     // Measure text to set canvas size
     const metrics = ctx.measureText(text);
     const textWidth = metrics.width;
@@ -71,11 +71,11 @@ const MetallicPaintText: React.FC<MetallicPaintTextProps> = ({
     // Get image data
     const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
     setImageData(imgData);
-  };
+  }, [text, fontSize, fontFamily, fontWeight]);
 
   useEffect(() => {
     generateTextImage();
-  }, [text, fontSize, fontFamily, fontWeight]);
+  }, [generateTextImage]);
 
   if (!imageData) {
     return (
@@ -94,4 +94,4 @@ const MetallicPaintText: React.FC<MetallicPaintTextProps> = ({
   );
 };
 
-export default MetallicPaintText;
+export default memo(MetallicPaintText);

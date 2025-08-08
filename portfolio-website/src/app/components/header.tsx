@@ -1,11 +1,11 @@
 "use client";
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback, memo } from 'react';
 import Link from 'next/link';
 import { LiquidGlassGroup, LiquidGlassItem } from "@/components/ui/liquid-glass-group";
 import GlassSurface from "@/components/react-bits/GlassSurface/GlassSurface";
 
-export default function Header() {
+function Header() {
   const [isScrolled, setIsScrolled] = useState(false);
 
   useEffect(() => {
@@ -13,13 +13,13 @@ export default function Header() {
       setIsScrolled(window.scrollY > 50);
     };
 
-    window.addEventListener('scroll', handleScroll);
+    window.addEventListener('scroll', handleScroll, { passive: true });
     return () => {
       window.removeEventListener('scroll', handleScroll);
     };
   }, []);
 
-  const scrollToSection = (sectionId: string) => {
+  const scrollToSection = useCallback((sectionId: string) => {
     const element = document.getElementById(sectionId);
     if (element) {
       const headerHeight = 100; // Account for larger fixed header
@@ -30,9 +30,10 @@ export default function Header() {
         behavior: 'smooth'
       });
     }
-  };
+  }, []);
 
-  const HeaderContent = (
+  // Reusable header content component
+  const HeaderContent = () => (
     <>
       <div className="flex-shrink-0">
         <Link href="/" className="flex items-center gap-2">
@@ -53,28 +54,38 @@ export default function Header() {
   );
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 transition-all duration-300 ease-in-out bg-transparent">
-      {isScrolled ? (
-        <div className="py-3 transition-all duration-300 ease-in-out">
-          <div className="mx-auto w-4/5 transition-all duration-300 ease-in-out">
-            <GlassSurface
-              width="100%"
-              height={64}
-              className="rounded-2xl transition-all duration-300 ease-in-out"
-            >
-              <div className="flex items-center justify-between w-full h-full px-6">
-                {HeaderContent}
-              </div>
-            </GlassSurface>
-          </div>
+    <header className="fixed top-0 left-0 right-0 z-50">
+      {/* Container A - Top State: Full-width transparent */}
+      <div className={`absolute inset-0 transition-opacity duration-300 ease-in-out ${
+        !isScrolled ? 'opacity-100' : 'opacity-0 pointer-events-none'
+      }`}>
+        <div className="flex items-center justify-between w-full h-20 lg:h-24 px-6 lg:px-8">
+          <HeaderContent />
         </div>
-      ) : (
-        <div className="px-6 lg:px-8">
-          <div className="flex h-20 lg:h-24 items-center justify-between transition-all duration-300 ease-in-out">
-            {HeaderContent}
-          </div>
+      </div>
+
+      {/* Container B - Scrolled State: Centered GlassSurface */}
+      <div className={`transition-opacity duration-300 ease-in-out py-3 ${
+        isScrolled ? 'opacity-100' : 'opacity-0 pointer-events-none'
+      }`}>
+        <div className={`mx-auto transition-all duration-300 ease-in-out ${
+          isScrolled ? 'w-4/5' : 'w-full'
+        }`}>
+          <GlassSurface
+            width="100%"
+            height={64}
+            className="rounded-2xl"
+            backgroundOpacity={0.16}
+            blur={11}
+          >
+            <div className="flex items-center justify-between w-full h-full px-6">
+              <HeaderContent />
+            </div>
+          </GlassSurface>
         </div>
-      )}
+      </div>
     </header>
   );
 }
+
+export default memo(Header);
