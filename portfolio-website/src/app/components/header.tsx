@@ -74,9 +74,19 @@ function Header() {
           <GlassSurface
             width="100%"
             height={64}
-            className="rounded-2xl"
-            backgroundOpacity={0.16}
+            borderRadius={50}
+            backgroundOpacity={0.1}
+            saturation={1}
+            borderWidth={0.07}
+            brightness={50}
+            opacity={0.93}
             blur={11}
+            displace={0.5}
+            distortionScale={-180}
+            redOffset={0}
+            greenOffset={10}
+            blueOffset={20}
+            className=""
           >
             <div className="flex items-center justify-between w-full h-full px-6">
               <HeaderContent />

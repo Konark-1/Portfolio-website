@@ -2,9 +2,9 @@
 
 @config "../../tailwind.config.ts";
 
-/* Reglia Monarch Font */
+/* Regalia Monarch Font */
 @font-face {
-  font-family: 'Reglia Monarch';
+  font-family: 'Regalia Monarch';
   src: url('/fonts/Regalia%20Monarch.otf?v=1') format('opentype'),
        url('/fonts/Regalia%20Monarch.ttf?v=1') format('truetype');
   font-weight: normal;
@@ -136,9 +136,9 @@ body {
   }
 }
 
-/* Hero Text with Reglia Monarch Font */
+/* Hero Text with Regalia Monarch Font */
 .hero-chrome-text {
-  font-family: 'Reglia Monarch', 'Times New Roman', serif !important;
+  font-family: 'Regalia Monarch', 'Times New Roman', serif !important;
   color: #ffffff !important;
   text-shadow:
     2px 2px 4px rgba(0, 0, 0, 0.5),

@@ -43,11 +43,18 @@ export default function HomePage() {
             <GlassSurface
               width={160}
               height={55}
-              borderRadius={30}
-              backgroundOpacity={0.2}
-              blur={20}
-              saturation={1.2}
-              brightness={60}
+              borderRadius={50}
+              backgroundOpacity={0.1}
+              saturation={1}
+              borderWidth={0.07}
+              brightness={50}
+              opacity={0.93}
+              blur={11}
+              displace={0.5}
+              distortionScale={-180}
+              redOffset={0}
+              greenOffset={10}
+              blueOffset={20}
               className="cursor-pointer hover:scale-105 transition-all duration-300 hover:shadow-lg pointer-events-auto group"
             >
               <button className="px-8 py-3 text-white font-semibold w-full h-full text-sm tracking-wide flex items-center justify-center gap-2">
@@ -58,11 +65,18 @@ export default function HomePage() {
           <GlassSurface
             width={160}
             height={55}
-            borderRadius={30}
-            backgroundOpacity={0.2}
-            blur={20}
-            saturation={1.2}
-            brightness={60}
+            borderRadius={50}
+            backgroundOpacity={0.1}
+            saturation={1}
+            borderWidth={0.07}
+            brightness={50}
+            opacity={0.93}
+            blur={11}
+            displace={0.5}
+            distortionScale={-180}
+            redOffset={0}
+            greenOffset={10}
+            blueOffset={20}
             className="cursor-pointer hover:scale-105 transition-all duration-300 hover:shadow-lg pointer-events-auto group"
             onClick={() => {
               const element = document.getElementById('about');
