@@ -21,14 +21,14 @@ export default function RootLayout({
         {/* Preload critical fonts */}
         <link
           rel="preload"
-          href="/fonts/Regalia%20Monarch.otf"
+          href="/fonts/Regalia Monarch.otf"
           as="font"
           type="font/otf"
           crossOrigin="anonymous"
         />
         <link
           rel="preload"
-          href="/fonts/Regalia%20Monarch.ttf"
+          href="/fonts/Regalia Monarch.ttf"
           as="font"
           type="font/ttf"
           crossOrigin="anonymous"

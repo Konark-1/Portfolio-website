@@ -3,6 +3,7 @@
 import { lazy, Suspense } from 'react';
 import GlassSurface from "@/components/react-bits/GlassSurface/GlassSurface";
 import LoadingSkeleton from "@/components/ui/LoadingSkeleton";
+import SkillsTimeline from "@/components/ui/skills-timeline";
 import Link from 'next/link';
 
 // Lazy load the heavy WebGL component
@@ -97,45 +98,37 @@ export default function HomePage() {
         </div>
       </div>
 
-      {/* About Section */}
+      {/* Combined About & Technical Expertise Section */}
       <section id="about" className="relative z-10 bg-black text-white py-24 sm:py-32">
         <div className="mx-auto max-w-7xl px-6 lg:px-8">
-          <div className="mx-auto max-w-4xl lg:mx-0">
-            <h2 className="text-5xl font-bold tracking-tight sm:text-6xl lg:text-7xl metallic-text">About Me</h2>
-            <p className="mt-6 text-lg leading-8 text-gray-300">
-              I am a detail-oriented Data Analyst with a Bachelor of Commerce (Honours) from Amity University. My professional journey began at Xceedance Consulting Pvt Ltd as a Claims Analyst, where I honed my skills in analyzing, modifying, and updating critical data. I am currently advancing my expertise through a dedicated Data Analyst course at Ducat, Noida.
-            </p>
-          </div>
+          {/* Two-column layout */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center">
 
-          <div className="mx-auto mt-16 max-w-4xl lg:max-w-none">
-            <h3 className="text-4xl font-bold tracking-tight sm:text-5xl lg:text-6xl metallic-text">Technical Expertise</h3>
-            <p className="mt-4 text-gray-400">My toolkit is both powerful and flexible, with a special focus on integrating AI to enhance efficiency and unlock deeper insights.</p>
-            <dl className="mt-8 grid grid-cols-1 gap-x-8 gap-y-8 sm:grid-cols-2 lg:grid-cols-3">
-              <div className="flex flex-col">
-                <dt className="font-semibold text-white">Power BI</dt>
-                <dd className="mt-1 text-gray-400">Creating compelling dashboards that transform raw data into visual stories, enabling stakeholders to make informed strategic decisions through intuitive, interactive visualizations.</dd>
+            {/* Left Column - Content */}
+            <div className="space-y-16">
+              {/* About Me Content */}
+              <div>
+                <h2 className="text-4xl font-bold tracking-tight sm:text-5xl lg:text-6xl metallic-text">About Me</h2>
+                <p className="mt-6 text-lg leading-8 text-gray-300">
+                  I am a detail-oriented Data Analyst with a Bachelor of Commerce (Honours) from Amity University. My professional journey began at Xceedance Consulting Pvt Ltd as a Claims Analyst, where I honed my skills in analyzing, modifying, and updating critical data. I am currently advancing my expertise through a dedicated Data Analyst course at Ducat, Noida.
+                </p>
               </div>
-              <div className="flex flex-col">
-                <dt className="font-semibold text-white">SQL</dt>
-                <dd className="mt-1 text-gray-400">Crafting complex queries to extract meaningful insights from large datasets, ensuring accurate and efficient data retrieval for critical business analysis.</dd>
+
+              {/* Technical Expertise Content */}
+              <div>
+                <h3 className="text-3xl font-bold tracking-tight sm:text-4xl lg:text-5xl metallic-text">Technical Expertise</h3>
+                <p className="mt-4 text-lg leading-7 text-gray-400">
+                  My toolkit is both powerful and flexible, with a special focus on integrating AI to enhance efficiency and unlock deeper insights. Explore the interactive timeline to discover my skills and experience.
+                </p>
               </div>
-              <div className="flex flex-col">
-                <dt className="font-semibold text-white">Advanced Excel</dt>
-                <dd className="mt-1 text-gray-400">Proficient in VLOOKUP, HLOOKUP, pivot tables, charts, and slicers for comprehensive data analysis and reporting.</dd>
+            </div>
+
+            {/* Right Column - Interactive Component */}
+            <div className="flex justify-center items-center lg:justify-end">
+              <div className="w-full max-w-2xl">
+                <SkillsTimeline />
               </div>
-              <div className="flex flex-col">
-                <dt className="font-semibold text-white">Python</dt>
-                <dd className="mt-1 text-gray-400">Developing data analysis solutions through intuitive 'vibe coding' - learning and experimenting to build analytical tools. Self-taught with a natural aptitude for understanding code structure through hands-on problem-solving.</dd>
-              </div>
-              <div className="flex flex-col">
-                <dt className="font-semibold text-white">Business Analysis</dt>
-                <dd className="mt-1 text-gray-400">Leveraging BCom Honours foundation to bridge the gap between data insights and business strategy, ensuring analytical findings drive practical commercial outcomes.</dd>
-              </div>
-              <div className="flex flex-col">
-                <dt className="font-semibold text-white">Financial Analysis</dt>
-                <dd className="mt-1 text-gray-400">Applying accounting and finance principles to evaluate business performance, assess financial health, and support data-driven investment decisions.</dd>
-              </div>
-            </dl>
+            </div>
           </div>
         </div>
       </section>
