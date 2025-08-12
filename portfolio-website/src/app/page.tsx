@@ -113,23 +113,27 @@ export default function HomePage() {
             <dl className="mt-8 grid grid-cols-1 gap-x-8 gap-y-8 sm:grid-cols-2 lg:grid-cols-3">
               <div className="flex flex-col">
                 <dt className="font-semibold text-white">Power BI</dt>
-                <dd className="mt-1 text-gray-400">Crafting interactive and insightful dashboards to visualize complex data stories.</dd>
+                <dd className="mt-1 text-gray-400">Creating compelling dashboards that transform raw data into visual stories, enabling stakeholders to make informed strategic decisions through intuitive, interactive visualizations.</dd>
               </div>
               <div className="flex flex-col">
                 <dt className="font-semibold text-white">SQL</dt>
-                <dd className="mt-1 text-gray-400">Querying and manipulating large datasets with precision and efficiency.</dd>
+                <dd className="mt-1 text-gray-400">Crafting complex queries to extract meaningful insights from large datasets, ensuring accurate and efficient data retrieval for critical business analysis.</dd>
               </div>
               <div className="flex flex-col">
                 <dt className="font-semibold text-white">Advanced Excel</dt>
-                <dd className="mt-1 text-gray-400">Leveraging advanced functions, pivot tables, and macros for in-depth analysis.</dd>
+                <dd className="mt-1 text-gray-400">Proficient in VLOOKUP, HLOOKUP, pivot tables, charts, and slicers for comprehensive data analysis and reporting.</dd>
               </div>
               <div className="flex flex-col">
-                <dt className="font-semibold text-white">Statistical Analysis</dt>
-                <dd className="mt-1 text-gray-400">Applying statistical methods to ensure data-driven decisions are sound and reliable.</dd>
+                <dt className="font-semibold text-white">Python</dt>
+                <dd className="mt-1 text-gray-400">Developing data analysis solutions through intuitive 'vibe coding' - learning and experimenting to build analytical tools. Self-taught with a natural aptitude for understanding code structure through hands-on problem-solving.</dd>
               </div>
-               <div className="flex flex-col">
-                <dt className="font-semibold text-white">AI Integration</dt>
-                <dd className="mt-1 text-gray-400">Enhancing analytical workflows with AI tools to deliver faster and more robust insights.</dd>
+              <div className="flex flex-col">
+                <dt className="font-semibold text-white">Business Analysis</dt>
+                <dd className="mt-1 text-gray-400">Leveraging BCom Honours foundation to bridge the gap between data insights and business strategy, ensuring analytical findings drive practical commercial outcomes.</dd>
+              </div>
+              <div className="flex flex-col">
+                <dt className="font-semibold text-white">Financial Analysis</dt>
+                <dd className="mt-1 text-gray-400">Applying accounting and finance principles to evaluate business performance, assess financial health, and support data-driven investment decisions.</dd>
               </div>
             </dl>
           </div>
