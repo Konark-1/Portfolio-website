@@ -68,7 +68,7 @@ export default function HomePage() {
             onClick={() => {
               const element = document.getElementById('about');
               if (element) {
-                const headerHeight = 100;
+                const headerHeight = 115;
                 const elementPosition = element.offsetTop - headerHeight;
                 window.scrollTo({
                   top: elementPosition,
