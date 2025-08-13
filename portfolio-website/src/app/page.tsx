@@ -63,21 +63,7 @@ export default function HomePage() {
               </button>
             </GlassSurface>
           </Link>
-          <GlassSurface
-            width={160}
-            height={55}
-            borderRadius={50}
-            backgroundOpacity={0.1}
-            saturation={1}
-            borderWidth={0.07}
-            brightness={50}
-            opacity={0.93}
-            blur={11}
-            displace={0.5}
-            distortionScale={-180}
-            redOffset={0}
-            greenOffset={10}
-            blueOffset={20}
+          <div
             className="cursor-pointer hover:scale-105 transition-all duration-300 hover:shadow-lg pointer-events-auto group"
             onClick={() => {
               const element = document.getElementById('about');
@@ -91,18 +77,35 @@ export default function HomePage() {
               }
             }}
           >
-            <button className="px-8 py-3 text-white/80 font-medium w-full h-full text-sm tracking-wide flex items-center justify-center gap-2">
-              Learn More
-            </button>
-          </GlassSurface>
+            <GlassSurface
+              width={160}
+              height={55}
+              borderRadius={50}
+              backgroundOpacity={0.1}
+              saturation={1}
+              borderWidth={0.07}
+              brightness={50}
+              opacity={0.93}
+              blur={11}
+              displace={0.5}
+              distortionScale={-180}
+              redOffset={0}
+              greenOffset={10}
+              blueOffset={20}
+            >
+              <button className="px-8 py-3 text-white/80 font-medium w-full h-full text-sm tracking-wide flex items-center justify-center gap-2">
+                Learn More
+              </button>
+            </GlassSurface>
+          </div>
         </div>
       </div>
 
       {/* Combined About & Technical Expertise Section */}
-      <section id="about" className="relative z-10 bg-black text-white py-24 sm:py-32">
-        <div className="mx-auto max-w-7xl px-6 lg:px-8">
+      <section id="about" className="relative z-10 bg-black text-white min-h-screen flex items-center">
+        <div className="mx-auto max-w-7xl px-6 lg:px-8 w-full">
           {/* Two-column layout */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center min-h-[80vh]">
 
             {/* Left Column - Content */}
             <div className="space-y-16">
@@ -125,7 +128,7 @@ export default function HomePage() {
 
             {/* Right Column - Interactive Component */}
             <div className="flex justify-center items-center lg:justify-end">
-              <div className="w-full max-w-2xl">
+              <div className="w-full max-w-3xl">
                 <SkillsTimeline />
               </div>
             </div>
