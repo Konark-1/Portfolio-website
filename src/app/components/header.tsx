@@ -22,7 +22,7 @@ function Header() {
   const scrollToSection = useCallback((sectionId: string) => {
     const element = document.getElementById(sectionId);
     if (element) {
-      const headerHeight = 100; // Account for larger fixed header
+      const headerHeight = 115; // Increased from 100 to 115 (15% increase)
       const elementPosition = element.offsetTop - headerHeight;
 
       window.scrollTo({
@@ -37,7 +37,7 @@ function Header() {
     <>
       <div className="flex-shrink-0">
         <Link href="/" className="flex items-center gap-2">
-          <span className="text-3xl lg:text-4xl font-bold metallic-text">
+          <span className="text-3xl lg:text-5xl font-bold metallic-text">
             Konark Parihar
           </span>
         </Link>
@@ -59,13 +59,13 @@ function Header() {
       <div className={`absolute inset-0 transition-opacity duration-300 ease-in-out ${
         !isScrolled ? 'opacity-100' : 'opacity-0 pointer-events-none'
       }`}>
-        <div className="flex items-center justify-between w-full h-20 lg:h-24 px-6 lg:px-8">
+        <div className="flex items-center justify-between w-full h-23 lg:h-28 px-7 lg:px-9">
           <HeaderContent />
         </div>
       </div>
 
       {/* Container B - Scrolled State: Centered GlassSurface */}
-      <div className={`transition-opacity duration-300 ease-in-out py-3 ${
+      <div className={`transition-opacity duration-300 ease-in-out py-3.5 ${
         isScrolled ? 'opacity-100' : 'opacity-0 pointer-events-none'
       }`}>
         <div className={`mx-auto transition-all duration-300 ease-in-out ${
@@ -73,8 +73,8 @@ function Header() {
         }`}>
           <GlassSurface
             width="100%"
-            height={64}
-            borderRadius={50}
+            height={74}
+            borderRadius={58}
             backgroundOpacity={0.1}
             saturation={1}
             borderWidth={0.07}
@@ -88,7 +88,7 @@ function Header() {
             blueOffset={20}
             className=""
           >
-            <div className="flex items-center justify-between w-full h-full px-6">
+            <div className="flex items-center justify-between w-full h-full px-7">
               <HeaderContent />
             </div>
           </GlassSurface>
