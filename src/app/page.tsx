@@ -12,8 +12,8 @@ const LiquidChrome = lazy(() => import("@/components/react-bits/LiquidChrome/Liq
 export default function HomePage() {
   return (
     <main className="relative min-h-screen overflow-hidden bg-gradient-to-br from-gray-900 via-black to-gray-800">
-      {/* Background component positioned absolutely */}
-      <div className="absolute inset-0 w-full h-full pointer-events-none">
+      {/* Background component positioned fixed so header can blur it */}
+      <div className="fixed inset-0 w-full h-full pointer-events-none">
         <Suspense fallback={<LoadingSkeleton className="absolute inset-0" />}>
           <LiquidChrome
             baseColor={[0, 0.05, 0.05]}
@@ -39,30 +39,7 @@ export default function HomePage() {
         </div>
 
         {/* Action buttons */}
-        <div className="mt-10 flex flex-wrap justify-center gap-4">
-          <Link href="/portfolio">
-            <GlassSurface
-              width={160}
-              height={55}
-              borderRadius={50}
-              backgroundOpacity={0.1}
-              saturation={1}
-              borderWidth={0.07}
-              brightness={50}
-              opacity={0.93}
-              blur={11}
-              displace={0.5}
-              distortionScale={-180}
-              redOffset={0}
-              greenOffset={10}
-              blueOffset={20}
-              className="cursor-pointer hover:scale-105 transition-all duration-300 hover:shadow-lg pointer-events-auto group"
-            >
-              <button className="px-8 py-3 text-white font-semibold w-full h-full text-sm tracking-wide flex items-center justify-center gap-2">
-                Get Started
-              </button>
-            </GlassSurface>
-          </Link>
+        <div className="mt-10 flex flex-nowrap justify-center gap-4">
           <div
             className="cursor-pointer hover:scale-105 transition-all duration-300 hover:shadow-lg pointer-events-auto group"
             onClick={() => {
@@ -93,11 +70,33 @@ export default function HomePage() {
               greenOffset={10}
               blueOffset={20}
             >
-              <button className="px-8 py-3 text-white/80 font-medium w-full h-full text-sm tracking-wide flex items-center justify-center gap-2">
-                Learn More
+              <button className="px-8 py-3 text-white font-semibold w-full h-full text-sm tracking-wide flex items-center justify-center gap-2">
+                Get Started
               </button>
             </GlassSurface>
           </div>
+          <Link href="/portfolio">
+            <GlassSurface
+              width={160}
+              height={55}
+              borderRadius={50}
+              backgroundOpacity={0.1}
+              saturation={1}
+              borderWidth={0.07}
+              brightness={50}
+              opacity={0.93}
+              blur={11}
+              displace={0.5}
+              distortionScale={-180}
+              redOffset={0}
+              greenOffset={10}
+              blueOffset={20}
+            >
+              <button className="px-8 py-3 text-white/80 font-medium w-full h-full text-sm tracking-wide flex items-center justify-center gap-2">
+                MY PORTFOLIO
+              </button>
+            </GlassSurface>
+          </Link>
         </div>
       </div>
 
