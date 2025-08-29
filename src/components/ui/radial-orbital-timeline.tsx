@@ -111,18 +111,23 @@ export default function RadialOrbitalTimeline({
     setRotationAngle(270 - targetAngle);
   };
 
+  // Ensure deterministic rounding to avoid SSR/CSR precision mismatches
+  const round = (n: number, d = 3) => Math.round(n * Math.pow(10, d)) / Math.pow(10, d);
+
   const calculateNodePosition = (index: number, total: number) => {
     const angle = ((index / total) * 360 + rotationAngle) % 360;
-    const radius = 200; // Increased radius for larger size
+    const radius = 150;
     const radian = (angle * Math.PI) / 180;
 
-    const x = radius * Math.cos(radian) + centerOffset.x;
-    const y = radius * Math.sin(radian) + centerOffset.y;
+    const rawX = radius * Math.cos(radian) + centerOffset.x;
+    const rawY = radius * Math.sin(radian) + centerOffset.y;
+
+    const x = round(rawX, 3);
+    const y = round(rawY, 3);
 
     const zIndex = Math.round(100 + 50 * Math.cos(radian));
-    const opacity = Math.max(
-      0.4,
-      Math.min(1, 0.4 + 0.6 * ((1 + Math.sin(radian)) / 2))
+    const opacity = Number(
+      Math.max(0.4, Math.min(1, 0.4 + 0.6 * ((1 + Math.sin(radian)) / 2))).toFixed(6)
     );
 
     return { x, y, angle, zIndex, opacity };
@@ -154,11 +159,11 @@ export default function RadialOrbitalTimeline({
 
   return (
     <div
-      className="w-full h-[700px] flex flex-col items-center justify-center bg-black/20 backdrop-blur-sm rounded-2xl overflow-hidden"
+      className="w-full h-[500px] flex flex-col items-center justify-center bg-black/20 backdrop-blur-sm rounded-2xl overflow-hidden"
       ref={containerRef}
       onClick={handleContainerClick}
     >
-      <div className="relative w-full max-w-4xl h-full flex items-center justify-center">
+      <div className="relative w-full max-w-3xl h-full flex items-center justify-center">
         <div
           className="absolute w-full h-full flex items-center justify-center"
           ref={orbitRef}
@@ -167,16 +172,16 @@ export default function RadialOrbitalTimeline({
             transform: `translate(${centerOffset.x}px, ${centerOffset.y}px)`,
           }}
         >
-          <div className="absolute w-16 h-16 rounded-full bg-gradient-to-br from-purple-500 via-blue-500 to-teal-500 animate-pulse flex items-center justify-center z-10">
-            <div className="absolute w-20 h-20 rounded-full border border-white/20 animate-ping opacity-70"></div>
+          <div className="absolute w-12 h-12 rounded-full bg-gradient-to-br from-purple-500 via-blue-500 to-teal-500 animate-pulse flex items-center justify-center z-10">
+            <div className="absolute w-16 h-16 rounded-full border border-white/20 animate-ping opacity-70"></div>
             <div
-              className="absolute w-24 h-24 rounded-full border border-white/10 animate-ping opacity-50"
+              className="absolute w-20 h-20 rounded-full border border-white/10 animate-ping opacity-50"
               style={{ animationDelay: "0.5s" }}
             ></div>
-            <div className="w-8 h-8 rounded-full bg-white/80 backdrop-blur-md"></div>
+            <div className="w-6 h-6 rounded-full bg-white/80 backdrop-blur-md"></div>
           </div>
 
-          <div className="absolute w-96 h-96 rounded-full border border-white/10"></div>
+          <div className="absolute w-80 h-80 rounded-full border border-white/10"></div>
 
           {timelineData.map((item, index) => {
             const position = calculateNodePosition(index, timelineData.length);
@@ -186,7 +191,8 @@ export default function RadialOrbitalTimeline({
             const Icon = item.icon;
 
             const nodeStyle = {
-              transform: `translate(${position.x}px, ${position.y}px)`,
+              // Use fixed decimals for x/y to keep SSR and client markup identical
+              transform: `translate(${position.x.toFixed(3)}px, ${position.y.toFixed(3)}px)`,
               zIndex: isExpanded ? 200 : position.zIndex,
               opacity: isExpanded ? 1 : position.opacity,
             };
@@ -210,16 +216,16 @@ export default function RadialOrbitalTimeline({
                   }`}
                   style={{
                     background: `radial-gradient(circle, rgba(255,255,255,0.2) 0%, rgba(255,255,255,0) 70%)`,
-                    width: `${item.energy * 0.4 + 48}px`,
-                    height: `${item.energy * 0.4 + 48}px`,
-                    left: `-${(item.energy * 0.4 + 48 - 48) / 2}px`,
-                    top: `-${(item.energy * 0.4 + 48 - 48) / 2}px`,
+                    width: `${item.energy * 0.3 + 32}px`,
+                    height: `${item.energy * 0.3 + 32}px`,
+                    left: `-${(item.energy * 0.3 + 32 - 32) / 2}px`,
+                    top: `-${(item.energy * 0.3 + 32 - 32) / 2}px`,
                   }}
                 ></div>
 
                 <div
                   className={`
-                  w-12 h-12 rounded-full flex items-center justify-center
+                  w-8 h-8 rounded-full flex items-center justify-center
                   ${
                     isExpanded
                       ? "bg-white text-black"
@@ -239,13 +245,13 @@ export default function RadialOrbitalTimeline({
                   ${isExpanded ? "scale-125" : ""}
                 `}
                 >
-                  <Icon size={18} />
+                  <Icon size={14} />
                 </div>
 
                 <div
                   className={`
-                  absolute top-14 whitespace-nowrap
-                  text-sm font-semibold tracking-wider
+                  absolute top-10 left-1/2 -translate-x-1/2 whitespace-nowrap
+                  text-xs font-semibold tracking-wider text-center
                   transition-all duration-300
                   ${isExpanded ? "text-white scale-110" : "text-white/70"}
                 `}
@@ -254,7 +260,7 @@ export default function RadialOrbitalTimeline({
                 </div>
 
                 {isExpanded && (
-                  <Card className="absolute top-20 left-1/2 -translate-x-1/2 w-64 bg-black/90 backdrop-blur-lg border-white/30 shadow-xl shadow-white/10 overflow-visible">
+                  <Card className="absolute top-16 left-1/2 -translate-x-1/2 w-56 bg-black/90 backdrop-blur-lg border-white/30 shadow-xl shadow-white/10 overflow-visible">
                     <div className="absolute -top-3 left-1/2 -translate-x-1/2 w-px h-3 bg-white/50"></div>
                     <CardHeader className="pb-2">
                       <div className="flex justify-between items-center">

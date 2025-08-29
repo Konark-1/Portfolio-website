@@ -1,6 +1,6 @@
 "use client";
 
-import { lazy, Suspense } from 'react';
+import { lazy, Suspense, useState } from 'react';
 import GlassSurface from "@/components/react-bits/GlassSurface/GlassSurface";
 import LoadingSkeleton from "@/components/ui/LoadingSkeleton";
 import SkillsTimeline from "@/components/ui/skills-timeline";
@@ -100,6 +100,23 @@ export default function HomePage() {
         </div>
       </div>
 
+      {/* Projects Section (Flow-inspired tabs) */}
+      <section id="projects" className="relative z-10 bg-black text-white py-24 sm:py-32 overflow-hidden">
+        <div className="mx-auto max-w-7xl px-6 lg:px-8">
+          <div className="text-center">
+            <h2 className="text-5xl font-bold tracking-tight sm:text-6xl lg:text-7xl chrome-text">Projects</h2>
+            <p className="mt-6 text-lg leading-8 text-gray-300 max-w-3xl mx-auto">
+              A cinematic showcase of interactive analytics. Explore embedded Power BI dashboards with smooth, polished interactions.
+            </p>
+          </div>
+
+          {/* Tab buttons */}
+          <div className="sticky top-24 z-20 bg-gradient-to-b from-black via-black/95 to-transparent pb-8 pt-4 pointer-events-none">
+            <ProjectsTabs />
+          </div>
+        </div>
+      </section>
+
       {/* Combined About & Technical Expertise Section */}
       <section id="about" className="relative z-10 bg-black text-white min-h-screen flex items-center">
         <div className="mx-auto max-w-7xl px-6 lg:px-8 w-full">
@@ -145,5 +162,121 @@ export default function HomePage() {
         </div>
       </section>
     </main>
+  );
+}
+
+function ProjectsTabs() {
+  const [activeTab, setActiveTab] = useState<'consistent' | 'seamless' | 'cinematic'>("seamless");
+  const [hoverTab, setHoverTab] = useState<null | 'consistent' | 'seamless' | 'cinematic'>(null);
+
+  const descriptionByTab: Record<'consistent' | 'seamless' | 'cinematic', string> = {
+    consistent: "Bring your own assets, or generate them. Then manage and reference them as you build.",
+    seamless: "An interface designed for creative, iterative story-building — from ideation to iteration.",
+    cinematic: "State-of-the-art visuals presented beautifully. Third project coming soon.",
+  };
+
+  const tabs = [
+    { key: 'seamless' as const, label: 'Seamless' },
+    { key: 'consistent' as const, label: 'Consistent' },
+    { key: 'cinematic' as const, label: 'Cinematic' },
+  ];
+
+  const displayed = hoverTab ?? activeTab;
+
+  return (
+    <div className="mt-12 pointer-events-auto">
+      {/* Full-width titles row with blur like reference */}
+      <div className="ml-[calc(50%-50vw)] w-screen">
+        <div className="border-t border-white/15 bg-gradient-to-b from-white/5 via-white/0 to-transparent">
+          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pt-8 grid grid-cols-3 items-start gap-4">
+            {tabs.map(({ key, label }) => {
+              const isDisplayed = displayed === key;
+              return (
+                <h3
+                  key={key}
+                  onMouseEnter={() => setHoverTab(key)}
+                  onMouseLeave={() => setHoverTab(null)}
+                  onClick={() => setActiveTab(key)}
+                  className={`text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-semibold cursor-pointer select-none
+                    transition-[filter,opacity] duration-500
+                    ${isDisplayed ? 'opacity-100' : 'opacity-80'}
+                    ${isDisplayed ? 'filter-none' : 'blur-[6px]'}
+                  `}
+                >
+                  {label}
+                </h3>
+              );
+            })}
+          </div>
+        </div>
+      </div>
+
+      {/* Sub description - based on active selection */}
+      <p className="mt-6 text-gray-300 max-w-3xl mx-auto text-left">
+        {descriptionByTab[activeTab]}
+      </p>
+
+      {/* Content area */}
+      <div className="mt-10">
+        {activeTab === 'consistent' && (
+          <div className="mx-auto w-[74vw] px-0">
+            <div className="relative rounded-[22px] md:rounded-[24px] overflow-hidden bg-black/80 shadow-[0_30px_80px_rgba(0,0,0,0.45)] ring-1 ring-white/10">
+              {/* Turquoise glow border */}
+              <div className="pointer-events-none absolute inset-0">
+                <div className="absolute -inset-2 rounded-[28px] bg-teal-400/20 blur-xl" />
+                <div className="absolute inset-0 rounded-[22px] ring-1 ring-teal-400/20" />
+              </div>
+              <div className="relative pt-[62.5%]">
+                <iframe
+                  title="project"
+                  src="https://app.powerbi.com/view?r=eyJrIjoiNmE4MmRhMmItNTFlNC00MzMzLTkwZjQtNjc1NjEyZDI2ZTczIiwidCI6IjE4YjExOTE3LTU2NGQtNDJhYi05M2M4LWMxY2JhZDlhNjRiMiJ9"
+                  className="absolute inset-0 h-full w-full [transform:translateX(-0.5%)_scaleX(1.016)] origin-center"
+                  style={{ border: '0' }}
+                  allowFullScreen
+                  loading="lazy"
+                />
+              </div>
+            </div>
+          </div>
+        )}
+
+        {activeTab === 'seamless' && (
+          <div className="mx-auto w-[74vw] px-0">
+            <div className="relative rounded-[22px] md:rounded-[24px] overflow-hidden bg-black/80 shadow-[0_30px_80px_rgba(0,0,0,0.45)] ring-1 ring-white/10">
+              {/* Turquoise glow border */}
+              <div className="pointer-events-none absolute inset-0">
+                <div className="absolute -inset-2 rounded-[28px] bg-teal-400/20 blur-xl" />
+                <div className="absolute inset-0 rounded-[22px] ring-1 ring-teal-400/20" />
+              </div>
+              <div className="relative pt-[56.25%]">
+                <iframe
+                  title="Project2"
+                  src="https://app.powerbi.com/view?r=eyJrIjoiNTg1OTYwMWYtNTdiZi00YjU2LWI3ZWMtMjkxZGZlMGYwZTVkIiwidCI6IjE4YjExOTE3LTU2NGQtNDJhYi05M2M4LWMxY2JhZDlhNjRiMiJ9"
+                  className="absolute inset-0 h-full w-full [transform:translateX(-0.5%)_scaleX(1.016)] origin-center"
+                  style={{ border: '0' }}
+                  allowFullScreen
+                  loading="lazy"
+                />
+              </div>
+            </div>
+          </div>
+        )}
+
+        {activeTab === 'cinematic' && (
+          <div className="mx-auto w-[74vw] px-0">
+            <div className="relative rounded-[22px] md:rounded-[24px] overflow-hidden bg-black/80 shadow-[0_30px_80px_rgba(0,0,0,0.45)] ring-1 ring-white/10">
+              {/* Turquoise glow border */}
+              <div className="pointer-events-none absolute inset-0">
+                <div className="absolute -inset-2 rounded-[28px] bg-teal-400/20 blur-xl" />
+                <div className="absolute inset-0 rounded-[22px] ring-1 ring-teal-400/20" />
+              </div>
+              <div className="relative pt-[56.25%] bg-gray-900/50 flex items-center justify-center">
+                <p className="text-gray-500 text-lg">Project content coming soon...</p>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
   );
 }
