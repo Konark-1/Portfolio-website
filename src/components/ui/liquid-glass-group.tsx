@@ -11,7 +11,7 @@ type LiquidGlassGroupProps = {
 export const LiquidGlassGroup = memo(function LiquidGlassGroup({ children, className = "" }: LiquidGlassGroupProps) {
   return (
     <div
-      className={`liquid-animated relative inline-flex items-center gap-1 rounded-full border border-white/10 bg-white/5/\[.04\] px-1.5 py-1.5 backdrop-blur-md overflow-hidden ${className}`}
+      className={`liquid-animated relative inline-flex items-center gap-0.5 rounded-full border border-white/10 bg-white/5/\[.04\] px-0.5 py-0.5 backdrop-blur-md overflow-hidden ${className}`}
     >
       <div className="pointer-events-none absolute -inset-10 -z-10 opacity-40 blur-2xl">
         <div className="liquid-bg h-full w-full" />
@@ -29,7 +29,7 @@ type LiquidGlassItemProps = {
 
 export const LiquidGlassItem = memo(function LiquidGlassItem({ children, href, onClick }: LiquidGlassItemProps) {
   const baseClasses =
-    "zoom-on-hover relative z-10 rounded-full px-5 py-2.5 text-base font-medium text-white/80 hover:text-white transition-colors duration-200 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white/40";
+    "zoom-on-hover relative z-10 rounded-full px-3 py-1.5 text-base font-medium text-white/80 hover:text-white transition-colors duration-200 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white/40";
 
   if (href) {
     return (
