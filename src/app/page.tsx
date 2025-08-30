@@ -100,23 +100,6 @@ export default function HomePage() {
         </div>
       </div>
 
-      {/* Projects Section (Flow-inspired tabs) */}
-      <section id="projects" className="relative z-10 bg-black text-white py-24 sm:py-32 overflow-hidden">
-        <div className="mx-auto max-w-7xl px-6 lg:px-8">
-          <div className="text-center">
-            <h2 className="text-5xl font-bold tracking-tight sm:text-6xl lg:text-7xl chrome-text">Projects</h2>
-            <p className="mt-6 text-lg leading-8 text-gray-300 max-w-3xl mx-auto">
-              A cinematic showcase of interactive analytics. Explore embedded Power BI dashboards with smooth, polished interactions.
-            </p>
-          </div>
-
-          {/* Tab buttons */}
-          <div className="sticky top-24 z-20 bg-gradient-to-b from-black via-black/95 to-transparent pb-8 pt-4 pointer-events-none">
-            <ProjectsTabs />
-          </div>
-        </div>
-      </section>
-
       {/* Combined About & Technical Expertise Section */}
       <section id="about" className="relative z-10 bg-black text-white min-h-screen flex items-center">
         <div className="mx-auto max-w-7xl px-6 lg:px-8 w-full">
@@ -148,6 +131,23 @@ export default function HomePage() {
                 <SkillsTimeline />
               </div>
             </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Projects Section (Flow-inspired tabs) */}
+      <section id="projects" className="relative z-10 bg-black text-white py-24 sm:py-32 overflow-hidden">
+        <div className="mx-auto max-w-7xl px-6 lg:px-8">
+          <div className="text-center">
+            <h2 className="text-5xl font-bold tracking-tight sm:text-6xl lg:text-7xl chrome-text">Projects</h2>
+            <p className="mt-6 text-lg leading-8 text-gray-300 max-w-3xl mx-auto">
+              A cinematic showcase of interactive analytics. Explore embedded Power BI dashboards with smooth, polished interactions.
+            </p>
+          </div>
+
+          {/* Tab buttons */}
+          <div className="sticky top-24 z-20 bg-gradient-to-b from-black via-black/95 to-transparent pb-8 pt-4 pointer-events-none">
+            <ProjectsTabs />
           </div>
         </div>
       </section>
