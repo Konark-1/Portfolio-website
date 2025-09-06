@@ -166,19 +166,19 @@ export default function HomePage() {
 }
 
 function ProjectsTabs() {
-  const [activeTab, setActiveTab] = useState<'consistent' | 'seamless' | 'cinematic'>("seamless");
+  const [activeTab, setActiveTab] = useState<'consistent' | 'seamless' | 'cinematic'>("cinematic");
   const [hoverTab, setHoverTab] = useState<null | 'consistent' | 'seamless' | 'cinematic'>(null);
 
   const descriptionByTab: Record<'consistent' | 'seamless' | 'cinematic', string> = {
     consistent: "Bring your own assets, or generate them. Then manage and reference them as you build.",
     seamless: "An interface designed for creative, iterative story-building — from ideation to iteration.",
-    cinematic: "State-of-the-art visuals presented beautifully. Third project coming soon.",
+    cinematic: "State-of-the-art visuals presented beautifully. Interactive PowerBI dashboard showcasing advanced analytics.",
   };
 
   const tabs = [
+    { key: 'cinematic' as const, label: 'Cinematic' },
     { key: 'seamless' as const, label: 'Seamless' },
     { key: 'consistent' as const, label: 'Consistent' },
-    { key: 'cinematic' as const, label: 'Cinematic' },
   ];
 
   const displayed = hoverTab ?? activeTab;
@@ -218,7 +218,7 @@ function ProjectsTabs() {
 
       {/* Content area */}
       <div className="mt-10">
-        {activeTab === 'consistent' && (
+        {activeTab === 'cinematic' && (
           <div className="mx-auto w-[74vw] px-0">
             <div className="relative rounded-[22px] md:rounded-[24px] overflow-hidden bg-black/80 shadow-[0_30px_80px_rgba(0,0,0,0.45)] ring-1 ring-white/10">
               {/* Turquoise glow border */}
@@ -226,11 +226,11 @@ function ProjectsTabs() {
                 <div className="absolute -inset-2 rounded-[28px] bg-teal-400/20 blur-xl" />
                 <div className="absolute inset-0 rounded-[22px] ring-1 ring-teal-400/20" />
               </div>
-              <div className="relative pt-[62.5%]">
+              <div className="relative pt-[59.77%] overflow-hidden">
                 <iframe
-                  title="project"
-                  src="https://app.powerbi.com/view?r=eyJrIjoiNmE4MmRhMmItNTFlNC00MzMzLTkwZjQtNjc1NjEyZDI2ZTczIiwidCI6IjE4YjExOTE3LTU2NGQtNDJhYi05M2M4LWMxY2JhZDlhNjRiMiJ9"
-                  className="absolute inset-0 h-full w-full [transform:translateX(-0.5%)_scaleX(1.016)] origin-center"
+                  title="Project 3"
+                  src="https://app.powerbi.com/view?r=eyJrIjoiNGQ0MzFkY2UtN2M1ZS00Mzg4LTk0YzAtZjc4MmVjMDhjY2ZhIiwidCI6IjE4YjExOTE3LTU2NGQtNDJhYi05M2M4LWMxY2JhZDlhNjRiMiJ9&pageName=ReportSection&config=eyJjbHVzdGVyVXJsIjoiaHR0cHM6Ly93YWJpLXVzLWVhc3QyLXJlZGlyZWN0LmFuYWx5c2lzLndpbmRvd3MubmV0LyIsImVtYmVkRmVhdHVyZXMiOnsibW9kZXJuRW1iZWQiOmZhbHNlLCJoaWRlQW5nbGVQYW5lbCI6dHJ1ZSwiaGlkZUZvb3RlciI6dHJ1ZX19"
+                  className="absolute inset-0 h-full w-full [transform:translateX(0%)_scaleX(1.05)] origin-center"
                   style={{ border: '0' }}
                   allowFullScreen
                   loading="lazy"
@@ -248,11 +248,11 @@ function ProjectsTabs() {
                 <div className="absolute -inset-2 rounded-[28px] bg-teal-400/20 blur-xl" />
                 <div className="absolute inset-0 rounded-[22px] ring-1 ring-teal-400/20" />
               </div>
-              <div className="relative pt-[56.25%]">
+              <div className="relative pt-[59.77%] overflow-hidden">
                 <iframe
                   title="Project2"
-                  src="https://app.powerbi.com/view?r=eyJrIjoiNTg1OTYwMWYtNTdiZi00YjU2LWI3ZWMtMjkxZGZlMGYwZTVkIiwidCI6IjE4YjExOTE3LTU2NGQtNDJhYi05M2M4LWMxY2JhZDlhNjRiMiJ9"
-                  className="absolute inset-0 h-full w-full [transform:translateX(-0.5%)_scaleX(1.016)] origin-center"
+                  src="https://app.powerbi.com/view?r=eyJrIjoiNTg1OTYwMWYtNTdiZi00YjU2LWI3ZWMtMjkxZGZlMGYwZTVkIiwidCI6IjE4YjExOTE3LTU2NGQtNDJhYi05M2M4LWMxY2JhZDlhNjRiMiJ9&pageName=ReportSection&config=eyJjbHVzdGVyVXJsIjoiaHR0cHM6Ly93YWJpLXVzLWVhc3QyLXJlZGlyZWN0LmFuYWx5c2lzLndpbmRvd3MubmV0LyIsImVtYmVkRmVhdHVyZXMiOnsibW9kZXJuRW1iZWQiOmZhbHNlLCJoaWRlQW5nbGVQYW5lbCI6dHJ1ZSwiaGlkZUZvb3RlciI6dHJ1ZX19"
+                  className="absolute inset-0 h-full w-full [transform:translateX(0%)_scaleX(1.05)] origin-center"
                   style={{ border: '0' }}
                   allowFullScreen
                   loading="lazy"
@@ -262,7 +262,7 @@ function ProjectsTabs() {
           </div>
         )}
 
-        {activeTab === 'cinematic' && (
+        {activeTab === 'consistent' && (
           <div className="mx-auto w-[74vw] px-0">
             <div className="relative rounded-[22px] md:rounded-[24px] overflow-hidden bg-black/80 shadow-[0_30px_80px_rgba(0,0,0,0.45)] ring-1 ring-white/10">
               {/* Turquoise glow border */}
@@ -270,8 +270,15 @@ function ProjectsTabs() {
                 <div className="absolute -inset-2 rounded-[28px] bg-teal-400/20 blur-xl" />
                 <div className="absolute inset-0 rounded-[22px] ring-1 ring-teal-400/20" />
               </div>
-              <div className="relative pt-[56.25%] bg-gray-900/50 flex items-center justify-center">
-                <p className="text-gray-500 text-lg">Project content coming soon...</p>
+              <div className="relative pt-[59.77%] overflow-hidden">
+                <iframe
+                  title="project"
+                  src="https://app.powerbi.com/view?r=eyJrIjoiNmE4MmRhMmItNTFlNC00MzMzLTkwZjQtNjc1NjEyZDI2ZTczIiwidCI6IjE4YjExOTE3LTU2NGQtNDJhYi05M2M4LWMxY2JhZDlhNjRiMiJ9&pageName=ReportSection&config=eyJjbHVzdGVyVXJsIjoiaHR0cHM6Ly93YWJpLXVzLWVhc3QyLXJlZGlyZWN0LmFuYWx5c2lzLndpbmRvd3MubmV0LyIsImVtYmVkRmVhdHVyZXMiOnsibW9kZXJuRW1iZWQiOmZhbHNlLCJoaWRlQW5nbGVQYW5lbCI6dHJ1ZSwiaGlkZUZvb3RlciI6dHJ1ZX19"
+                  className="absolute inset-0 h-full w-full [transform:translateX(0%)_scaleX(1.05)] origin-center"
+                  style={{ border: '0' }}
+                  allowFullScreen
+                  loading="lazy"
+                />
               </div>
             </div>
           </div>
