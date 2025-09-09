@@ -218,71 +218,46 @@ function ProjectsTabs() {
 
       {/* Content area */}
       <div className="mt-10">
-        {activeTab === 'cinematic' && (
-          <div className="mx-auto w-[74vw] px-0">
-            <div className="relative rounded-[22px] md:rounded-[24px] overflow-hidden bg-black/80 shadow-[0_30px_80px_rgba(0,0,0,0.45)] ring-1 ring-white/10">
-              {/* Turquoise glow border */}
-              <div className="pointer-events-none absolute inset-0">
-                <div className="absolute -inset-2 rounded-[28px] bg-teal-400/20 blur-xl" />
-                <div className="absolute inset-0 rounded-[22px] ring-1 ring-teal-400/20" />
-              </div>
-              <div className="relative pt-[59.77%] overflow-hidden">
-                <iframe
-                  title="Project 3"
-                  src="https://app.fabric.microsoft.com/view?r=eyJrIjoiNGQ0MzFkY2UtN2M1ZS00Mzg4LTk0YzAtZjc4MmVjMDhjY2ZhIiwidCI6IjE4YjExOTE3LTU2NGQtNDJhYi05M2M4LWMxY2JhZDlhNjRiMiJ9"
-                  className="absolute inset-0 h-full w-full [transform:translateX(0%)_scaleX(1.05)] origin-center"
-                  style={{ border: '0' }}
-                  allowFullScreen
-                  loading="lazy"
-                />
-              </div>
+        {/* Keep DOM of all three iframes mounted to preload and avoid switching lag */}
+        <div className="mx-auto w-[74vw] px-0">
+          <div className="relative rounded-[22px] md:rounded-[24px] overflow-hidden bg-black/80 shadow-[0_30px_80px_rgba(0,0,0,0.45)] ring-1 ring-white/10">
+            {/* Turquoise glow border */}
+            <div className="pointer-events-none absolute inset-0">
+              <div className="absolute -inset-2 rounded-[28px] bg-teal-400/20 blur-xl" />
+              <div className="absolute inset-0 rounded-[22px] ring-1 ring-teal-400/20" />
             </div>
-          </div>
-        )}
 
-        {activeTab === 'seamless' && (
-          <div className="mx-auto w-[74vw] px-0">
-            <div className="relative rounded-[22px] md:rounded-[24px] overflow-hidden bg-black/80 shadow-[0_30px_80px_rgba(0,0,0,0.45)] ring-1 ring-white/10">
-              {/* Turquoise glow border */}
-              <div className="pointer-events-none absolute inset-0">
-                <div className="absolute -inset-2 rounded-[28px] bg-teal-400/20 blur-xl" />
-                <div className="absolute inset-0 rounded-[22px] ring-1 ring-teal-400/20" />
-              </div>
-              <div className="relative pt-[59.77%] overflow-hidden">
-                <iframe
-                  title="Project2"
-                  src="https://app.powerbi.com/view?r=eyJrIjoiNTg1OTYwMWYtNTdiZi00YjU2LWI3ZWMtMjkxZGZlMGYwZTVkIiwidCI6IjE4YjExOTE3LTU2NGQtNDJhYi05M2M4LWMxY2JhZDlhNjRiMiJ9&pageName=ReportSection&config=eyJjbHVzdGVyVXJsIjoiaHR0cHM6Ly93YWJpLXVzLWVhc3QyLXJlZGlyZWN0LmFuYWx5c2lzLndpbmRvd3MubmV0LyIsImVtYmVkRmVhdHVyZXMiOnsibW9kZXJuRW1iZWQiOmZhbHNlLCJoaWRlQW5nbGVQYW5lbCI6dHJ1ZSwiaGlkZUZvb3RlciI6dHJ1ZX19"
-                  className="absolute inset-0 h-full w-full [transform:translateX(0%)_scaleX(1.05)] origin-center"
-                  style={{ border: '0' }}
-                  allowFullScreen
-                  loading="lazy"
-                />
-              </div>
-            </div>
-          </div>
-        )}
+            {/* Shared aspect-ratio container */}
+            <div className="relative pt-[59.77%] overflow-hidden">
+              {/* Cinematic */}
+              <iframe
+                title="Project 3"
+                src="https://app.fabric.microsoft.com/view?r=eyJrIjoiNGQ0MzFkY2UtN2M1ZS00Mzg4LTk0YzAtZjc4MmVjMDhjY2ZhIiwidCI6IjE4YjExOTE3LTU2NGQtNDJhYi05M2M4LWMxY2JhZDlhNjRiMiJ9"
+                className="absolute inset-0 h-full w-full [transform:translateX(0%)_scaleX(1.05)] origin-center"
+                style={{ border: '0', zIndex: activeTab === 'cinematic' ? 2 : 1, opacity: activeTab === 'cinematic' ? 1 : 0, transform: activeTab === 'cinematic' ? 'translateX(0%) scaleX(1.05)' : 'translateX(-200vw) scaleX(1.05)', pointerEvents: activeTab === 'cinematic' ? 'auto' : 'none', visibility: 'visible' }}
+                allowFullScreen
+              />
 
-        {activeTab === 'consistent' && (
-          <div className="mx-auto w-[74vw] px-0">
-            <div className="relative rounded-[22px] md:rounded-[24px] overflow-hidden bg-black/80 shadow-[0_30px_80px_rgba(0,0,0,0.45)] ring-1 ring-white/10">
-              {/* Turquoise glow border */}
-              <div className="pointer-events-none absolute inset-0">
-                <div className="absolute -inset-2 rounded-[28px] bg-teal-400/20 blur-xl" />
-                <div className="absolute inset-0 rounded-[22px] ring-1 ring-teal-400/20" />
-              </div>
-              <div className="relative pt-[59.77%] overflow-hidden">
-                <iframe
-                  title="project"
-                  src="https://app.powerbi.com/view?r=eyJrIjoiNmE4MmRhMmItNTFlNC00MzMzLTkwZjQtNjc1NjEyZDI2ZTczIiwidCI6IjE4YjExOTE3LTU2NGQtNDJhYi05M2M4LWMxY2JhZDlhNjRiMiJ9&pageName=ReportSection&config=eyJjbHVzdGVyVXJsIjoiaHR0cHM6Ly93YWJpLXVzLWVhc3QyLXJlZGlyZWN0LmFuYWx5c2lzLndpbmRvd3MubmV0LyIsImVtYmVkRmVhdHVyZXMiOnsibW9kZXJuRW1iZWQiOmZhbHNlLCJoaWRlQW5nbGVQYW5lbCI6dHJ1ZSwiaGlkZUZvb3RlciI6dHJ1ZX19"
-                  className="absolute inset-0 h-full w-full [transform:translateX(0%)_scaleX(1.05)] origin-center"
-                  style={{ border: '0' }}
-                  allowFullScreen
-                  loading="lazy"
-                />
-              </div>
+              {/* Seamless */}
+              <iframe
+                title="Project2"
+                src="https://app.powerbi.com/view?r=eyJrIjoiNTg1OTYwMWYtNTdiZi00YjU2LWI3ZWMtMjkxZGZlMGYwZTVkIiwidCI6IjE4YjExOTE3LTU2NGQtNDJhYi05M2M4LWMxY2JhZDlhNjRiMiJ9&pageName=ReportSection&config=eyJjbHVzdGVyVXJsIjoiaHR0cHM6Ly93YWJpLXVzLWVhc3QyLXJlZGlyZWN0LmFuYWx5c2lzLndpbmRvd3MubmV0LyIsImVtYmVkRmVhdHVyZXMiOnsibW9kZXJuRW1iZWQiOmZhbHNlLCJoaWRlQW5nbGVQYW5lbCI6dHJ1ZSwiaGlkZUZvb3RlciI6dHJ1ZX19"
+                className="absolute inset-0 h-full w-full [transform:translateX(0%)_scaleX(1.05)] origin-center"
+                style={{ border: '0', zIndex: activeTab === 'seamless' ? 2 : 1, opacity: activeTab === 'seamless' ? 1 : 0, transform: activeTab === 'seamless' ? 'translateX(0%) scaleX(1.05)' : 'translateX(-200vw) scaleX(1.05)', pointerEvents: activeTab === 'seamless' ? 'auto' : 'none', visibility: 'visible' }}
+                allowFullScreen
+              />
+
+              {/* Consistent */}
+              <iframe
+                title="project"
+                src="https://app.powerbi.com/view?r=eyJrIjoiNmE4MmRhMmItNTFlNC00MzMzLTkwZjQtNjc1NjEyZDI2ZTczIiwidCI6IjE4YjExOTE3LTU2NGQtNDJhYi05M2M4LWMxY2JhZDlhNjRiMiJ9&pageName=ReportSection&config=eyJjbHVzdGVyVXJsIjoiaHR0cHM6Ly93YWJpLXVzLWVhc3QyLXJlZGlyZWN0LmFuYWx5c2lzLndpbmRvd3MubmV0LyIsImVtYmVkRmVhdHVyZXMiOnsibW9kZXJuRW1iZWQiOmZhbHNlLCJoaWRlQW5nbGVQYW5lbCI6dHJ1ZSwiaGlkZUZvb3RlciI6dHJ1ZX19"
+                className="absolute inset-0 h-full w-full [transform:translateX(0%)_scaleX(1.05)] origin-center"
+                style={{ border: '0', zIndex: activeTab === 'consistent' ? 2 : 1, opacity: activeTab === 'consistent' ? 1 : 0, transform: activeTab === 'consistent' ? 'translateX(0%) scaleX(1.05)' : 'translateX(-200vw) scaleX(1.05)', pointerEvents: activeTab === 'consistent' ? 'auto' : 'none', visibility: 'visible' }}
+                allowFullScreen
+              />
             </div>
           </div>
-        )}
+        </div>
       </div>
     </div>
   );
