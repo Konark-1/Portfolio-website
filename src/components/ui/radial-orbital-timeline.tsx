@@ -36,9 +36,29 @@ export default function RadialOrbitalTimeline({
     y: 0,
   });
   const [activeNodeId, setActiveNodeId] = useState<number | null>(null);
+  const [isMobile, setIsMobile] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const orbitRef = useRef<HTMLDivElement>(null);
   const nodeRefs = useRef<Record<number, HTMLDivElement | null>>({});
+
+  // Handle window resize for mobile detection
+  useEffect(() => {
+    const checkIsMobile = () => {
+      setIsMobile(window.innerWidth < 640);
+    };
+    
+    checkIsMobile();
+    window.addEventListener('resize', checkIsMobile);
+    
+    return () => window.removeEventListener('resize', checkIsMobile);
+  }, []);
+
+  // Pause auto-rotation on mobile to improve performance
+  useEffect(() => {
+    if (isMobile) {
+      setAutoRotate(false);
+    }
+  }, [isMobile]);
 
   const handleContainerClick = (e: React.MouseEvent<HTMLDivElement>) => {
     if (e.target === containerRef.current || e.target === orbitRef.current) {
@@ -85,7 +105,7 @@ export default function RadialOrbitalTimeline({
   useEffect(() => {
     let rotationTimer: NodeJS.Timeout;
 
-    if (autoRotate && viewMode === "orbital") {
+    if (autoRotate && viewMode === "orbital" && !isMobile) {
       rotationTimer = setInterval(() => {
         setRotationAngle((prev) => {
           const newAngle = (prev + 0.3) % 360;
@@ -99,7 +119,7 @@ export default function RadialOrbitalTimeline({
         clearInterval(rotationTimer);
       }
     };
-  }, [autoRotate, viewMode]);
+  }, [autoRotate, viewMode, isMobile]);
 
   const centerViewOnNode = (nodeId: number) => {
     if (viewMode !== "orbital" || !nodeRefs.current[nodeId]) return;
@@ -116,7 +136,7 @@ export default function RadialOrbitalTimeline({
 
   const calculateNodePosition = (index: number, total: number) => {
     const angle = ((index / total) * 360 + rotationAngle) % 360;
-    const radius = 150;
+    const radius = isMobile ? 120 : 150; // Smaller radius on mobile
     const radian = (angle * Math.PI) / 180;
 
     const rawX = radius * Math.cos(radian) + centerOffset.x;
@@ -159,7 +179,7 @@ export default function RadialOrbitalTimeline({
 
   return (
     <div
-      className="w-full h-[500px] flex flex-col items-center justify-center bg-black/20 backdrop-blur-sm rounded-2xl overflow-hidden"
+      className="w-full h-[400px] sm:h-[500px] flex flex-col items-center justify-center bg-black/20 backdrop-blur-sm rounded-2xl overflow-hidden"
       ref={containerRef}
       onClick={handleContainerClick}
     >
@@ -181,7 +201,7 @@ export default function RadialOrbitalTimeline({
             <div className="w-6 h-6 rounded-full bg-white/80 backdrop-blur-md"></div>
           </div>
 
-          <div className="absolute w-80 h-80 rounded-full border border-white/10"></div>
+          <div className="absolute w-60 h-60 sm:w-80 sm:h-80 rounded-full border border-white/10"></div>
 
           {timelineData.map((item, index) => {
             const position = calculateNodePosition(index, timelineData.length);
@@ -225,7 +245,7 @@ export default function RadialOrbitalTimeline({
 
                 <div
                   className={`
-                  w-8 h-8 rounded-full flex items-center justify-center
+                  w-6 h-6 sm:w-8 sm:h-8 rounded-full flex items-center justify-center
                   ${
                     isExpanded
                       ? "bg-white text-black"
@@ -245,12 +265,12 @@ export default function RadialOrbitalTimeline({
                   ${isExpanded ? "scale-125" : ""}
                 `}
                 >
-                  <Icon size={14} />
+                  <Icon size={isMobile ? 12 : 14} />
                 </div>
 
                 <div
                   className={`
-                  absolute top-10 left-1/2 -translate-x-1/2 whitespace-nowrap
+                  absolute top-8 sm:top-10 left-1/2 -translate-x-1/2 whitespace-nowrap
                   text-xs font-semibold tracking-wider text-center
                   transition-all duration-300
                   ${isExpanded ? "text-white scale-110" : "text-white/70"}
@@ -260,7 +280,7 @@ export default function RadialOrbitalTimeline({
                 </div>
 
                 {isExpanded && (
-                  <Card className="absolute top-16 left-1/2 -translate-x-1/2 w-56 bg-black/90 backdrop-blur-lg border-white/30 shadow-xl shadow-white/10 overflow-visible">
+                  <Card className="absolute top-14 sm:top-16 left-1/2 -translate-x-1/2 w-48 sm:w-56 bg-black/90 backdrop-blur-lg border-white/30 shadow-xl shadow-white/10 overflow-visible">
                     <div className="absolute -top-3 left-1/2 -translate-x-1/2 w-px h-3 bg-white/50"></div>
                     <CardHeader className="pb-2">
                       <div className="flex justify-between items-center">
