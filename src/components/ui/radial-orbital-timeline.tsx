@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { ArrowRight, Link, Zap } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -134,7 +134,8 @@ export default function RadialOrbitalTimeline({
   // Ensure deterministic rounding to avoid SSR/CSR precision mismatches
   const round = (n: number, d = 3) => Math.round(n * Math.pow(10, d)) / Math.pow(10, d);
 
-  const calculateNodePosition = (index: number, total: number) => {
+  // Memoize position calculations to prevent unnecessary recalculations
+  const calculateNodePosition = useCallback((index: number, total: number) => {
     const angle = ((index / total) * 360 + rotationAngle) % 360;
     const radius = isMobile ? 120 : 150; // Smaller radius on mobile
     const radian = (angle * Math.PI) / 180;
@@ -145,13 +146,14 @@ export default function RadialOrbitalTimeline({
     const x = round(rawX, 3);
     const y = round(rawY, 3);
 
-    const zIndex = Math.round(100 + 50 * Math.cos(radian));
-    const opacity = Number(
+    // Simplify zIndex and opacity calculations for mobile
+    const zIndex = isMobile ? 100 : Math.round(100 + 50 * Math.cos(radian));
+    const opacity = isMobile ? 1 : Number(
       Math.max(0.4, Math.min(1, 0.4 + 0.6 * ((1 + Math.sin(radian)) / 2))).toFixed(6)
     );
 
     return { x, y, angle, zIndex, opacity };
-  };
+  }, [rotationAngle, centerOffset.x, centerOffset.y, isMobile]);
 
   const getRelatedItems = (itemId: number): number[] => {
     const currentItem = timelineData.find((item) => item.id === itemId);
@@ -179,10 +181,38 @@ export default function RadialOrbitalTimeline({
 
   return (
     <div
-      className="w-full h-[400px] sm:h-[500px] flex flex-col items-center justify-center bg-black/20 backdrop-blur-sm rounded-2xl overflow-hidden"
+      className={`w-full h-[400px] sm:h-[500px] flex flex-col items-center justify-center bg-black/20 backdrop-blur-sm rounded-2xl overflow-hidden ${
+        isMobile ? 'orbital-timeline-mobile' : ''
+      }`}
       ref={containerRef}
       onClick={handleContainerClick}
     >
+      {/* Mobile rotation controls */}
+      {isMobile && (
+        <div className="absolute top-4 right-4 z-20 flex gap-2">
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              setRotationAngle(prev => (prev - 45) % 360);
+            }}
+            className="w-8 h-8 rounded-full bg-white/20 backdrop-blur-sm border border-white/30 flex items-center justify-center text-white hover:bg-white/30 transition-colors"
+            aria-label="Rotate left"
+          >
+            ↶
+          </button>
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              setRotationAngle(prev => (prev + 45) % 360);
+            }}
+            className="w-8 h-8 rounded-full bg-white/20 backdrop-blur-sm border border-white/30 flex items-center justify-center text-white hover:bg-white/30 transition-colors"
+            aria-label="Rotate right"
+          >
+            ↷
+          </button>
+        </div>
+      )}
+      
       <div className="relative w-full max-w-3xl h-full flex items-center justify-center">
         <div
           className="absolute w-full h-full flex items-center justify-center"
@@ -210,11 +240,13 @@ export default function RadialOrbitalTimeline({
             const isPulsing = pulseEffect[item.id];
             const Icon = item.icon;
 
+            // Optimize style object for mobile
             const nodeStyle = {
               // Use fixed decimals for x/y to keep SSR and client markup identical
-              transform: `translate(${position.x.toFixed(3)}px, ${position.y.toFixed(3)}px)`,
+              transform: `translate3d(${position.x.toFixed(3)}px, ${position.y.toFixed(3)}px, 0)`,
               zIndex: isExpanded ? 200 : position.zIndex,
               opacity: isExpanded ? 1 : position.opacity,
+              willChange: isMobile ? 'auto' : 'transform',
             };
 
             return (
@@ -223,25 +255,31 @@ export default function RadialOrbitalTimeline({
                   ref={(el) => {
                     nodeRefs.current[item.id] = el;
                   }}
-                  className="absolute transition-all duration-700 cursor-pointer"
+                  className={`absolute cursor-pointer ${
+                    isMobile 
+                      ? 'transition-transform duration-300 ease-out orbital-node-mobile' 
+                      : 'transition-all duration-700'
+                  }`}
                   style={nodeStyle}
                   onClick={(e) => {
                     e.stopPropagation();
                     toggleItem(item.id);
                   }}
                 >
-                <div
-                  className={`absolute rounded-full -inset-1 ${
-                    isPulsing ? "animate-pulse duration-1000" : ""
-                  }`}
-                  style={{
-                    background: `radial-gradient(circle, rgba(255,255,255,0.2) 0%, rgba(255,255,255,0) 70%)`,
-                    width: `${item.energy * 0.3 + 32}px`,
-                    height: `${item.energy * 0.3 + 32}px`,
-                    left: `-${(item.energy * 0.3 + 32 - 32) / 2}px`,
-                    top: `-${(item.energy * 0.3 + 32 - 32) / 2}px`,
-                  }}
-                ></div>
+                {!isMobile && (
+                  <div
+                    className={`absolute rounded-full -inset-1 ${
+                      isPulsing ? "animate-pulse duration-1000" : ""
+                    }`}
+                    style={{
+                      background: `radial-gradient(circle, rgba(255,255,255,0.2) 0%, rgba(255,255,255,0) 70%)`,
+                      width: `${item.energy * 0.3 + 32}px`,
+                      height: `${item.energy * 0.3 + 32}px`,
+                      left: `-${(item.energy * 0.3 + 32 - 32) / 2}px`,
+                      top: `-${(item.energy * 0.3 + 32 - 32) / 2}px`,
+                    }}
+                  ></div>
+                )}
 
                 <div
                   className={`

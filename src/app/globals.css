@@ -608,6 +608,29 @@ div h1.hero-chrome-text.text-5xl {
   * {
     -webkit-tap-highlight-color: transparent;
   }
+  
+  /* Optimize orbital timeline for mobile */
+  .orbital-timeline-mobile {
+    transform: translateZ(0);
+    -webkit-transform: translateZ(0);
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+    perspective: 1000px;
+    -webkit-perspective: 1000px;
+  }
+  
+  /* Reduce animations on mobile for better performance */
+  .orbital-node-mobile {
+    will-change: auto;
+    transform: translate3d(0, 0, 0);
+    -webkit-transform: translate3d(0, 0, 0);
+  }
+  
+  /* Disable complex animations on mobile */
+  .no-mobile-animation {
+    animation: none !important;
+    transition: transform 0.3s ease-out !important;
+  }
 }
 
 /* Tablet optimizations */
