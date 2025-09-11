@@ -572,3 +572,47 @@ div h1.hero-chrome-text.text-5xl {
 .rounded-xl {
   border-radius: 0.75rem;
 }
+
+/* Mobile-specific optimizations */
+@media (max-width: 640px) {
+  /* Improve touch targets */
+  button, a, [role="button"] {
+    min-height: 44px;
+    min-width: 44px;
+  }
+  
+  /* Optimize text readability on mobile */
+  .hero-chrome-text {
+    line-height: 1.1;
+    word-spacing: -0.05em;
+  }
+  
+  /* Improve mobile scrolling */
+  .overflow-x-hidden {
+    -webkit-overflow-scrolling: touch;
+  }
+  
+  /* Mobile-specific spacing */
+  .mobile-px-2 {
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
+  }
+  
+  /* Ensure proper mobile viewport */
+  html {
+    -webkit-text-size-adjust: 100%;
+    -ms-text-size-adjust: 100%;
+  }
+  
+  /* Improve mobile performance */
+  * {
+    -webkit-tap-highlight-color: transparent;
+  }
+}
+
+/* Tablet optimizations */
+@media (min-width: 641px) and (max-width: 1024px) {
+  .hero-chrome-text {
+    line-height: 1.2;
+  }
+}

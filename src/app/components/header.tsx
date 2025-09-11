@@ -4,11 +4,13 @@ import { useState, useEffect, useCallback, memo, useRef } from 'react';
 import Link from 'next/link';
 import { LiquidGlassGroup, LiquidGlassItem } from "@/components/ui/liquid-glass-group";
 import GlassSurface from "@/components/react-bits/GlassSurface/GlassSurface";
+import { Menu, X } from 'lucide-react';
 
 function Header() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isVisible, setIsVisible] = useState(true);
   const [isHovered, setIsHovered] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const lastScrollY = useRef(0);
   const hideHeaderTimeout = useRef<NodeJS.Timeout | null>(null);
 
@@ -65,6 +67,8 @@ function Header() {
         top: elementPosition,
         behavior: 'smooth'
       });
+      // Close mobile menu after navigation
+      setIsMobileMenuOpen(false);
     }
   }, []);
 
@@ -73,7 +77,7 @@ function Header() {
     <>
       <div className="flex-shrink-0">
         <Link href="/" className="flex items-center gap-2">
-          <span className="text-2xl lg:text-4xl font-bold metallic-text">
+          <span className="text-xl sm:text-2xl lg:text-4xl font-bold metallic-text">
             Konark Parihar
           </span>
         </Link>
@@ -85,6 +89,16 @@ function Header() {
           <LiquidGlassItem href="/portfolio">Portfolio</LiquidGlassItem>
           <LiquidGlassItem onClick={() => scrollToSection('certificates')}>Certificates</LiquidGlassItem>
         </LiquidGlassGroup>
+      </div>
+      {/* Mobile menu button */}
+      <div className="md:hidden">
+        <button
+          onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+          className="p-2 text-white hover:text-gray-300 transition-colors"
+          aria-label="Toggle mobile menu"
+        >
+          {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
+        </button>
       </div>
     </>
   );
@@ -118,7 +132,7 @@ function Header() {
       <div className={`absolute inset-0 transition-opacity duration-300 ease-in-out ${
         !isScrolled ? 'opacity-100' : 'opacity-0 pointer-events-none'
       }`}>
-        <div className="flex items-center justify-between w-full h-20 lg:h-24 px-6 lg:px-8">
+        <div className="flex items-center justify-between w-full h-16 sm:h-20 lg:h-24 px-4 sm:px-6 lg:px-8">
           <HeaderContent />
         </div>
       </div>
@@ -153,6 +167,40 @@ function Header() {
             </div>
           </GlassSurface>
           </div>
+        </div>
+      </div>
+
+      {/* Mobile Menu Dropdown */}
+      <div className={`md:hidden absolute top-full left-0 right-0 bg-black/95 backdrop-blur-lg border-t border-white/10 transition-all duration-300 ease-in-out ${
+        isMobileMenuOpen ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-4 pointer-events-none'
+      }`}>
+        <div className="px-4 py-6 space-y-4">
+          <Link 
+            href="/" 
+            className="block text-white hover:text-gray-300 transition-colors text-lg font-medium"
+            onClick={() => setIsMobileMenuOpen(false)}
+          >
+            Home
+          </Link>
+          <button 
+            onClick={() => scrollToSection('about')}
+            className="block text-white hover:text-gray-300 transition-colors text-lg font-medium w-full text-left"
+          >
+            About
+          </button>
+          <Link 
+            href="/portfolio" 
+            className="block text-white hover:text-gray-300 transition-colors text-lg font-medium"
+            onClick={() => setIsMobileMenuOpen(false)}
+          >
+            Portfolio
+          </Link>
+          <button 
+            onClick={() => scrollToSection('certificates')}
+            className="block text-white hover:text-gray-300 transition-colors text-lg font-medium w-full text-left"
+          >
+            Certificates
+          </button>
         </div>
       </div>
     </header>
