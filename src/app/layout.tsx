@@ -22,21 +22,6 @@ export default function RootLayout({
         <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
         <meta name="theme-color" content="#000000" />
         
-        {/* Preload critical fonts */}
-        <link
-          rel="preload"
-          href="/fonts/Regalia Monarch.otf"
-          as="font"
-          type="font/otf"
-          crossOrigin="anonymous"
-        />
-        <link
-          rel="preload"
-          href="/fonts/Regalia Monarch.ttf"
-          as="font"
-          type="font/ttf"
-          crossOrigin="anonymous"
-        />
         {/* Power BI Resize Script */}
         <script
           dangerouslySetInnerHTML={{
