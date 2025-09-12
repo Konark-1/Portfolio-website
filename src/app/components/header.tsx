@@ -13,6 +13,7 @@ function Header() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const lastScrollY = useRef(0);
   const hideHeaderTimeout = useRef<NodeJS.Timeout | null>(null);
+  const mobileMenuRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -21,6 +22,11 @@ function Header() {
 
       // Update the glass effect state
       setIsScrolled(scrolledPastHero);
+
+      // Close mobile menu when scrolling
+      if (isMobileMenuOpen) {
+        setIsMobileMenuOpen(false);
+      }
 
       // Clear any existing timer on scroll activity
       if (hideHeaderTimeout.current) {
@@ -36,8 +42,8 @@ function Header() {
         setIsVisible(true);
       } else {
         // When scrolling down past the hero, set a timer to hide the header
-        // But only if not hovered
-        if (!isHovered) {
+        // But only if not hovered and not on mobile (mobile should always be visible when scrolled)
+        if (!isHovered && window.innerWidth >= 768) {
           hideHeaderTimeout.current = setTimeout(() => {
             setIsVisible(false);
           }, 700); // Hide after 0.7 seconds of inactivity
@@ -55,7 +61,36 @@ function Header() {
         clearTimeout(hideHeaderTimeout.current);
       }
     };
-  }, [isHovered]);
+  }, [isHovered, isMobileMenuOpen]);
+
+  // Handle clicking outside mobile menu to close it
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (isMobileMenuOpen && mobileMenuRef.current && !mobileMenuRef.current.contains(event.target as Node)) {
+        setIsMobileMenuOpen(false);
+      }
+    };
+
+    if (isMobileMenuOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [isMobileMenuOpen]);
+
+  // Close mobile menu on window resize to desktop
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth >= 768 && isMobileMenuOpen) {
+        setIsMobileMenuOpen(false);
+      }
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, [isMobileMenuOpen]);
 
   const scrollToSection = useCallback((sectionId: string) => {
     const element = document.getElementById(sectionId);
@@ -77,7 +112,10 @@ function Header() {
     <>
       <div className="flex-shrink-0">
         <Link href="/" className="flex items-center gap-2">
-          <span className="text-xl sm:text-2xl lg:text-4xl font-bold metallic-text">
+          <span 
+            className="text-xl sm:text-2xl md:text-3xl lg:text-4xl xl:text-4xl font-bold metallic-text"
+            style={{ fontSize: 'clamp(1.25rem, 2.5rem, 2.5rem)' }}
+          >
             Konark Parihar
           </span>
         </Link>
@@ -94,7 +132,7 @@ function Header() {
       <div className="md:hidden">
         <button
           onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-          className="p-2 text-white hover:text-gray-300 transition-colors"
+          className="p-2 text-white hover:text-gray-300 transition-all duration-200 hover:scale-105 active:scale-95"
           aria-label="Toggle mobile menu"
         >
           {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
@@ -108,6 +146,7 @@ function Header() {
       className={`fixed top-0 left-0 right-0 z-50 transition-transform duration-300 ease-in-out ${
         isScrolled && !isVisible ? '-translate-y-full' : 'translate-y-0'
       }`}
+      suppressHydrationWarning
       onMouseEnter={() => {
         setIsHovered(true);
         // Clear any existing hide timer when hovering
@@ -132,7 +171,7 @@ function Header() {
       <div className={`absolute inset-0 transition-opacity duration-300 ease-in-out ${
         !isScrolled ? 'opacity-100' : 'opacity-0 pointer-events-none'
       }`}>
-        <div className="flex items-center justify-between w-full h-16 sm:h-20 lg:h-24 px-4 sm:px-6 lg:px-8">
+        <div className="flex items-center justify-between w-full h-20 sm:h-24 lg:h-28 px-4 sm:px-6 lg:px-8">
           <HeaderContent />
         </div>
       </div>
@@ -142,7 +181,7 @@ function Header() {
         isScrolled ? 'opacity-100' : 'opacity-0 pointer-events-none'
       }`}>
         <div className={`mx-auto transition-all duration-300 ease-in-out ${
-          isScrolled ? 'w-4/5' : 'w-full'
+          isScrolled ? 'w-4/5 md:w-4/5' : 'w-full'
         }`}>
           <div className="relative">
             <GlassSurface
@@ -171,36 +210,59 @@ function Header() {
       </div>
 
       {/* Mobile Menu Dropdown */}
-      <div className={`md:hidden absolute top-full left-0 right-0 bg-black/95 backdrop-blur-lg border-t border-white/10 transition-all duration-300 ease-in-out ${
-        isMobileMenuOpen ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-4 pointer-events-none'
-      }`}>
-        <div className="px-4 py-6 space-y-4">
-          <Link 
-            href="/" 
-            className="block text-white hover:text-gray-300 transition-colors text-lg font-medium"
-            onClick={() => setIsMobileMenuOpen(false)}
+      <div 
+        ref={mobileMenuRef}
+        className={`md:hidden absolute top-full left-0 right-0 transition-all duration-300 ease-in-out ${
+          isMobileMenuOpen ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-4 pointer-events-none'
+        }`}
+      >
+        <div className="relative px-4 py-6">
+          <GlassSurface
+            width="100%"
+            height="auto"
+            borderRadius={20}
+            backgroundOpacity={0.1}
+            saturation={1}
+            borderWidth={0.07}
+            brightness={50}
+            opacity={0.93}
+            blur={11}
+            displace={0.5}
+            distortionScale={-180}
+            redOffset={0}
+            greenOffset={10}
+            blueOffset={20}
+            className="w-full"
           >
-            Home
-          </Link>
-          <button 
-            onClick={() => scrollToSection('about')}
-            className="block text-white hover:text-gray-300 transition-colors text-lg font-medium w-full text-left"
-          >
-            About
-          </button>
-          <Link 
-            href="/portfolio" 
-            className="block text-white hover:text-gray-300 transition-colors text-lg font-medium"
-            onClick={() => setIsMobileMenuOpen(false)}
-          >
-            Portfolio
-          </Link>
-          <button 
-            onClick={() => scrollToSection('certificates')}
-            className="block text-white hover:text-gray-300 transition-colors text-lg font-medium w-full text-left"
-          >
-            Certificates
-          </button>
+            <div className="px-4 py-6 space-y-4 text-center">
+              <Link 
+                href="/" 
+                className="block text-white hover:text-gray-300 transition-colors text-lg font-medium"
+                onClick={() => setIsMobileMenuOpen(false)}
+              >
+                Home
+              </Link>
+              <button 
+                onClick={() => scrollToSection('about')}
+                className="block text-white hover:text-gray-300 transition-colors text-lg font-medium w-full"
+              >
+                About
+              </button>
+              <Link 
+                href="/portfolio" 
+                className="block text-white hover:text-gray-300 transition-colors text-lg font-medium"
+                onClick={() => setIsMobileMenuOpen(false)}
+              >
+                Portfolio
+              </Link>
+              <button 
+                onClick={() => scrollToSection('certificates')}
+                className="block text-white hover:text-gray-300 transition-colors text-lg font-medium w-full"
+              >
+                Certificates
+              </button>
+            </div>
+          </GlassSurface>
         </div>
       </div>
     </header>

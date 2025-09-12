@@ -39,9 +39,9 @@ export default function HomePage() {
         </div>
 
         {/* Action buttons */}
-        <div className="mt-8 sm:mt-10 flex flex-col sm:flex-row flex-nowrap justify-center gap-3 sm:gap-4 w-full max-w-md sm:max-w-none">
+        <div className="mt-8 sm:mt-10 flex flex-col sm:flex-row flex-nowrap justify-center items-center gap-3 sm:gap-4 w-full max-w-md sm:max-w-none">
           <div
-            className="cursor-pointer hover:scale-105 transition-all duration-300 hover:shadow-lg pointer-events-auto group w-full sm:w-auto"
+            className="cursor-pointer hover:scale-105 transition-all duration-300 hover:shadow-lg pointer-events-auto group w-[85%] sm:w-auto"
             onClick={() => {
               const element = document.getElementById('about');
               if (element) {
@@ -75,7 +75,7 @@ export default function HomePage() {
               </button>
             </GlassSurface>
           </div>
-          <Link href="/portfolio" className="w-full sm:w-auto">
+          <Link href="/portfolio" className="w-[85%] sm:w-auto">
             <GlassSurface
               width="100%"
               height={55}
@@ -101,33 +101,58 @@ export default function HomePage() {
       </div>
 
       {/* Combined About & Technical Expertise Section */}
-      <section id="about" className="relative z-10 bg-black text-white min-h-screen flex items-center">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 w-full">
-          {/* Two-column layout */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 sm:gap-12 lg:gap-16 items-center min-h-[80vh] py-8 sm:py-12">
+      <section id="about" className="relative z-10 bg-black text-white">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 w-full py-12 sm:py-16 lg:py-24">
+          {/* Two-column layout: content left, orbital right */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 sm:gap-12 lg:gap-16 items-start">
 
-            {/* Left Column - Content */}
-            <div className="space-y-8 sm:space-y-12 lg:space-y-16 order-2 lg:order-1">
-              {/* About Me Content */}
-              <div>
-                <h2 className="text-3xl font-bold tracking-tight sm:text-4xl md:text-5xl lg:text-6xl metallic-text">About Me</h2>
-                <p className="mt-4 sm:mt-6 text-base sm:text-lg leading-7 sm:leading-8 text-gray-300">
-                  I am a detail-oriented Data Analyst with a Bachelor of Commerce (Honours) from Amity University. My professional journey began at Xceedance Consulting Pvt Ltd as a Claims Analyst, where I honed my skills in analyzing, modifying, and updating critical data. I am currently advancing my expertise through a dedicated Data Analyst course at Ducat, Noida.
-                </p>
+            {/* Left Column - Two service-style blocks */}
+            <div className="order-1">
+              {/* Block: About Me (reference-style) */}
+              <div className="border-t border-white/20 pt-8 sm:pt-10">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8 items-start">
+                  <div>
+                    <h2 className="text-3xl font-extrabold tracking-tight sm:text-4xl md:text-5xl metallic-text">About Me</h2>
+                    <div className="mt-5 inline-flex">
+                      <span className="inline-flex items-center rounded-full bg-emerald-500 text-black px-5 py-3 text-sm font-semibold shadow-[0_10px_30px_rgba(16,185,129,0.35)]">
+                        Learn more
+                      </span>
+                    </div>
+                  </div>
+                  <div>
+                    <p className="text-base sm:text-lg leading-7 sm:leading-8 text-gray-300">
+                      I am a detail-oriented Data Analyst with a Bachelor of Commerce (Honours) from Amity University. My professional journey began at Xceedance Consulting Pvt Ltd as a Claims Analyst, where I honed my skills in analyzing, modifying, and updating critical data. I am currently advancing my expertise through a dedicated Data Analyst course at Ducat, Noida.
+                    </p>
+                  </div>
+                </div>
               </div>
 
-              {/* Technical Expertise Content */}
-              <div>
-                <h3 className="text-2xl font-bold tracking-tight sm:text-3xl md:text-4xl lg:text-5xl metallic-text">Technical Expertise</h3>
-                <p className="mt-3 sm:mt-4 text-base sm:text-lg leading-6 sm:leading-7 text-gray-400">
-                  My toolkit is both powerful and flexible, with a special focus on integrating AI to enhance efficiency and unlock deeper insights. Explore the interactive timeline to discover my skills and experience.
-                </p>
+              {/* Divider */}
+              <div className="my-10 sm:my-12 border-t border-white/20" />
+
+              {/* Block: Technical Expertise (reference-style) */}
+              <div className="border-t border-transparent pt-0">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8 items-start">
+                  <div>
+                    <h3 className="text-2xl font-extrabold tracking-tight sm:text-3xl md:text-4xl metallic-text">Technical Expertise</h3>
+                    <div className="mt-5 inline-flex">
+                      <span className="inline-flex items-center rounded-full bg-emerald-500 text-black px-5 py-3 text-sm font-semibold shadow-[0_10px_30px_rgba(16,185,129,0.35)]">
+                        View skills
+                      </span>
+                    </div>
+                  </div>
+                  <div>
+                    <p className="text-base sm:text-lg leading-7 sm:leading-8 text-gray-400">
+                      My toolkit is both powerful and flexible, with a focus on analytics and AI to enhance efficiency and unlock deeper insights. Explore the interactive timeline to discover my skills and experience across tools and domains.
+                    </p>
+                  </div>
+                </div>
               </div>
             </div>
 
-            {/* Right Column - Interactive Component */}
-            <div className="flex justify-center items-center lg:justify-end order-1 lg:order-2">
-              <div className="w-full max-w-3xl">
+            {/* Right Column - Orbital timeline (always on the right) */}
+            <div className="order-2 lg:sticky lg:top-24">
+              <div className="w-full max-w-3xl ml-auto">
                 <SkillsTimeline />
               </div>
             </div>
@@ -184,11 +209,11 @@ function ProjectsTabs() {
   const displayed = hoverTab ?? activeTab;
 
   return (
-    <div className="mt-8 sm:mt-12 pointer-events-auto">
+    <div className="mt-6 sm:mt-12 pointer-events-auto">
       {/* Full-width titles row with blur like reference */}
       <div className="ml-[calc(50%-50vw)] w-screen">
         <div className="border-t border-white/15 bg-gradient-to-b from-white/5 via-white/0 to-transparent">
-          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pt-6 sm:pt-8 grid grid-cols-1 sm:grid-cols-3 items-start gap-2 sm:gap-4">
+          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pt-4 sm:pt-8 flex flex-col sm:grid sm:grid-cols-3 items-center gap-4 sm:gap-4">
             {tabs.map(({ key, label }) => {
               const isDisplayed = displayed === key;
               return (
@@ -197,11 +222,17 @@ function ProjectsTabs() {
                   onMouseEnter={() => setHoverTab(key)}
                   onMouseLeave={() => setHoverTab(null)}
                   onClick={() => setActiveTab(key)}
-                  className={`text-xl sm:text-2xl md:text-3xl lg:text-4xl xl:text-5xl 2xl:text-6xl font-semibold cursor-pointer select-none text-center sm:text-left
-                    transition-[filter,opacity] duration-500
-                    ${isDisplayed ? 'opacity-100' : 'opacity-80'}
-                    ${isDisplayed ? 'filter-none' : 'blur-[6px]'}
+                  className={`text-sm sm:text-2xl md:text-3xl lg:text-4xl xl:text-5xl font-bold cursor-pointer select-none text-center
+                    transition-all duration-300 ease-in-out
+                    ${isDisplayed ? 'opacity-100 scale-105' : 'opacity-60 scale-100'}
+                    ${isDisplayed ? 'filter-none' : 'blur-[4px] sm:blur-[8px]'}
+                    py-2 px-4 rounded-lg w-full sm:w-auto
+                    ${isDisplayed ? 'bg-white/10 border border-white/20' : 'bg-white/5 border border-white/10 hover:bg-white/8'}
+                    shadow-md
                   `}
+                  style={{ 
+                    fontSize: 'clamp(0.875rem, 1rem, 2.5rem)' 
+                  }}
                 >
                   {label}
                 </h3>
@@ -212,7 +243,7 @@ function ProjectsTabs() {
       </div>
 
       {/* Sub description - based on active selection */}
-      <p className="mt-4 sm:mt-6 text-sm sm:text-base text-gray-300 max-w-3xl mx-auto text-center sm:text-left px-4">
+      <p className="mt-4 sm:mt-6 text-sm sm:text-base text-gray-300 max-w-3xl mx-auto text-center px-4 leading-relaxed">
         {descriptionByTab[activeTab]}
       </p>
 

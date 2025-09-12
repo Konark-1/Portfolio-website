@@ -2,16 +2,6 @@
 
 @config "../../tailwind.config.ts";
 
-/* Regalia Monarch Font */
-@font-face {
-  font-family: 'Regalia Monarch';
-  src: url('/fonts/Regalia Monarch.otf') format('opentype'),
-       url('/fonts/Regalia Monarch.ttf') format('truetype');
-  font-weight: normal;
-  font-style: normal;
-  font-display: swap;
-}
-
 :root {
   --background: #ffffff;
   --foreground: #171717;
@@ -49,24 +39,6 @@ html {
   box-sizing: border-box;
 }
 
-/* Hero Text with Regalia Monarch Font */
-.hero-chrome-text {
-  font-family: 'Regalia Monarch', 'RegaliaMonarch', 'Cinzel', 'Times New Roman', serif !important;
-  color: #ffffff !important;
-  text-shadow:
-    2px 2px 4px rgba(0, 0, 0, 0.5),
-    0 0 10px rgba(255, 255, 255, 0.2);
-  font-weight: normal !important;
-}
-
-/* High specificity selectors to override Tailwind */
-h1.hero-chrome-text,
-main h1.hero-chrome-text,
-.text-center h1.hero-chrome-text,
-div h1.hero-chrome-text.text-5xl {
-  font-family: 'Regalia Monarch', 'RegaliaMonarch', 'Cinzel', 'Times New Roman', serif !important;
-  font-weight: normal !important;
-}
 
 /* Animation for the pulsing effect */
 @keyframes pulse {
@@ -274,15 +246,6 @@ div h1.hero-chrome-text.text-5xl {
   }
 }
 
-/* Hero Text with Regalia Monarch Font */
-.hero-chrome-text {
-  font-family: 'Regalia Monarch', 'Times New Roman', serif !important;
-  color: #ffffff !important;
-  text-shadow:
-    2px 2px 4px rgba(0, 0, 0, 0.5),
-    0 0 10px rgba(255, 255, 255, 0.2);
-  font-weight: normal !important;
-}
 
 /* Loading shimmer animation */
 @keyframes shimmer {
@@ -638,4 +601,10 @@ div h1.hero-chrome-text.text-5xl {
   .hero-chrome-text {
     line-height: 1.2;
   }
+}
+
+/* Custom size for header name */
+.text-40px {
+  font-size: 40px;
+  line-height: 1;
 }

@@ -47,10 +47,17 @@ export default function RadialOrbitalTimeline({
       setIsMobile(window.innerWidth < 640);
     };
     
-    checkIsMobile();
-    window.addEventListener('resize', checkIsMobile);
+    // Only run on client side to avoid hydration mismatch
+    if (typeof window !== 'undefined') {
+      checkIsMobile();
+      window.addEventListener('resize', checkIsMobile);
+    }
     
-    return () => window.removeEventListener('resize', checkIsMobile);
+    return () => {
+      if (typeof window !== 'undefined') {
+        window.removeEventListener('resize', checkIsMobile);
+      }
+    };
   }, []);
 
   // Pause auto-rotation on mobile to improve performance
@@ -303,7 +310,7 @@ export default function RadialOrbitalTimeline({
                   ${isExpanded ? "scale-125" : ""}
                 `}
                 >
-                  <Icon size={isMobile ? 12 : 14} />
+                  <Icon size={14} />
                 </div>
 
                 <div
