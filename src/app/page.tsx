@@ -103,8 +103,8 @@ export default function HomePage() {
       {/* Combined About & Technical Expertise Section */}
       <section id="about" className="relative z-10 bg-black text-white">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 w-full py-12 sm:py-16 lg:py-24">
-          {/* Two-column layout: content left, orbital right */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 sm:gap-12 lg:gap-16 items-start">
+          {/* Content blocks */}
+          <div className="grid grid-cols-1 gap-10 sm:gap-12 lg:gap-16 items-start">
 
             {/* Left Column - Two service-style blocks */}
             <div className="order-1">
@@ -113,11 +113,6 @@ export default function HomePage() {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8 items-start">
                   <div>
                     <h2 className="text-3xl font-extrabold tracking-tight sm:text-4xl md:text-5xl metallic-text">About Me</h2>
-                    <div className="mt-5 inline-flex">
-                      <span className="inline-flex items-center rounded-full bg-emerald-500 text-black px-5 py-3 text-sm font-semibold shadow-[0_10px_30px_rgba(16,185,129,0.35)]">
-                        Learn more
-                      </span>
-                    </div>
                   </div>
                   <div>
                     <p className="text-base sm:text-lg leading-7 sm:leading-8 text-gray-300">
@@ -134,12 +129,7 @@ export default function HomePage() {
               <div className="border-t border-transparent pt-0">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8 items-start">
                   <div>
-                    <h3 className="text-2xl font-extrabold tracking-tight sm:text-3xl md:text-4xl metallic-text">Technical Expertise</h3>
-                    <div className="mt-5 inline-flex">
-                      <span className="inline-flex items-center rounded-full bg-emerald-500 text-black px-5 py-3 text-sm font-semibold shadow-[0_10px_30px_rgba(16,185,129,0.35)]">
-                        View skills
-                      </span>
-                    </div>
+                    <h3 className="text-3xl font-extrabold tracking-tight sm:text-4xl md:text-5xl metallic-text">Technical Expertise</h3>
                   </div>
                   <div>
                     <p className="text-base sm:text-lg leading-7 sm:leading-8 text-gray-400">
@@ -150,11 +140,12 @@ export default function HomePage() {
               </div>
             </div>
 
-            {/* Right Column - Orbital timeline (always on the right) */}
-            <div className="order-2 lg:sticky lg:top-24">
-              <div className="w-full max-w-3xl ml-auto">
-                <SkillsTimeline />
-              </div>
+          </div>
+
+          {/* Orbital timeline below the section */}
+          <div className="mt-12 sm:mt-16">
+            <div className="w-full max-w-4xl mx-auto">
+              <SkillsTimeline />
             </div>
           </div>
         </div>
