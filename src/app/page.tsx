@@ -208,6 +208,11 @@ export default function HomePage() {
 function ProjectsTabs() {
   const [activeTab, setActiveTab] = useState<'consistent' | 'seamless' | 'cinematic'>("cinematic");
   const [hoverTab, setHoverTab] = useState<null | 'consistent' | 'seamless' | 'cinematic'>(null);
+  const [loadedState, setLoadedState] = useState<Record<'consistent' | 'seamless' | 'cinematic', boolean>>({
+    cinematic: false,
+    seamless: false,
+    consistent: false,
+  });
 
 
   const tabs = [
@@ -266,15 +271,20 @@ function ProjectsTabs() {
 
             {/* Shared aspect-ratio container */}
             <div className="relative pt-[56.25%] sm:pt-[59.77%] overflow-hidden">
+              <div
+                className={`absolute inset-0 bg-black transition-opacity duration-500 ease-out z-[5]`}
+                style={{ opacity: loadedState[(hoverTab ?? activeTab)] ? 0 : 1, pointerEvents: 'none' }}
+              />
               {/* Cinematic */}
               <iframe
                 title="Project 3"
                 src="https://app.fabric.microsoft.com/view?r=eyJrIjoiNGQ0MzFkY2UtN2M1ZS00Mzg4LTk0YzAtZjc4MmVjMDhjY2ZhIiwidCI6IjE4YjExOTE3LTU2NGQtNDJhYi05M2M4LWMxY2JhZDlhNjRiMiJ9&config=eyJjbHVzdGVyVXJsIjoiaHR0cHM6Ly93YWJpLXVzLWVhc3QyLXJlZGlyZWN0LmFuYWx5c2lzLndpbmRvd3MubmV0LyIsImVtYmVkRmVhdHVyZXMiOnsibW9kZXJuRW1iZWQiOnRydWUsImhpZGVBbmdsZVBhbmVsIjpmYWxzZSwiaGlkZUZvb3RlciI6ZmFsc2UsImRpc2FibGVGaWx0ZXJQYW5lbCI6ZmFsc2UsImRpc2FibGVWaXN1YWxQYW5lbCI6ZmFsc2UsImRpc2FibGVXZWJDb250ZXh0TWVudSI6ZmFsc2UsImRpc2FibGVBbmFseXppbmdQYW5lbCI6ZmFsc2UsImRpc2FibGVGb2N1c01vZGUiOmZhbHNlLCJkaXNhYmxlU2VhcmNoUGFuZWwiOmZhbHNlLCJkaXNhYmxlUGFnZU5hdmlnYXRvciI6ZmFsc2UsImRpc2FibGVTbGljZXJzUGFuZWwiOmZhbHNlLCJkaXNhYmxlU2VsZWN0aW9uUGFuZWwiOmZhbHNlLCJkaXNhYmxlQm9va21hcmtzUGFuZWwiOmZhbHNlLCJkaXNhYmxlU2V0dGluZ3NQYW5lbCI6ZmFsc2UsImRpc2FibGVJbnNpZ2h0c1BhbmVsIjpmYWxzZX19"
                 className="absolute inset-0 h-full w-full [transform:translateX(0%)_scaleX(1.05)] origin-center"
-                style={{ border: '0', zIndex: activeTab === 'cinematic' ? 2 : 1, opacity: activeTab === 'cinematic' ? 1 : 0, transform: activeTab === 'cinematic' ? 'translateX(0%) scaleX(1.05)' : 'translateX(-200vw) scaleX(1.05)', pointerEvents: activeTab === 'cinematic' ? 'auto' : 'none', visibility: 'visible' }}
+                style={{ border: '0', backgroundColor: '#000', zIndex: activeTab === 'cinematic' ? 2 : 1, opacity: activeTab === 'cinematic' ? (loadedState?.cinematic ? 1 : 0) : 0, transform: activeTab === 'cinematic' ? 'translateX(0%) scaleX(1.05)' : 'translateX(-200vw) scaleX(1.05)', pointerEvents: activeTab === 'cinematic' ? (loadedState?.cinematic ? 'auto' : 'none') : 'none', visibility: 'visible', transition: 'opacity 400ms ease-out' }}
                 allowFullScreen
                 loading="eager"
                 referrerPolicy="no-referrer-when-downgrade"
+                onLoad={() => setLoadedState(prev => ({ ...prev, cinematic: true }))}
               />
 
               {/* Seamless */}
@@ -282,10 +292,11 @@ function ProjectsTabs() {
                 title="Project2"
                 src="https://app.powerbi.com/view?r=eyJrIjoiNTg1OTYwMWYtNTdiZi00YjU2LWI3ZWMtMjkxZGZlMGYwZTVkIiwidCI6IjE4YjExOTE3LTU2NGQtNDJhYi05M2M4LWMxY2JhZDlhNjRiMiJ9&pageName=ReportSection&config=eyJjbHVzdGVyVXJsIjoiaHR0cHM6Ly93YWJpLXVzLWVhc3QyLXJlZGlyZWN0LmFuYWx5c2lzLndpbmRvd3MubmV0LyIsImVtYmVkRmVhdHVyZXMiOnsibW9kZXJuRW1iZWQiOnRydWUsImhpZGVBbmdsZVBhbmVsIjpmYWxzZSwiaGlkZUZvb3RlciI6ZmFsc2UsImRpc2FibGVGaWx0ZXJQYW5lbCI6ZmFsc2UsImRpc2FibGVWaXN1YWxQYW5lbCI6ZmFsc2UsImRpc2FibGVXZWJDb250ZXh0TWVudSI6ZmFsc2UsImRpc2FibGVBbmFseXppbmdQYW5lbCI6ZmFsc2UsImRpc2FibGVGb2N1c01vZGUiOmZhbHNlLCJkaXNhYmxlU2VhcmNoUGFuZWwiOmZhbHNlLCJkaXNhYmxlUGFnZU5hdmlnYXRvciI6ZmFsc2UsImRpc2FibGVTbGljZXJzUGFuZWwiOmZhbHNlLCJkaXNhYmxlU2VsZWN0aW9uUGFuZWwiOmZhbHNlLCJkaXNhYmxlQm9va21hcmtzUGFuZWwiOmZhbHNlLCJkaXNhYmxlU2V0dGluZ3NQYW5lbCI6ZmFsc2UsImRpc2FibGVJbnNpZ2h0c1BhbmVsIjpmYWxzZX19"
                 className="absolute inset-0 h-full w-full [transform:translateX(0%)_scaleX(1.05)] origin-center"
-                style={{ border: '0', zIndex: activeTab === 'seamless' ? 2 : 1, opacity: activeTab === 'seamless' ? 1 : 0, transform: activeTab === 'seamless' ? 'translateX(0%) scaleX(1.05)' : 'translateX(-200vw) scaleX(1.05)', pointerEvents: activeTab === 'seamless' ? 'auto' : 'none', visibility: 'visible' }}
+                style={{ border: '0', backgroundColor: '#000', zIndex: activeTab === 'seamless' ? 2 : 1, opacity: activeTab === 'seamless' ? (loadedState?.seamless ? 1 : 0) : 0, transform: activeTab === 'seamless' ? 'translateX(0%) scaleX(1.05)' : 'translateX(-200vw) scaleX(1.05)', pointerEvents: activeTab === 'seamless' ? (loadedState?.seamless ? 'auto' : 'none') : 'none', visibility: 'visible', transition: 'opacity 400ms ease-out' }}
                 allowFullScreen
                 loading="eager"
                 referrerPolicy="no-referrer-when-downgrade"
+                onLoad={() => setLoadedState(prev => ({ ...prev, seamless: true }))}
               />
 
               {/* Consistent */}
@@ -293,10 +304,11 @@ function ProjectsTabs() {
                 title="project"
                 src="https://app.powerbi.com/view?r=eyJrIjoiNmE4MmRhMmItNTFlNC00MzMzLTkwZjQtNjc1NjEyZDI2ZTczIiwidCI6IjE4YjExOTE3LTU2NGQtNDJhYi05M2M4LWMxY2JhZDlhNjRiMiJ9&pageName=ReportSection&config=eyJjbHVzdGVyVXJsIjoiaHR0cHM6Ly93YWJpLXVzLWVhc3QyLXJlZGlyZWN0LmFuYWx5c2lzLndpbmRvd3MubmV0LyIsImVtYmVkRmVhdHVyZXMiOnsibW9kZXJuRW1iZWQiOnRydWUsImhpZGVBbmdsZVBhbmVsIjpmYWxzZSwiaGlkZUZvb3RlciI6ZmFsc2UsImRpc2FibGVGaWx0ZXJQYW5lbCI6ZmFsc2UsImRpc2FibGVWaXN1YWxQYW5lbCI6ZmFsc2UsImRpc2FibGVXZWJDb250ZXh0TWVudSI6ZmFsc2UsImRpc2FibGVBbmFseXppbmdQYW5lbCI6ZmFsc2UsImRpc2FibGVGb2N1c01vZGUiOmZhbHNlLCJkaXNhYmxlU2VhcmNoUGFuZWwiOmZhbHNlLCJkaXNhYmxlUGFnZU5hdmlnYXRvciI6ZmFsc2UsImRpc2FibGVTbGljZXJzUGFuZWwiOmZhbHNlLCJkaXNhYmxlU2VsZWN0aW9uUGFuZWwiOmZhbHNlLCJkaXNhYmxlQm9va21hcmtzUGFuZWwiOmZhbHNlLCJkaXNhYmxlU2V0dGluZ3NQYW5lbCI6ZmFsc2UsImRpc2FibGVJbnNpZ2h0c1BhbmVsIjpmYWxzZX19"
                 className="absolute inset-0 h-full w-full [transform:translateX(0%)_scaleX(1.05)] origin-center"
-                style={{ border: '0', zIndex: activeTab === 'consistent' ? 2 : 1, opacity: activeTab === 'consistent' ? 1 : 0, transform: activeTab === 'consistent' ? 'translateX(0%) scaleX(1.05)' : 'translateX(-200vw) scaleX(1.05)', pointerEvents: activeTab === 'consistent' ? 'auto' : 'none', visibility: 'visible' }}
+                style={{ border: '0', backgroundColor: '#000', zIndex: activeTab === 'consistent' ? 2 : 1, opacity: activeTab === 'consistent' ? (loadedState?.consistent ? 1 : 0) : 0, transform: activeTab === 'consistent' ? 'translateX(0%) scaleX(1.05)' : 'translateX(-200vw) scaleX(1.05)', pointerEvents: activeTab === 'consistent' ? (loadedState?.consistent ? 'auto' : 'none') : 'none', visibility: 'visible', transition: 'opacity 400ms ease-out' }}
                 allowFullScreen
                 loading="eager"
                 referrerPolicy="no-referrer-when-downgrade"
+                onLoad={() => setLoadedState(prev => ({ ...prev, consistent: true }))}
               />
             </div>
           </div>
