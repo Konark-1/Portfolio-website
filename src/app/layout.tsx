@@ -7,34 +7,7 @@ import CursorMount from "./components/CursorMount";
 
 const inter = Inter({ subsets: ["latin"], display: "swap" });
 
-export const metadata: Metadata = {
-  title: "Konark - Data Analyst Portfolio",
-  description: "Portfolio of Konark, a skilled data analyst.",
-};
-
-export default function RootLayout({
-  children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
-  return (
-    <html lang="en" suppressHydrationWarning>
-      <head>
-        {/* Mobile viewport optimization (allow zoom for accessibility) */}
-        <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <meta name="theme-color" content="#000000" />
-        
-        {/* Network hints for faster Power BI connect on first paint */}
-        <link rel="preconnect" href="https://app.powerbi.com" crossOrigin="anonymous" />
-        <link rel="dns-prefetch" href="https://app.powerbi.com" />
-        <link rel="preconnect" href="https://app.fabric.microsoft.com" crossOrigin="anonymous" />
-        <link rel="dns-prefetch" href="https://app.fabric.microsoft.com" />
-        <link rel="preconnect" href="https://wabi-us-east2-redirect.analysis.windows.net" crossOrigin="anonymous" />
-        <link rel="dns-prefetch" href="https://wabi-us-east2-redirect.analysis.windows.net" />
-      </head>
-      <body className={`${inter.className} dark`}>
-        <Script id="pbi-resize-script" strategy="afterInteractive">
-{`!function(){if("undefined"==typeof window.powerbiresizescript){window.powerbiresizescript=1;window.onmessage=function(event){var isReportPageLoadedEvent=function(event){try{if(event&&event.data&&event.data.url==='/reports/undefined/events/pageChanged'){return!0}}catch(error){return undefined}};if(isReportPageLoadedEvent(event)){var iframe=getIframeElement(event.source)
+const PBI_RESIZE_SCRIPT = `!function(){if("undefined"==typeof window.powerbiresizescript){window.powerbiresizescript=1;window.onmessage=function(event){var isReportPageLoadedEvent=function(event){try{if(event&&event.data&&event.data.url==='/reports/undefined/events/pageChanged'){return!0}}catch(error){return undefined}};if(isReportPageLoadedEvent(event)){var iframe=getIframeElement(event.source)
 setTimeout(function(){if(iframe&&iframe.parentNode.children.length>1){switch(iframe.parentNode.getAttribute('pbi-resize-load-event')){case 'click':showElement(iframe);break;case 'page-load':case 'seconds-timeout':case 'in-view':var button=getChildByTag(iframe.parentNode,'div');setButtonState(button,'readynow');break}}},(iframe.parentNode.getAttribute('pbi-resize-delay-show')||1)*1000)}};function getChildByTag(parent,tagName){if(parent){for(var i=0;i<parent.children.length;i++){if(parent.children[i].tagName.toLowerCase()===tagName.toLowerCase()){return parent.children[i]}}}
 return null}
 function getIframeElement(srcWindow){var frames=document.getElementsByTagName('iframe');for(var i=0;i<frames.length;i++){if(frames[i].contentWindow===srcWindow){return frames[i]}}}
@@ -73,8 +46,34 @@ if(warn){console.warn("pbi-resize: requested iframe dimension is below the minim
 document.addEventListener("DOMContentLoaded",e);window.addEventListener("resize",e,{passive:true});window.addEventListener("orientationchange",e);function isInViewport(e){var bounding=e.getBoundingClientRect();return(bounding.top>=0&&bounding.left>=0&&bounding.bottom<=(window.innerHeight||document.documentElement.clientHeight)&&bounding.right<=(window.innerWidth||document.documentElement.clientWidth))};function changeCurrentSrc(e,isWebSize,web,mobile,newSrc){if(web&&mobile){var iframe=e.nextElementSibling;if(e instanceof HTMLImageElement&&iframe.src&&(newSrc!=iframe.src)){iframe.setAttribute('src',newSrc);setButtonState(iframe.nextElementSibling,'loading')}
 var currentSrc=isWebSize?web:mobile;e.setAttribute('src',currentSrc)}}
 function resize(){if(navigator.userAgent.indexOf('MSIE')!==-1||navigator.appVersion.indexOf('Trident/')>0){var evt=document.createEvent('UIEvents');evt.initUIEvent('resize',!0,!1,window,0);window.dispatchEvent(evt)}else{window.dispatchEvent(new Event('resize'))}}
-function loadIframe(parent,src){var iframe=getChildByTag(parent,'iframe');var button=getChildByTag(parent,'div');var spinner=getChildByTag(button,'span');spinner.style.display='block';var style=document.createElement('style');style.type='text/css';var keyFrames='@keyframes pbi-resize-spinner {\\n                0% {\\n                    transform: rotate(0deg);\\n                }\\n                100% {\\n                    transform: rotate(360deg);\\n                }\\n            }';style.innerHTML=keyFrames;document.getElementsByTagName('head')[0].appendChild(style);iframe.setAttribute('src',src);iframe.setAttribute('frameborder','0');iframe.setAttribute('allowFullScreen','true');setButtonState(button,'loading')}}}();`}
-        </Script>
+function loadIframe(parent,src){var iframe=getChildByTag(parent,'iframe');var button=getChildByTag(parent,'div');var spinner=getChildByTag(button,'span');spinner.style.display='block';var style=document.createElement('style');style.type='text/css';var keyFrames='@keyframes pbi-resize-spinner {\\n                0% {\\n                    transform: rotate(0deg);\\n                }\\n                100% {\\n                    transform: rotate(360deg);\\n                }\\n            }';style.innerHTML=keyFrames;document.getElementsByTagName('head')[0].appendChild(style);iframe.setAttribute('src',src);iframe.setAttribute('frameborder','0');iframe.setAttribute('allowFullScreen','true');setButtonState(button,'loading')}}}();`;
+export const metadata: Metadata = {
+  title: "Konark - Data Analyst Portfolio",
+  description: "Portfolio of Konark, a skilled data analyst.",
+};
+
+export default function RootLayout({
+  children,
+}: Readonly<{
+  children: React.ReactNode;
+}>) {
+  return (
+    <html lang="en" suppressHydrationWarning>
+      <head>
+        {/* Mobile viewport optimization (allow zoom for accessibility) */}
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <meta name="theme-color" content="#000000" />
+        
+        {/* Network hints for faster Power BI connect on first paint */}
+        <link rel="preconnect" href="https://app.powerbi.com" crossOrigin="anonymous" />
+        <link rel="dns-prefetch" href="https://app.powerbi.com" />
+        <link rel="preconnect" href="https://app.fabric.microsoft.com" crossOrigin="anonymous" />
+        <link rel="dns-prefetch" href="https://app.fabric.microsoft.com" />
+        <link rel="preconnect" href="https://wabi-us-east2-redirect.analysis.windows.net" crossOrigin="anonymous" />
+        <link rel="dns-prefetch" href="https://wabi-us-east2-redirect.analysis.windows.net" />
+      </head>
+      <body className={`${inter.className} dark`}>
+        <Script id="pbi-resize-script" strategy="afterInteractive" dangerouslySetInnerHTML={{ __html: PBI_RESIZE_SCRIPT }} />
         <CursorMount />
         <Header /> {/* Add the header here */}
         {children}
