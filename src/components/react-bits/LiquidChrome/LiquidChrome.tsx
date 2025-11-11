@@ -155,28 +155,56 @@ export const LiquidChrome: React.FC<LiquidChromeProps> = ({
       }
     }
 
-    if (interactive) {
-      // Use global mouse tracking to prevent flickering
-      document.addEventListener("mousemove", handleGlobalMouseMove);
-      container.addEventListener("touchmove", handleTouchMove);
-    }
-
+    // Animation timing vars
     let animationId: number;
     let lastTime = 0;
     const targetFPS = 60;
     const frameInterval = 1000 / targetFPS;
+    // Maintain time only while visible to avoid jumps when pausing
+    let accumulatedTime = 0;
+    const isVisibleRef = { current: true };
+
+    if (interactive) {
+      // Use global mouse tracking to prevent flickering
+      document.addEventListener("mousemove", handleGlobalMouseMove, { passive: true });
+      container.addEventListener("touchmove", handleTouchMove, { passive: true });
+    }
 
     function update(t: number) {
       animationId = requestAnimationFrame(update);
 
       // Throttle to target FPS for better performance
       if (t - lastTime >= frameInterval) {
-        program.uniforms.uTime.value = t * 0.001 * speed;
-        renderer.render({ scene: mesh });
+        if (isVisibleRef.current) {
+          accumulatedTime += (t - lastTime);
+          program.uniforms.uTime.value = (accumulatedTime * 0.001) * speed;
+          renderer.render({ scene: mesh });
+        }
         lastTime = t;
       }
     }
     animationId = requestAnimationFrame(update);
+
+    // Pause when offscreen, resume smoothly when onscreen
+    const io = new IntersectionObserver(
+      (entries) => {
+        const entry = entries[0];
+        const now = performance.now();
+        if (entry && typeof entry.isIntersecting === 'boolean') {
+          if (entry.isIntersecting) {
+            isVisibleRef.current = true;
+            lastTime = now; // reset baseline to avoid large deltas
+            if (!animationId) {
+              animationId = requestAnimationFrame(update);
+            }
+          } else {
+            isVisibleRef.current = false;
+          }
+        }
+      },
+      { root: null, threshold: 0.01 }
+    );
+    io.observe(container);
 
     container.appendChild(gl.canvas);
 
@@ -187,6 +215,7 @@ export const LiquidChrome: React.FC<LiquidChromeProps> = ({
         document.removeEventListener("mousemove", handleGlobalMouseMove);
         container.removeEventListener("touchmove", handleTouchMove);
       }
+      io.disconnect();
       if (gl.canvas.parentElement) {
         gl.canvas.parentElement.removeChild(gl.canvas);
       }

@@ -709,3 +709,9 @@ html {
     @apply bg-background text-foreground;
   }
 }
+
+/* Performance utility: defer offscreen layout/paint */
+.cv-auto {
+  content-visibility: auto;
+  contain-intrinsic-size: 1000px;
+}

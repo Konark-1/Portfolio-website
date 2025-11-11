@@ -41,6 +41,7 @@ export interface GlassSurfaceProps {
     | "plus-lighter";
   className?: string;
   style?: React.CSSProperties;
+  disableShadow?: boolean;
 }
 
 const useDarkMode = () => {
@@ -81,6 +82,7 @@ const GlassSurface: React.FC<GlassSurfaceProps> = ({
   mixBlendMode = "difference",
   className = "",
   style = {},
+  disableShadow = false,
 }) => {
   const uniqueId = useId().replace(/:/g, '-');
   const filterId = `glass-filter-${uniqueId}`;
@@ -204,7 +206,9 @@ const GlassSurface: React.FC<GlassSurfaceProps> = ({
         backdropFilter: `blur(${blur}px) saturate(${saturation}) brightness(1.2)`,
         WebkitBackdropFilter: `blur(${blur}px) saturate(${saturation}) brightness(1.2)`,
         border: "1px solid rgba(255, 255, 255, 0.2)",
-        boxShadow: `inset 0 1px 0 0 rgba(255, 255, 255, 0.2),
+        boxShadow: disableShadow
+          ? 'none'
+          : `inset 0 1px 0 0 rgba(255, 255, 255, 0.2),
                     inset 0 -1px 0 0 rgba(255, 255, 255, 0.1)`,
       };
     }
@@ -214,7 +218,9 @@ const GlassSurface: React.FC<GlassSurfaceProps> = ({
       backdropFilter: `blur(${blur}px) saturate(${saturation}) brightness(1.1)`,
       WebkitBackdropFilter: `blur(${blur}px) saturate(${saturation}) brightness(1.1)`,
       border: "1px solid rgba(255, 255, 255, 0.3)",
-      boxShadow: `0 8px 32px 0 rgba(31, 38, 135, 0.2),
+      boxShadow: disableShadow
+        ? 'none'
+        : `0 8px 32px 0 rgba(31, 38, 135, 0.2),
                   0 2px 16px 0 rgba(31, 38, 135, 0.1),
                   inset 0 1px 0 0 rgba(255, 255, 255, 0.4),
                   inset 0 -1px 0 0 rgba(255, 255, 255, 0.2)`,
