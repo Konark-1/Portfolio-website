@@ -1,7 +1,7 @@
 "use client";
 
 import { motion, useSpring } from "framer-motion";
-import { FC, useEffect, useRef, useState } from "react";
+import { FC, useEffect, useRef } from "react";
 
 interface Position {
   x: number;
@@ -110,6 +110,19 @@ export function SmoothCursor({
   });
 
   useEffect(() => {
+    // Respect reduced motion and touch devices: disable custom cursor for UX
+    const prefersReducedMotion = typeof window !== 'undefined' && window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const isTouchLike = typeof window !== 'undefined' && !!window.matchMedia && window.matchMedia('(hover: none), (pointer: coarse)').matches;
+    if (prefersReducedMotion || isTouchLike) {
+      return;
+    }
+
+    // Inject high-specificity CSS to hide native cursor on interactive elements
+    const styleEl = document.createElement('style');
+    styleEl.setAttribute('data-smooth-cursor', 'true');
+    styleEl.textContent = `@media (hover: hover) and (pointer: fine) { html, body, *, a, button, [role="button"], input, select, textarea, [tabindex] { cursor: none !important; } }`;
+    document.head.appendChild(styleEl);
+
     const updateVelocity = (currentPos: Position) => {
       const currentTime = Date.now();
       const deltaTime = currentTime - lastUpdateTime.current;
@@ -190,7 +203,7 @@ export function SmoothCursor({
       f.addEventListener('mouseenter', handleIframeEnter);
       f.addEventListener('mouseleave', handleIframeLeave);
     });
-    window.addEventListener("mousemove", throttledMouseMove);
+    window.addEventListener("mousemove", throttledMouseMove, { passive: true });
 
     return () => {
       window.removeEventListener("mousemove", throttledMouseMove);
@@ -200,6 +213,9 @@ export function SmoothCursor({
         f.removeEventListener('mouseenter', handleIframeEnter);
         f.removeEventListener('mouseleave', handleIframeLeave);
       });
+      if (styleEl && styleEl.parentNode) {
+        styleEl.parentNode.removeChild(styleEl);
+      }
     };
   }, [cursorX, cursorY, rotation, scale]);
 

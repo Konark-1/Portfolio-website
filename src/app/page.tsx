@@ -3,7 +3,6 @@
 import { lazy, Suspense, useState } from 'react';
 import GlassSurface from "@/components/react-bits/GlassSurface/GlassSurface";
 import LoadingSkeleton from "@/components/ui/LoadingSkeleton";
-import Link from 'next/link';
 
 // Lazy load the heavy WebGL component
 const LiquidChrome = lazy(() => import("@/components/react-bits/LiquidChrome/LiquidChrome"));
@@ -11,52 +10,25 @@ const LiquidChrome = lazy(() => import("@/components/react-bits/LiquidChrome/Liq
 export default function HomePage() {
   return (
     <main className="relative min-h-screen overflow-hidden bg-gradient-to-br from-gray-900 via-black to-gray-800">
-      {/* Hidden preload iframes - start loading immediately when page opens */}
-      <div className="absolute top-0 left-0 w-1 h-1 opacity-0 pointer-events-none overflow-hidden cursor-exempt cursor-default">
-        <iframe
-          title="Project 3 Preload"
-          src="https://app.fabric.microsoft.com/view?r=eyJrIjoiNGQ0MzFkY2UtN2M1ZS00Mzg4LTk0YzAtZjc4MmVjMDhjY2ZhIiwidCI6IjE4YjExOTE3LTU2NGQtNDJhYi05M2M4LWMxY2JhZDlhNjRiMiJ9&config=eyJjbHVzdGVyVXJsIjoiaHR0cHM6Ly93YWJpLXVzLWVhc3QyLXJlZGlyZWN0LmFuYWx5c2lzLndpbmRvd3MubmV0LyIsImVtYmVkRmVhdHVyZXMiOnsibW9kZXJuRW1iZWQiOnRydWUsImhpZGVBbmdsZVBhbmVsIjpmYWxzZSwiaGlkZUZvb3RlciI6ZmFsc2UsImRpc2FibGVGaWx0ZXJQYW5lbCI6ZmFsc2UsImRpc2FibGVWaXN1YWxQYW5lbCI6ZmFsc2UsImRpc2FibGVXZWJDb250ZXh0TWVudSI6ZmFsc2UsImRpc2FibGVBbmFseXppbmdQYW5lbCI6ZmFsc2UsImRpc2FibGVGb2N1c01vZGUiOmZhbHNlLCJkaXNhYmxlU2VhcmNoUGFuZWwiOmZhbHNlLCJkaXNhYmxlUGFnZU5hdmlnYXRvciI6ZmFsc2UsImRpc2FibGVTbGljZXJzUGFuZWwiOmZhbHNlLCJkaXNhYmxlU2VsZWN0aW9uUGFuZWwiOmZhbHNlLCJkaXNhYmxlQm9va21hcmtzUGFuZWwiOmZhbHNlLCJkaXNhYmxlU2V0dGluZ3NQYW5lbCI6ZmFsc2UsImRpc2FibGVJbnNpZ2h0c1BhbmVsIjpmYWxzZX19"
-          className="w-full h-full cursor-exempt cursor-default"
-          style={{ border: '0' }}
-          allowFullScreen
-          loading="eager"
-          referrerPolicy="no-referrer-when-downgrade"
-        />
-        <iframe
-          title="Project2 Preload"
-          src="https://app.powerbi.com/view?r=eyJrIjoiNTg1OTYwMWYtNTdiZi00YjU2LWI3ZWMtMjkxZGZlMGYwZTVkIiwidCI6IjE4YjExOTE3LTU2NGQtNDJhYi05M2M4LWMxY2JhZDlhNjRiMiJ9&pageName=ReportSection&config=eyJjbHVzdGVyVXJsIjoiaHR0cHM6Ly93YWJpLXVzLWVhc3QyLXJlZGlyZWN0LmFuYWx5c2lzLndpbmRvd3MubmV0LyIsImVtYmVkRmVhdHVyZXMiOnsibW9kZXJuRW1iZWQiOnRydWUsImhpZGVBbmdsZVBhbmVsIjpmYWxzZSwiaGlkZUZvb3RlciI6ZmFsc2UsImRpc2FibGVGaWx0ZXJQYW5lbCI6ZmFsc2UsImRpc2FibGVWaXN1YWxQYW5lbCI6ZmFsc2UsImRpc2FibGVXZWJDb250ZXh0TWVudSI6ZmFsc2UsImRpc2FibGVBbmFseXppbmdQYW5lbCI6ZmFsc2UsImRpc2FibGVGb2N1c01vZGUiOmZhbHNlLCJkaXNhYmxlU2VhcmNoUGFuZWwiOmZhbHNlLCJkaXNhYmxlUGFnZU5hdmlnYXRvciI6ZmFsc2UsImRpc2FibGVTbGljZXJzUGFuZWwiOmZhbHNlLCJkaXNhYmxlU2VsZWN0aW9uUGFuZWwiOmZhbHNlLCJkaXNhYmxlQm9va21hcmtzUGFuZWwiOmZhbHNlLCJkaXNhYmxlU2V0dGluZ3NQYW5lbCI6ZmFsc2UsImRpc2FibGVJbnNpZ2h0c1BhbmVsIjpmYWxzZX19"
-          className="w-full h-full cursor-exempt cursor-default"
-          style={{ border: '0' }}
-          allowFullScreen
-          loading="eager"
-          referrerPolicy="no-referrer-when-downgrade"
-        />
-        <iframe
-          title="project Preload"
-          src="https://app.powerbi.com/view?r=eyJrIjoiNmE4MmRhMmItNTFlNC00MzMzLTkwZjQtNjc1NjEyZDI2ZTczIiwidCI6IjE4YjExOTE3LTU2NGQtNDJhYi05M2M4LWMxY2JhZDlhNjRiMiJ9&pageName=ReportSection&config=eyJjbHVzdGVyVXJsIjoiaHR0cHM6Ly93YWJpLXVzLWVhc3QyLXJlZGlyZWN0LmFuYWx5c2lzLndpbmRvd3MubmV0LyIsImVtYmVkRmVhdHVyZXMiOnsibW9kZXJuRW1iZWQiOnRydWUsImhpZGVBbmdsZVBhbmVsIjpmYWxzZSwiaGlkZUZvb3RlciI6ZmFsc2UsImRpc2FibGVGaWx0ZXJQYW5lbCI6ZmFsc2UsImRpc2FibGVWaXN1YWxQYW5lbCI6ZmFsc2UsImRpc2FibGVXZWJDb250ZXh0TWVudSI6ZmFsc2UsImRpc2FibGVBbmFseXppbmdQYW5lbCI6ZmFsc2UsImRpc2FibGVGb2N1c01vZGUiOmZhbHNlLCJkaXNhYmxlU2VhcmNoUGFuZWwiOmZhbHNlLCJkaXNhYmxlUGFnZU5hdmlnYXRvciI6ZmFsc2UsImRpc2FibGVTbGljZXJzUGFuZWwiOmZhbHNlLCJkaXNhYmxlU2VsZWN0aW9uUGFuZWwiOmZhbHNlLCJkaXNhYmxlQm9va21hcmtzUGFuZWwiOmZhbHNlLCJkaXNhYmxlU2V0dGluZ3NQYW5lbCI6ZmFsc2UsImRpc2FibGVJbnNpZ2h0c1BhbmVsIjpmYWxzZX19"
-          className="w-full h-full cursor-exempt cursor-default"
-          style={{ border: '0' }}
-          allowFullScreen
-          loading="eager"
-          referrerPolicy="no-referrer-when-downgrade"
-        />
-      </div>
+      {/* Connection warming handled via preconnect/dns-prefetch in layout */}
 
-      {/* Background component positioned fixed so header can blur it */}
-      <div className="fixed inset-0 w-full h-full pointer-events-none">
-        <Suspense fallback={<LoadingSkeleton className="absolute inset-0" />}>
-          <LiquidChrome
-            baseColor={[0, 0.05, 0.05]}
-            speed={0.85}
-            amplitude={0.3}
-            frequencyX={3}
-            frequencyY={2}
-            interactive={true}
-          />
-        </Suspense>
-      </div>
+      {/* Hero section with LiquidChrome background - limited to hero only */}
+      <div className="relative min-h-screen overflow-hidden">
+        {/* LiquidChrome background only for hero section */}
+        <div className="absolute inset-0 w-full h-full pointer-events-none">
+          <Suspense fallback={<LoadingSkeleton className="absolute inset-0" />}>
+            <LiquidChrome
+              baseColor={[0, 0.05, 0.05]}
+              speed={0.85}
+              amplitude={0.3}
+              frequencyX={3}
+              frequencyY={2}
+              interactive={true}
+            />
+          </Suspense>
+        </div>
 
-      {/* Content container with proper spacing from header */}
+        {/* Content container with proper spacing from header */}
       <div className="relative z-10 flex flex-col items-center justify-center min-h-screen pt-20 sm:pt-24 lg:pt-28 px-4 sm:px-6">
         {/* Main heading */}
         <div className="text-center max-w-7xl">
@@ -99,13 +71,30 @@ export default function HomePage() {
               redOffset={0}
               greenOffset={10}
               blueOffset={20}
+              disableShadow
             >
               <button className="px-6 sm:px-8 py-3 text-white font-semibold w-full h-full text-sm sm:text-base tracking-wide flex items-center justify-center gap-2">
                 Get Started
               </button>
             </GlassSurface>
           </div>
-          <Link href="/portfolio" className="w-[85%] sm:w-auto">
+          <div
+            className="w-[85%] sm:w-auto cursor-pointer hover:scale-105 transition-all duration-300 hover:shadow-lg pointer-events-auto group"
+            onClick={() => {
+              const element = document.getElementById('projects');
+              if (element) {
+                const headerHeight = 115;
+                const elementPosition = element.offsetTop - headerHeight;
+                window.scrollTo({
+                  top: elementPosition,
+                  behavior: 'smooth'
+                });
+              } else {
+                // Fallback: navigate if section not found
+                window.location.href = '/portfolio';
+              }
+            }}
+          >
             <GlassSurface
               width="100%"
               height={55}
@@ -121,13 +110,15 @@ export default function HomePage() {
               redOffset={0}
               greenOffset={10}
               blueOffset={20}
+              disableShadow
             >
-              <button className="px-6 sm:px-8 py-3 text-white/80 font-medium w-full h-full text-sm sm:text-base tracking-wide flex items-center justify-center gap-2">
+              <span className="px-6 sm:px-8 py-3 text-white/80 font-medium w-full h-full text-sm sm:text-base tracking-wide flex items-center justify-center gap-2">
                 MY PORTFOLIO
-              </button>
+              </span>
             </GlassSurface>
-          </Link>
+          </div>
         </div>
+      </div>
       </div>
 
       {/* Combined About & Technical Expertise Section */}
@@ -176,7 +167,7 @@ export default function HomePage() {
       </section>
 
       {/* Projects Section (Flow-inspired tabs) */}
-      <section id="projects" className="relative z-10 bg-black text-white py-16 sm:py-24 lg:py-32 overflow-hidden">
+      <section id="projects" className="relative z-10 bg-black text-white py-16 sm:py-24 lg:py-32 overflow-hidden cv-auto">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="text-center">
             <h2 className="text-3xl font-bold tracking-tight sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl chrome-text">Projects</h2>
@@ -187,13 +178,15 @@ export default function HomePage() {
 
           {/* Tab buttons */}
           <div className="sticky top-20 sm:top-24 z-20 bg-gradient-to-b from-black via-black/95 to-transparent pb-6 sm:pb-8 pt-4 pointer-events-none">
-            <ProjectsTabs />
+            <Suspense fallback={<div className="h-12" />}>
+              <ProjectsTabs />
+            </Suspense>
           </div>
         </div>
       </section>
 
       {/* Certificates Section */}
-      <section id="certificates" className="relative z-10 bg-gray-900 text-white py-16 sm:py-24 lg:py-32">
+      <section id="certificates" className="relative z-10 bg-gray-900 text-white py-16 sm:py-24 lg:py-32 cv-auto">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <h2 className="text-3xl font-bold tracking-tight sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl chrome-text">Professional Certificates</h2>
           <p className="mt-4 sm:mt-6 text-base sm:text-lg leading-6 sm:leading-8 text-gray-300 px-2">
@@ -282,7 +275,7 @@ function ProjectsTabs() {
                 className="absolute inset-0 h-full w-full [transform:translateX(0%)_scaleX(1.05)] origin-center"
                 style={{ border: '0', backgroundColor: '#000', zIndex: activeTab === 'cinematic' ? 2 : 1, opacity: activeTab === 'cinematic' ? (loadedState?.cinematic ? 1 : 0) : 0, transform: activeTab === 'cinematic' ? 'translateX(0%) scaleX(1.05)' : 'translateX(-200vw) scaleX(1.05)', pointerEvents: activeTab === 'cinematic' ? (loadedState?.cinematic ? 'auto' : 'none') : 'none', visibility: 'visible', transition: 'opacity 400ms ease-out' }}
                 allowFullScreen
-                loading="eager"
+                loading={activeTab === 'cinematic' ? 'eager' : 'lazy'}
                 referrerPolicy="no-referrer-when-downgrade"
                 onLoad={() => setLoadedState(prev => ({ ...prev, cinematic: true }))}
               />
@@ -294,7 +287,7 @@ function ProjectsTabs() {
                 className="absolute inset-0 h-full w-full [transform:translateX(0%)_scaleX(1.05)] origin-center"
                 style={{ border: '0', backgroundColor: '#000', zIndex: activeTab === 'seamless' ? 2 : 1, opacity: activeTab === 'seamless' ? (loadedState?.seamless ? 1 : 0) : 0, transform: activeTab === 'seamless' ? 'translateX(0%) scaleX(1.05)' : 'translateX(-200vw) scaleX(1.05)', pointerEvents: activeTab === 'seamless' ? (loadedState?.seamless ? 'auto' : 'none') : 'none', visibility: 'visible', transition: 'opacity 400ms ease-out' }}
                 allowFullScreen
-                loading="eager"
+                loading={activeTab === 'seamless' ? 'eager' : 'lazy'}
                 referrerPolicy="no-referrer-when-downgrade"
                 onLoad={() => setLoadedState(prev => ({ ...prev, seamless: true }))}
               />
@@ -306,7 +299,7 @@ function ProjectsTabs() {
                 className="absolute inset-0 h-full w-full [transform:translateX(0%)_scaleX(1.05)] origin-center"
                 style={{ border: '0', backgroundColor: '#000', zIndex: activeTab === 'consistent' ? 2 : 1, opacity: activeTab === 'consistent' ? (loadedState?.consistent ? 1 : 0) : 0, transform: activeTab === 'consistent' ? 'translateX(0%) scaleX(1.05)' : 'translateX(-200vw) scaleX(1.05)', pointerEvents: activeTab === 'consistent' ? (loadedState?.consistent ? 'auto' : 'none') : 'none', visibility: 'visible', transition: 'opacity 400ms ease-out' }}
                 allowFullScreen
-                loading="eager"
+                loading={activeTab === 'consistent' ? 'eager' : 'lazy'}
                 referrerPolicy="no-referrer-when-downgrade"
                 onLoad={() => setLoadedState(prev => ({ ...prev, consistent: true }))}
               />
