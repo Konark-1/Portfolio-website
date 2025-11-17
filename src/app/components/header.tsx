@@ -107,6 +107,25 @@ function Header() {
     }
   }, []);
 
+  const scrollToTop = useCallback(() => {
+    window.scrollTo({
+      top: 0,
+      behavior: 'smooth'
+    });
+    setIsMobileMenuOpen(false);
+  }, []);
+
+  const scrollToPortfolio = useCallback(() => {
+    const projectsSection = document.getElementById('projects');
+
+    if (projectsSection) {
+      scrollToSection('projects');
+      return;
+    }
+
+    window.location.href = '/portfolio';
+  }, [scrollToSection]);
+
   // Reusable header content component
   const HeaderContent = () => (
     <>
@@ -122,9 +141,9 @@ function Header() {
       </div>
       <div className="hidden md:block">
         <LiquidGlassGroup className="ring-1 ring-white/10">
-          <LiquidGlassItem href="/">Home</LiquidGlassItem>
+          <LiquidGlassItem onClick={scrollToTop}>Home</LiquidGlassItem>
           <LiquidGlassItem onClick={() => scrollToSection('about')}>About</LiquidGlassItem>
-          <LiquidGlassItem href="/portfolio">Portfolio</LiquidGlassItem>
+          <LiquidGlassItem onClick={scrollToPortfolio}>Portfolio</LiquidGlassItem>
           <LiquidGlassItem onClick={() => scrollToSection('certificates')}>Certificates</LiquidGlassItem>
         </LiquidGlassGroup>
       </div>
@@ -235,26 +254,24 @@ function Header() {
             className="w-full"
           >
             <div className="px-4 py-6 space-y-4 text-center">
-              <Link 
-                href="/" 
-                className="block text-white hover:text-gray-300 transition-colors text-lg font-medium"
-                onClick={() => setIsMobileMenuOpen(false)}
+              <button 
+                onClick={scrollToTop}
+                className="block text-white hover:text-gray-300 transition-colors text-lg font-medium w-full"
               >
                 Home
-              </Link>
+              </button>
               <button 
                 onClick={() => scrollToSection('about')}
                 className="block text-white hover:text-gray-300 transition-colors text-lg font-medium w-full"
               >
                 About
               </button>
-              <Link 
-                href="/portfolio" 
-                className="block text-white hover:text-gray-300 transition-colors text-lg font-medium"
-                onClick={() => setIsMobileMenuOpen(false)}
+              <button 
+                onClick={scrollToPortfolio}
+                className="block text-white hover:text-gray-300 transition-colors text-lg font-medium w-full"
               >
                 Portfolio
-              </Link>
+              </button>
               <button 
                 onClick={() => scrollToSection('certificates')}
                 className="block text-white hover:text-gray-300 transition-colors text-lg font-medium w-full"
