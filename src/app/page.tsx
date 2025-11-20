@@ -1,94 +1,33 @@
 "use client";
 
-import { lazy, Suspense, useState } from 'react';
+import { lazy, Suspense } from 'react';
 import GlassSurface from "@/components/react-bits/GlassSurface/GlassSurface";
 import LoadingSkeleton from "@/components/ui/LoadingSkeleton";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { motion } from "framer-motion";
+import { Card, CardContent } from "@/components/ui/card";
 import {
   BarChart3,
   Brain,
   Code2,
   Database,
   FileText,
-  Github,
   Globe,
   Layers,
   Linkedin,
+  Lightbulb,
   Mail,
-  MapPin,
   Phone,
-  Send,
   Sparkles,
+  Star,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
-
-type ContactLinkProps = {
-  icon: LucideIcon;
-  label: string;
-  value: string;
-  href?: string;
-};
+import BlurText from "@/components/react-bits/BlurText/BlurText";
 
 
 // Lazy load the heavy WebGL component
 const LiquidChrome = lazy(() => import("@/components/react-bits/LiquidChrome/LiquidChrome"));
 
 export default function HomePage() {
-  const contactItems = [
-    {
-      icon: Mail,
-      label: "Email",
-      value: "konarkofficial@gmail.com",
-      href: "mailto:konarkofficial@gmail.com",
-    },
-    {
-      icon: Phone,
-      label: "Phone",
-      value: "+91 8800957178",
-      href: "tel:+918800957178",
-    },
-    {
-      icon: MapPin,
-      label: "Location",
-      value: "Noida, Uttar Pradesh 201301",
-    },
-  ];
-
-  const stats = [
-    { number: "6+", label: "Months Experience" },
-    { number: "100%", label: "Data Accuracy" },
-    { number: "Nov 2025", label: "Recent Certification" },
-  ];
-
-  const highlights = [
-    {
-      title: "AI-Powered Workflow",
-      description: "3x faster SQL/Python delivery using AI copilots while keeping quality checks in place.",
-    },
-    {
-      title: "Commerce + Analytics",
-      description: "B.Com foundations plus real-world claims analytics for healthcare & insurance domains.",
-    },
-    {
-      title: "Power BI Storytelling",
-      description: "Specialist in immersive dashboards with DAX, governed datasets, and decision-grade visuals.",
-    },
-  ];
-
-  const socialLinks = [
-    {
-      icon: Linkedin,
-      href: "https://www.linkedin.com/in/konarkparihar",
-      label: "LinkedIn",
-    },
-    {
-      icon: Github,
-      href: "https://github.com/KonarkParihar",
-      label: "GitHub",
-    },
-  ];
 
   const skillsShowcase = [
     {
@@ -156,30 +95,6 @@ export default function HomePage() {
     },
   ];
 
-  const projectPlaceholders = [
-    {
-      title: "Weather Analytics Dashboard",
-      focus: "Power BI",
-      status: "In review",
-      description:
-        "Real-time monitoring across Indian cities with AQI, forecast overlays, and sunrise/sunset metrics.",
-    },
-    {
-      title: "Healthcare Provider Network",
-      focus: "Excel + Database",
-      status: "Case study draft",
-      description:
-        "Process automation story from the Xceedance experience showing data hygiene and reporting rigor.",
-    },
-    {
-      title: "AI-Assisted Data Cleaning",
-      focus: "Python",
-      status: "Code polish",
-      description:
-        "ETL pipeline demonstrating how copilots accelerate wrangling without compromising audit trails.",
-    },
-  ];
-
   const contactChannels = [
     {
       icon: Mail,
@@ -196,14 +111,103 @@ export default function HomePage() {
     {
       icon: FileText,
       label: "Resume",
-      value: "Download PDF",
-      href: "/resume.pdf",
+      value: "Download resume (PDF)",
+      href: "/Konark%20Resume.pdf",
+      download: true,
     },
     {
       icon: Linkedin,
       label: "LinkedIn",
       value: "linkedin.com/in/konarkparihar",
       href: "https://www.linkedin.com/in/konarkparihar",
+    },
+  ];
+
+  const dashboards = [
+    {
+      featured: true,
+      title: "Adaptive Weather Visuals",
+      subtitle: "Real-Time Environmental Intelligence System",
+      description:
+        "Dynamic weather monitoring dashboard featuring adaptive visualizations that respond to environmental conditions. Tracks temperature forecasts, air quality indices, visibility metrics, and sunrise/sunset data across multiple Indian cities with contextual alerts.",
+      embedUrl:
+        "https://app.fabric.microsoft.com/view?r=eyJrIjoiNGQ0MzFkY2UtN2M1ZS00Mzg4LTk0YzAtZjc4MmVjMDhjY2ZhIiwidCI6IjE4YjExOTE3LTU2NGQtNDJhYi05M2M4LWMxY2JhZDlhNjRiMiJ9&config=eyJjbHVzdGVyVXJsIjoiaHR0cHM6Ly93YWJpLXVzLWVhc3QyLXJlZGlyZWN0LmFuYWx5c2lzLndpbmRvd3MubmV0LyIsImVtYmVkRmVhdHVyZXMiOnsibW9kZXJuRW1iZWQiOnRydWUsImhpZGVBbmdsZVBhbmVsIjpmYWxzZSwiaGlkZUZvb3RlciI6ZmFsc2UsImRpc2FibGVGaWx0ZXJQYW5lbCI6ZmFsc2UsImRpc2FibGVWaXN1YWxQYW5lbCI6ZmFsc2UsImRpc2FibGVXZWJDb250ZXh0TWVudSI6ZmFsc2UsImRpc2FibGVBbmFseXppbmdQYW5lbCI6ZmFsc2UsImRpc2FibGVGb2N1c01vZGUiOmZhbHNlLCJkaXNhYmxlU2VhcmNoUGFuZWwiOmZhbHNlLCJkaXNhYmxlUGFnZU5hdmlnYXRvciI6ZmFsc2UsImRpc2FibGVTbGljZXJzUGFuZWwiOmZhbHNlLCJkaXNhYmxlU2VsZWN0aW9uUGFuZWwiOmZhbHNlLCJkaXNhYmxlQm9va21hcmtzUGFuZWwiOmZhbHNlLCJkaXNhYmxlU2V0dGluZ3NQYW5lbCI6ZmFsc2UsImRpc2FibGVJbnNpZ2h0c1BhbmVsIjpmYWxzZX19",
+      tech: ["Power BI", "DAX", "Weather API", "Real-Time Data", "Advanced Visuals"],
+      metrics: [
+        { label: "Data Points", value: "Real-Time" },
+        { label: "Cities", value: "4+ Indian" },
+        { label: "Metrics", value: "15+ Environmental" },
+        { label: "Update", value: "Hourly Sync" },
+      ],
+      insights: [
+        "Conditional formatting for AQI severity levels",
+        "Forecasted temperature trend analysis with 3-day predictions",
+        "Context-aware safety alerts for visibility/fog risk",
+        "Multi-city comparative weather visualization",
+      ],
+      gradient: "from-teal-500/20 via-cyan-500/10 to-cyan-400/0",
+    },
+    {
+      title: "Macro & Micro Level Analysis",
+      subtitle: "Executive & Operational Intelligence Platform",
+      description:
+        "Comprehensive dual-layer business analytics dashboard providing executive overview (macro) and granular operational insights (micro). Features geographic sales distribution, category profitability analysis, and segment-wise revenue breakdown with drill-through capabilities.",
+      embedUrl:
+        "https://app.powerbi.com/view?r=eyJrIjoiNTg1OTYwMWYtNTdiZi00YjU2LWI3ZWMtMjkxZGZlMGYwZTVkIiwidCI6IjE4YjExOTE3LTU2NGQtNDJhYi05M2M4LWMxY2JhZDlhNjRiMiJ9&pageName=ReportSection&config=eyJjbHVzdGVyVXJsIjoiaHR0cHM6Ly93YWJpLXVzLWVhc3QyLXJlZGlyZWN0LmFuYWx5c2lzLndpbmRvd3MubmV0LyIsImVtYmVkRmVhdHVyZXMiOnsibW9kZXJuRW1iZWQiOnRydWUsImhpZGVBbmdsZVBhbmVsIjpmYWxzZSwiaGlkZUZvb3RlciI6ZmFsc2UsImRpc2FibGVGaWx0ZXJQYW5lbCI6ZmFsc2UsImRpc2FibGVWaXN1YWxQYW5lbCI6ZmFsc2UsImRpc2FibGVXZWJDb250ZXh0TWVudSI6ZmFsc2UsImRpc2FibGVBbmFseXppbmdQYW5lbCI6ZmFsc2UsImRpc2FibGVGb2N1c01vZGUiOmZhbHNlLCJkaXNhYmxlU2VhcmNoUGFuZWwiOmZhbHNlLCJkaXNhYmxlUGFnZU5hdmlnYXRvciI6ZmFsc2UsImRpc2FibGVTbGljZXJzUGFuZWwiOmZhbHNlLCJkaXNhYmxlU2VsZWN0aW9uUGFuZWwiOmZhbHNlLCJkaXNhYmxlQm9va21hcmtzUGFuZWwiOmZhbHNlLCJkaXNhYmxlU2V0dGluZ3NQYW5lbCI6ZmFsc2UsImRpc2FibGVJbnNpZ2h0c1BhbmVsIjpmYWxzZX19",
+      tech: ["Power BI", "DAX", "Data Modeling", "Geographic Viz", "KPI Design"],
+      metrics: [
+        { label: "Total Sales", value: "2.30M" },
+        { label: "Avg Order", value: "458.61" },
+        { label: "Segments", value: "3 Business" },
+        { label: "Categories", value: "Tech | Office | Furniture" },
+      ],
+      insights: [
+        "Executive dashboard with 15+ KPIs for strategic decisions",
+        "Geographic map visualization for regional performance",
+        "Category profit margin comparison (46.7% tech)",
+        "City-level order analysis with interactive filtering",
+      ],
+      gradient: "from-blue-500/20 via-indigo-500/10 to-indigo-400/0",
+    },
+    {
+      title: "Distribution & Trend Analysis",
+      subtitle: "Konark Business Intelligence System",
+      description:
+        "Multi-dimensional business analysis dashboard examining quarterly performance, category distribution, expense ratios, and state-wise profit patterns. Features time-series profit trends, income categorization, and geographic bubble visualizations for India-specific insights.",
+      embedUrl:
+        "https://app.powerbi.com/view?r=eyJrIjoiNmE4MmRhMmItNTFlNC00MzMzLTkwZjQtNjc1NjEyZDI2ZTczIiwidCI6IjE4YjExOTE3LTU2NGQtNDJhYi05M2M4LWMxY2JhZDlhNjRiMiJ9&pageName=ReportSection&config=eyJjbHVzdGVyVXJsIjoiaHR0cHM6Ly93YWJpLXVzLWVhc3QyLXJlZGlyZWN0LmFuYWx5c2lzLndpbmRvd3MubmV0LyIsImVtYmVkRmVhdHVyZXMiOnsibW9kZXJuRW1iZWQiOnRydWUsImhpZGVBbmdsZVBhbmVsIjpmYWxzZSwiaGlkZUZvb3RlciI6ZmFsc2UsImRpc2FibGVGaWx0ZXJQYW5lbCI6ZmFsc2UsImRpc2FibGVWaXN1YWxQYW5lbCI6ZmFsc2UsImRpc2FibGVXZWJDb250ZXh0TWVudSI6ZmFsc2UsImRpc2FibGVBbmFseXppbmdQYW5lbCI6ZmFsc2UsImRpc2FibGVGb2N1c01vZGUiOmZhbHNlLCJkaXNhYmxlU2VhcmNoUGFuZWwiOmZhbHNlLCJkaXNhYmxlUGFnZU5hdmlnYXRvciI6ZmFsc2UsImRpc2FibGVTbGljZXJzUGFuZWwiOmZhbHNlLCJkaXNhYmxlU2VsZWN0aW9uUGFuZWwiOmZhbHNlLCJkaXNhYmxlQm9va21hcmtzUGFuZWwiOmZhbHNlLCJkaXNhYmxlU2V0dGluZ3NQYW5lbCI6ZmFsc2UsImRpc2FibGVJbnNpZ2h0c1BhbmVsIjpmYWxzZX19",
+      tech: ["Power BI", "Time Series", "Statistical Analysis", "Map Visuals", "DAX Measures"],
+      metrics: [
+        { label: "Total Profit", value: "37K" },
+        { label: "Expense Ratio", value: "0.99" },
+        { label: "States", value: "Multiple" },
+        { label: "Quarters", value: "4 Analyzed" },
+      ],
+      insights: [
+        "Month-over-month profit trend identification (peaks in Jan, Aug, Nov)",
+        "Clothing dominates sales at 62% of total quantity",
+        "State-level profitability mapping with bubble chart",
+        "Quarterly performance tracking with comparisons",
+      ],
+      gradient: "from-purple-500/20 via-pink-500/10 to-pink-400/0",
+    },
+  ];
+
+  const techHighlights = [
+    {
+      icon: "🎯",
+      title: "Advanced DAX",
+      description: "Complex measures, time intelligence, and calculated columns for dynamic insights.",
+    },
+    {
+      icon: "🔄",
+      title: "Data Modeling",
+      description: "Star schema design, relationship optimization, and query performance tuning.",
+    },
+    {
+      icon: "📊",
+      title: "Visual Storytelling",
+      description: "Color psychology, hierarchy design, and interactive drill-through experiences.",
     },
   ];
 
@@ -320,116 +324,103 @@ export default function HomePage() {
       </div>
       </div>
 
-      {/* About & Overview Section */}
-      <section id="about" className="relative z-10 bg-background text-foreground">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-16 sm:py-20 lg:py-28 space-y-12">
-          <div className="flex flex-col gap-6 sm:gap-8">
-            <p className="text-xs uppercase tracking-[0.55em] text-text-muted">
-              Get to know me
-            </p>
-            <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-              <div>
-                <h2 className="heading-2 text-text-primary mb-3">About Me</h2>
-                <p className="max-w-3xl text-lg text-text-muted">
-                  Detail-oriented data analyst blending a commerce foundation with modern BI tooling.
-                  I thrive on turning messy, high-volume datasets into accurate, actionable stories that help
-                  stakeholders decide faster.
-                </p>
-              </div>
-              <Badge className="self-start sm:self-auto text-background bg-accent-cyan/90 px-4 py-2 text-sm font-semibold">
-                🟢 Available for opportunities
-              </Badge>
+      {/* About Section - Minimal single-screen layout */}
+      <section
+        id="about"
+        className="relative min-h-screen flex items-center justify-center px-6 sm:px-8 py-24 overflow-hidden"
+      >
+        {/* Gradient transition from hero */}
+        <div className="absolute inset-0 bg-gradient-to-b from-[#0A192F]/0 via-[#0A192F]/50 to-[#0A192F]" />
+        {/* Ambient glows + accents */}
+        <div className="pointer-events-none absolute inset-0">
+          <div className="absolute -top-40 left-1/2 h-[480px] w-[480px] -translate-x-1/2 rounded-full bg-cyan-500/20 blur-[210px]" />
+          <div className="absolute bottom-[-120px] right-1/4 h-[360px] w-[360px] rounded-full bg-sky-500/10 blur-[200px]" />
+          <div className="absolute inset-x-8 top-10 h-px bg-gradient-to-r from-transparent via-white/20 to-transparent" />
+        </div>
+
+        <div className="max-w-3xl mx-auto w-full text-center space-y-16 relative z-10">
+          {/* 1. Section Label - Blur Text */}
+          <BlurText
+            className="text-xs tracking-[0.4em] uppercase text-gray-500"
+            delay={0}
+          >
+            Get to Know Me
+          </BlurText>
+
+          {/* 2. Name - Simple fade */}
+          <motion.h1
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.8, delay: 0.2 }}
+            className="text-5xl sm:text-6xl md:text-7xl font-bold tracking-tight text-white"
+          >
+            KONARK PARIHAR
+          </motion.h1>
+
+          {/* 3. Role - Blur Text */}
+          <BlurText
+            className="text-xl md:text-2xl text-cyan-400/90 font-medium"
+            delay={400}
+          >
+            Data Analyst &amp; Business Intelligence Specialist
+          </BlurText>
+
+          {/* 4. Availability Badge */}
+          <div className="flex justify-center">
+            <div className="inline-flex items-center gap-2 px-4 py-2 border border-emerald-400/30 bg-emerald-400/5 rounded-full shadow-[0_0_30px_rgba(16,185,129,0.15)]">
+              <div className="w-2 h-2 bg-emerald-400 rounded-full animate-pulse" />
+              <span className="text-sm text-emerald-300">Available for opportunities</span>
             </div>
           </div>
 
-          <div className="grid gap-10 md:grid-cols-3">
-            <Card className="border-white/10 bg-white/5 p-0 backdrop-blur-xl shadow-glass-soft">
-              <CardHeader className="space-y-6 border-b border-white/5">
-                <div className="flex flex-col items-center text-center gap-4">
-                  <div className="relative">
-                    <div className="absolute inset-0 rounded-full blur-3xl bg-accent-bright/30" />
-                    <div className="relative flex h-28 w-28 items-center justify-center rounded-full bg-gradient-to-br from-accent-bright/20 via-accent-cyan/40 to-highlight/25 text-3xl font-semibold text-text-primary shadow-glass">
-                      KP
-                      <span className="absolute inset-[-6px] rounded-full border border-accent-bright/40 opacity-70" />
-                    </div>
-                  </div>
-                  <div>
-                    <CardTitle className="text-xl text-text-primary">Konark Parihar</CardTitle>
-                    <p className="text-sm text-text-muted">Data Analyst & BI Specialist</p>
-                  </div>
-                </div>
-              </CardHeader>
-              <CardContent className="p-6 space-y-6">
-                <div className="space-y-3">
-                  {contactItems.map((item) => (
-                    <ContactLink key={item.label} {...item} />
-                  ))}
-                </div>
-                <div>
-                  <p className="text-xs uppercase tracking-[0.35em] text-text-muted mb-3">
-                    Connect
-                  </p>
-                  <div className="flex gap-3">
-                    {socialLinks.map(({ icon: Icon, href, label }) => (
-                      <a
-                        key={label}
-                        href={href}
-                        target="_blank"
-                        rel="noreferrer"
-                        aria-label={label}
-                        className="flex h-11 w-11 items-center justify-center rounded-xl border border-white/10 bg-white/5 text-text-primary transition hover:-translate-y-0.5 hover:border-accent-cyan/60 hover:text-accent-cyan"
-                      >
-                        <Icon className="h-5 w-5" />
-                      </a>
-                    ))}
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
+          {/* 5. Bio - Static */}
+          <motion.p
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
+            viewport={{ once: true }}
+            transition={{ duration: 1, delay: 0.6 }}
+            className="text-gray-400 leading-relaxed text-lg max-w-2xl mx-auto"
+          >
+            Data analyst with commerce background specializing in Power BI, SQL, and AI-powered workflows. 6+ months
+            managing healthcare databases at Xceedance (100% accuracy). Recent certification focused on turning messy
+            datasets into clear, decision-ready insights.
+          </motion.p>
 
-            <div className="md:col-span-2 space-y-10">
-              <motion.div
-                className="space-y-4 rounded-3xl border border-white/5 bg-white/5 p-6 sm:p-8 shadow-glass-soft"
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.6 }}
-              >
-                <p className="text-lg text-text-primary">
-                  I recently completed the Data Analyst certification from Ducat, Noida (Nov 2025) while
-                  applying my skills inside the Medical Provider Network team at Xceedance Consulting. The
-                  role demanded 100% accuracy on sensitive healthcare data — a standard I continue to uphold
-                  in every dashboard, SQL procedure, and insight narrative.
-                </p>
-                <p className="text-base text-text-muted">
-                  Beyond day-to-day deliveries, I’m known for building AI-assisted workflows that reduce
-                  repetitive legwork. This gives clients Power BI experiences that feel cinematic on the
-                  surface yet are powered by deeply governed data practices underneath.
-                </p>
-              </motion.div>
+          <div className="rounded-[36px] border border-white/10 bg-white/5 px-6 sm:px-10 py-10 space-y-10 shadow-[0_20px_80px_rgba(0,0,0,0.35)] backdrop-blur-sm">
+            {/* 6. Metrics - Horizontal row */}
+            <div className="flex flex-col sm:flex-row justify-center gap-8 sm:gap-12 md:gap-16">
+              {[
+                { value: "6+", label: "Months Experience" },
+                { value: "100%", label: "Data Accuracy" },
+                { value: "Nov 2025", label: "Certified" },
+              ].map(({ value, label }) => (
+                <div key={label} className="text-center space-y-1">
+                  <div className="text-4xl md:text-5xl font-semibold text-cyan-300/80">{value}</div>
+                  <div className="text-xs uppercase tracking-[0.35em] text-gray-500">{label}</div>
+                </div>
+              ))}
+            </div>
 
-              <div className="grid gap-4 sm:grid-cols-3">
-                {stats.map((stat) => (
-                  <StatCard key={stat.label} {...stat} />
-                ))}
-              </div>
-
-              <div className="grid gap-4 sm:grid-cols-2">
-                {highlights.map((highlight) => (
-                  <div
-                    key={highlight.title}
-                    className="rounded-3xl border border-white/5 bg-gradient-to-br from-white/5 via-white/0 to-transparent p-5 flex gap-3"
-                  >
-                    <div className="mt-1 flex h-10 w-10 items-center justify-center rounded-2xl bg-accent-cyan/10 text-accent-cyan">
-                      <Sparkles className="h-5 w-5" />
-                    </div>
-                    <div>
-                      <p className="text-sm font-semibold text-text-primary">{highlight.title}</p>
-                      <p className="text-sm text-text-muted mt-1">{highlight.description}</p>
-                    </div>
-                  </div>
-                ))}
-              </div>
+            {/* 7. Skills - Pills */}
+            <div className="flex flex-wrap justify-center gap-3 max-w-2xl mx-auto">
+              {[
+                "Power BI",
+                "SQL",
+                "Python",
+                "Excel",
+                "DAX",
+                "AI Workflow",
+                "Healthcare Analytics",
+                "Business Intelligence",
+              ].map((skill) => (
+                <span
+                  key={skill}
+                  className="px-4 py-1.5 text-sm text-gray-200/90 border border-white/10 rounded-full hover:text-cyan-300 hover:border-cyan-400/40 transition-colors cursor-default"
+                >
+                  {skill}
+                </span>
+              ))}
             </div>
           </div>
         </div>
@@ -484,40 +475,38 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Projects Section (Flow-inspired tabs) */}
-      <section id="projects" className="relative z-10 bg-black text-white py-16 sm:py-24 lg:py-32 overflow-hidden cv-auto">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="text-center">
-            <h2 className="text-3xl font-bold tracking-tight sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl chrome-text">Projects</h2>
-            <p className="mt-4 sm:mt-6 text-base sm:text-lg leading-6 sm:leading-8 text-gray-300 max-w-3xl mx-auto px-2">
-              A cinematic showcase of interactive analytics. Explore embedded Power BI dashboards with smooth, polished interactions.
+      {/* Projects Section - Premium minimalist redesign */}
+      <section id="projects" className="relative py-24 sm:py-32 px-4 overflow-hidden border-t border-white/5">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,#22d3ee1a,transparent_45%)] blur-3xl pointer-events-none" />
+        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-background/80 to-background pointer-events-none" />
+
+        <div className="max-w-7xl mx-auto relative z-10 space-y-16">
+          <div className="text-center space-y-6">
+            <h2 className="text-4xl sm:text-5xl md:text-6xl font-bold bg-gradient-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent">
+              Interactive Analytics
+            </h2>
+            <p className="text-lg sm:text-xl text-text-muted max-w-3xl mx-auto leading-relaxed">
+              A cinematic showcase of embedded Power BI dashboards. <span className="text-cyan-400">Fully interactive</span>,
+              real-time data visualizations built with advanced DAX, optimized queries, and storytelling design principles.
             </p>
           </div>
 
-          {/* Tab buttons */}
-          <div className="sticky top-20 sm:top-24 z-20 bg-gradient-to-b from-black via-black/95 to-transparent pb-6 sm:pb-8 pt-4 pointer-events-none">
-            <Suspense fallback={<div className="h-12" />}>
-              <ProjectsTabs />
-            </Suspense>
-          </div>
-        </div>
-      </section>
-
-      {/* Project Cards Framework */}
-      <section id="featured-projects" className="relative z-10 bg-background text-foreground border-t border-white/5">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-16 sm:py-20 lg:py-28 space-y-8">
-          <div className="text-center space-y-3">
-            <p className="text-xs uppercase tracking-[0.55em] text-text-muted">Project library</p>
-            <h2 className="heading-2 text-text-primary">Case studies & dashboards</h2>
-            <p className="text-text-muted max-w-3xl mx-auto">
-              Scaffold for 21st.dev inspired cards. Each placeholder card is ready for another agent to inject imagery,
-              metrics, and CTAs without touching layout.
-            </p>
-          </div>
-          <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
-            {projectPlaceholders.map((project) => (
-              <ProjectPlaceholderCard key={project.title} {...project} />
+          <div className="space-y-20">
+            {dashboards.map((dashboard) => (
+              <DashboardCard key={dashboard.title} {...dashboard} />
             ))}
+          </div>
+
+          <div className="mt-10 p-8 sm:p-10 rounded-3xl border border-cyan-500/20 bg-gradient-to-br from-cyan-500/5 to-transparent shadow-glass-soft">
+            <h3 className="text-2xl font-semibold mb-6 flex items-center gap-3 text-text-primary">
+              <span className="text-cyan-400 text-3xl">⚡</span>
+              Technical implementation highlights
+            </h3>
+            <div className="grid gap-6 md:grid-cols-3">
+              {techHighlights.map((highlight) => (
+                <TechHighlight key={highlight.title} {...highlight} />
+              ))}
+            </div>
           </div>
         </div>
       </section>
@@ -537,7 +526,7 @@ export default function HomePage() {
         <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 py-16 sm:py-20 lg:py-28 grid gap-10 lg:grid-cols-2">
           <div className="space-y-6">
             <p className="text-xs uppercase tracking-[0.55em] text-text-muted">Contact</p>
-            <h2 className="heading-2 text-text-primary">Let's work together</h2>
+            <h2 className="heading-2 text-text-primary">Let&rsquo;s work together</h2>
             <p className="text-text-muted">
               Structured so another agent can plug in Formspree, Vercel functions, or Shadcn form validation.
               Currently plain inputs to keep the foundation light.
@@ -617,172 +606,6 @@ export default function HomePage() {
   );
 }
 
-function ProjectsTabs() {
-  const [activeTab, setActiveTab] = useState<'consistent' | 'seamless' | 'cinematic'>("cinematic");
-  const [hoverTab, setHoverTab] = useState<null | 'consistent' | 'seamless' | 'cinematic'>(null);
-  const [loadedState, setLoadedState] = useState<Record<'consistent' | 'seamless' | 'cinematic', boolean>>({
-    cinematic: false,
-    seamless: false,
-    consistent: false,
-  });
-
-
-  const tabs = [
-    { key: 'cinematic' as const, label: 'Adaptive Visuals' },
-    { key: 'seamless' as const, label: 'Macro and Micro level Analysis' },
-    { key: 'consistent' as const, label: 'Distribution and Trend Analysis' },
-  ];
-
-  const displayed = hoverTab ?? activeTab;
-
-  return (
-    <div className="mt-6 sm:mt-12 pointer-events-auto">
-      {/* Full-width titles row with blur like reference */}
-      <div className="ml-[calc(50%-50vw)] w-screen">
-        <div className="border-t border-white/15 bg-gradient-to-b from-white/5 via-white/0 to-transparent">
-          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pt-4 sm:pt-8 flex flex-col sm:grid sm:grid-cols-3 items-center gap-4 sm:gap-4">
-            {tabs.map(({ key, label }) => {
-              const isDisplayed = displayed === key;
-              return (
-                <h3
-                  key={key}
-                  onMouseEnter={() => setHoverTab(key)}
-                  onMouseLeave={() => setHoverTab(null)}
-                  onClick={() => setActiveTab(key)}
-                  className={`text-sm sm:text-2xl md:text-3xl lg:text-4xl xl:text-5xl font-bold cursor-pointer select-none text-center
-                    transition-all duration-300 ease-in-out
-                    ${isDisplayed ? 'opacity-100 scale-105' : 'opacity-60 scale-100'}
-                    ${isDisplayed ? 'filter-none' : 'blur-[4px] sm:blur-[8px]'}
-                    py-2 px-4 rounded-lg w-full sm:w-auto
-                    ${isDisplayed ? 'bg-white/10 border border-white/20' : 'bg-white/5 border border-white/10 hover:bg-white/8'}
-                    shadow-md
-                  `}
-                  style={{ 
-                    fontSize: 'clamp(0.875rem, 1rem, 2.5rem)' 
-                  }}
-                >
-                  {label}
-                </h3>
-              );
-            })}
-          </div>
-        </div>
-      </div>
-
-
-      {/* Content area */}
-      <div className="mt-6 sm:mt-10">
-        {/* Keep DOM of all three iframes mounted to preload and avoid switching lag */}
-        <div className="mx-auto w-[95vw] sm:w-[90vw] md:w-[80vw] lg:w-[74vw] px-0">
-          <div className="relative rounded-[22px] md:rounded-[24px] overflow-hidden bg-black/80 shadow-[0_30px_80px_rgba(0,0,0,0.45)] ring-1 ring-white/10">
-            {/* Turquoise glow border */}
-            <div className="pointer-events-none absolute inset-0">
-              <div className="absolute -inset-2 rounded-[28px] bg-teal-400/20 blur-xl" />
-              <div className="absolute inset-0 rounded-[22px] ring-1 ring-teal-400/20" />
-            </div>
-
-            {/* Shared aspect-ratio container */}
-            <div className="relative pt-[56.25%] sm:pt-[59.77%] overflow-hidden">
-              <div
-                className={`absolute inset-0 bg-black transition-opacity duration-500 ease-out z-[5]`}
-                style={{ opacity: loadedState[(hoverTab ?? activeTab)] ? 0 : 1, pointerEvents: 'none' }}
-              />
-              {/* Cinematic */}
-              <iframe
-                title="Project 3"
-                src="https://app.fabric.microsoft.com/view?r=eyJrIjoiNGQ0MzFkY2UtN2M1ZS00Mzg4LTk0YzAtZjc4MmVjMDhjY2ZhIiwidCI6IjE4YjExOTE3LTU2NGQtNDJhYi05M2M4LWMxY2JhZDlhNjRiMiJ9&config=eyJjbHVzdGVyVXJsIjoiaHR0cHM6Ly93YWJpLXVzLWVhc3QyLXJlZGlyZWN0LmFuYWx5c2lzLndpbmRvd3MubmV0LyIsImVtYmVkRmVhdHVyZXMiOnsibW9kZXJuRW1iZWQiOnRydWUsImhpZGVBbmdsZVBhbmVsIjpmYWxzZSwiaGlkZUZvb3RlciI6ZmFsc2UsImRpc2FibGVGaWx0ZXJQYW5lbCI6ZmFsc2UsImRpc2FibGVWaXN1YWxQYW5lbCI6ZmFsc2UsImRpc2FibGVXZWJDb250ZXh0TWVudSI6ZmFsc2UsImRpc2FibGVBbmFseXppbmdQYW5lbCI6ZmFsc2UsImRpc2FibGVGb2N1c01vZGUiOmZhbHNlLCJkaXNhYmxlU2VhcmNoUGFuZWwiOmZhbHNlLCJkaXNhYmxlUGFnZU5hdmlnYXRvciI6ZmFsc2UsImRpc2FibGVTbGljZXJzUGFuZWwiOmZhbHNlLCJkaXNhYmxlU2VsZWN0aW9uUGFuZWwiOmZhbHNlLCJkaXNhYmxlQm9va21hcmtzUGFuZWwiOmZhbHNlLCJkaXNhYmxlU2V0dGluZ3NQYW5lbCI6ZmFsc2UsImRpc2FibGVJbnNpZ2h0c1BhbmVsIjpmYWxzZX19"
-                className="absolute inset-0 h-full w-full [transform:translateX(0%)_scaleX(1.05)] origin-center"
-                style={{ border: '0', backgroundColor: '#000', zIndex: activeTab === 'cinematic' ? 2 : 1, opacity: activeTab === 'cinematic' ? (loadedState?.cinematic ? 1 : 0) : 0, transform: activeTab === 'cinematic' ? 'translateX(0%) scaleX(1.05)' : 'translateX(-200vw) scaleX(1.05)', pointerEvents: activeTab === 'cinematic' ? (loadedState?.cinematic ? 'auto' : 'none') : 'none', visibility: 'visible', transition: 'opacity 400ms ease-out' }}
-                allowFullScreen
-                loading={activeTab === 'cinematic' ? 'eager' : 'lazy'}
-                referrerPolicy="no-referrer-when-downgrade"
-                onLoad={() => setLoadedState(prev => ({ ...prev, cinematic: true }))}
-              />
-
-              {/* Seamless */}
-              <iframe
-                title="Project2"
-                src="https://app.powerbi.com/view?r=eyJrIjoiNTg1OTYwMWYtNTdiZi00YjU2LWI3ZWMtMjkxZGZlMGYwZTVkIiwidCI6IjE4YjExOTE3LTU2NGQtNDJhYi05M2M4LWMxY2JhZDlhNjRiMiJ9&pageName=ReportSection&config=eyJjbHVzdGVyVXJsIjoiaHR0cHM6Ly93YWJpLXVzLWVhc3QyLXJlZGlyZWN0LmFuYWx5c2lzLndpbmRvd3MubmV0LyIsImVtYmVkRmVhdHVyZXMiOnsibW9kZXJuRW1iZWQiOnRydWUsImhpZGVBbmdsZVBhbmVsIjpmYWxzZSwiaGlkZUZvb3RlciI6ZmFsc2UsImRpc2FibGVGaWx0ZXJQYW5lbCI6ZmFsc2UsImRpc2FibGVWaXN1YWxQYW5lbCI6ZmFsc2UsImRpc2FibGVXZWJDb250ZXh0TWVudSI6ZmFsc2UsImRpc2FibGVBbmFseXppbmdQYW5lbCI6ZmFsc2UsImRpc2FibGVGb2N1c01vZGUiOmZhbHNlLCJkaXNhYmxlU2VhcmNoUGFuZWwiOmZhbHNlLCJkaXNhYmxlUGFnZU5hdmlnYXRvciI6ZmFsc2UsImRpc2FibGVTbGljZXJzUGFuZWwiOmZhbHNlLCJkaXNhYmxlU2VsZWN0aW9uUGFuZWwiOmZhbHNlLCJkaXNhYmxlQm9va21hcmtzUGFuZWwiOmZhbHNlLCJkaXNhYmxlU2V0dGluZ3NQYW5lbCI6ZmFsc2UsImRpc2FibGVJbnNpZ2h0c1BhbmVsIjpmYWxzZX19"
-                className="absolute inset-0 h-full w-full [transform:translateX(0%)_scaleX(1.05)] origin-center"
-                style={{ border: '0', backgroundColor: '#000', zIndex: activeTab === 'seamless' ? 2 : 1, opacity: activeTab === 'seamless' ? (loadedState?.seamless ? 1 : 0) : 0, transform: activeTab === 'seamless' ? 'translateX(0%) scaleX(1.05)' : 'translateX(-200vw) scaleX(1.05)', pointerEvents: activeTab === 'seamless' ? (loadedState?.seamless ? 'auto' : 'none') : 'none', visibility: 'visible', transition: 'opacity 400ms ease-out' }}
-                allowFullScreen
-                loading={activeTab === 'seamless' ? 'eager' : 'lazy'}
-                referrerPolicy="no-referrer-when-downgrade"
-                onLoad={() => setLoadedState(prev => ({ ...prev, seamless: true }))}
-              />
-
-              {/* Consistent */}
-              <iframe
-                title="project"
-                src="https://app.powerbi.com/view?r=eyJrIjoiNmE4MmRhMmItNTFlNC00MzMzLTkwZjQtNjc1NjEyZDI2ZTczIiwidCI6IjE4YjExOTE3LTU2NGQtNDJhYi05M2M4LWMxY2JhZDlhNjRiMiJ9&pageName=ReportSection&config=eyJjbHVzdGVyVXJsIjoiaHR0cHM6Ly93YWJpLXVzLWVhc3QyLXJlZGlyZWN0LmFuYWx5c2lzLndpbmRvd3MubmV0LyIsImVtYmVkRmVhdHVyZXMiOnsibW9kZXJuRW1iZWQiOnRydWUsImhpZGVBbmdsZVBhbmVsIjpmYWxzZSwiaGlkZUZvb3RlciI6ZmFsc2UsImRpc2FibGVGaWx0ZXJQYW5lbCI6ZmFsc2UsImRpc2FibGVWaXN1YWxQYW5lbCI6ZmFsc2UsImRpc2FibGVXZWJDb250ZXh0TWVudSI6ZmFsc2UsImRpc2FibGVBbmFseXppbmdQYW5lbCI6ZmFsc2UsImRpc2FibGVGb2N1c01vZGUiOmZhbHNlLCJkaXNhYmxlU2VhcmNoUGFuZWwiOmZhbHNlLCJkaXNhYmxlUGFnZU5hdmlnYXRvciI6ZmFsc2UsImRpc2FibGVTbGljZXJzUGFuZWwiOmZhbHNlLCJkaXNhYmxlU2VsZWN0aW9uUGFuZWwiOmZhbHNlLCJkaXNhYmxlQm9va21hcmtzUGFuZWwiOmZhbHNlLCJkaXNhYmxlU2V0dGluZ3NQYW5lbCI6ZmFsc2UsImRpc2FibGVJbnNpZ2h0c1BhbmVsIjpmYWxzZX19"
-                className="absolute inset-0 h-full w-full [transform:translateX(0%)_scaleX(1.05)] origin-center"
-                style={{ border: '0', backgroundColor: '#000', zIndex: activeTab === 'consistent' ? 2 : 1, opacity: activeTab === 'consistent' ? (loadedState?.consistent ? 1 : 0) : 0, transform: activeTab === 'consistent' ? 'translateX(0%) scaleX(1.05)' : 'translateX(-200vw) scaleX(1.05)', pointerEvents: activeTab === 'consistent' ? (loadedState?.consistent ? 'auto' : 'none') : 'none', visibility: 'visible', transition: 'opacity 400ms ease-out' }}
-                allowFullScreen
-                loading={activeTab === 'consistent' ? 'eager' : 'lazy'}
-                referrerPolicy="no-referrer-when-downgrade"
-                onLoad={() => setLoadedState(prev => ({ ...prev, consistent: true }))}
-              />
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-type ContactLinkProps = {
-  icon: LucideIcon;
-  label: string;
-  value: string;
-  href?: string;
-};
-
-function ContactLink({ icon: Icon, label, value, href }: ContactLinkProps) {
-  const content = (
-    <div className="flex items-center gap-3 rounded-2xl border border-white/5 bg-white/5 p-3 transition hover:border-accent-cyan/50 hover:bg-white/10">
-      <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-accent-cyan/10 text-accent-cyan">
-        <Icon className="h-4 w-4" />
-      </div>
-      <div>
-        <p className="text-[11px] uppercase tracking-[0.4em] text-text-muted">{label}</p>
-        <p className="text-sm font-semibold text-text-primary">{value}</p>
-      </div>
-    </div>
-  );
-
-  if (href) {
-    const isExternal = href.startsWith("http");
-    return (
-      <a
-        href={href}
-        target={isExternal ? "_blank" : undefined}
-        rel={isExternal ? "noreferrer" : undefined}
-        className="block focus:outline-none focus-visible:ring-2 focus-visible:ring-accent-cyan/60 focus-visible:ring-offset-2 focus-visible:ring-offset-background rounded-2xl"
-      >
-        {content}
-      </a>
-    );
-  }
-
-  return content;
-}
-
-type StatCardProps = {
-  number: string;
-  label: string;
-};
-
-function StatCard({ number, label }: StatCardProps) {
-  return (
-    <div className="rounded-3xl border border-white/5 bg-white/5 p-5 shadow-glass-soft">
-      <p className="text-3xl font-semibold text-text-primary">{number}</p>
-      <p className="mt-2 text-sm uppercase tracking-[0.25em] text-text-muted">
-        {label}
-      </p>
-    </div>
-  );
-}
-
 type SkillCardProps = {
   icon: LucideIcon;
   title: string;
@@ -856,42 +679,15 @@ function ExperienceEntry({
   );
 }
 
-type ProjectPlaceholderProps = {
-  title: string;
-  focus: string;
-  status: string;
-  description: string;
-};
-
-function ProjectPlaceholderCard({ title, focus, status, description }: ProjectPlaceholderProps) {
-  return (
-    <div className="rounded-3xl border border-white/5 bg-white/5 p-6 shadow-glass-soft space-y-4">
-      <div className="flex items-center justify-between text-sm">
-        <span className="uppercase tracking-[0.4em] text-text-muted">{focus}</span>
-        <span className="rounded-full border border-white/10 px-3 py-1 text-xs uppercase text-text-muted">
-          {status}
-        </span>
-      </div>
-      <h3 className="text-xl font-semibold text-text-primary">{title}</h3>
-      <p className="text-sm text-text-muted">{description}</p>
-      <button
-        type="button"
-        className="inline-flex items-center gap-2 text-sm font-semibold text-accent-cyan hover:text-accent-bright focus:outline-none"
-      >
-        Prep case study <Send className="h-4 w-4" />
-      </button>
-    </div>
-  );
-}
-
 type ContactChannelProps = {
   icon: LucideIcon;
   label: string;
   value: string;
   href?: string;
+  download?: boolean;
 };
 
-function ContactChannelCard({ icon: Icon, label, value, href }: ContactChannelProps) {
+function ContactChannelCard({ icon: Icon, label, value, href, download }: ContactChannelProps) {
   const content = (
     <div className="flex items-center justify-between rounded-3xl border border-white/5 bg-white/5 px-5 py-4 shadow-glass-soft">
       <div>
@@ -910,6 +706,7 @@ function ContactChannelCard({ icon: Icon, label, value, href }: ContactChannelPr
         href={href}
         target={href.startsWith("http") ? "_blank" : undefined}
         rel={href.startsWith("http") ? "noreferrer" : undefined}
+        download={download}
         className="block focus:outline-none focus-visible:ring-2 focus-visible:ring-accent-cyan/60 focus-visible:ring-offset-2 focus-visible:ring-offset-background rounded-3xl"
       >
         {content}
@@ -918,4 +715,127 @@ function ContactChannelCard({ icon: Icon, label, value, href }: ContactChannelPr
   }
 
   return content;
+}
+
+type DashboardCardProps = {
+  featured?: boolean;
+  title: string;
+  subtitle: string;
+  description: string;
+  embedUrl: string;
+  tech: string[];
+  metrics: { label: string; value: string }[];
+  insights: string[];
+  gradient: string;
+};
+
+function DashboardCard({
+  featured,
+  title,
+  subtitle,
+  description,
+  embedUrl,
+  tech,
+  metrics,
+  insights,
+  gradient,
+}: DashboardCardProps) {
+  return (
+    <motion.article
+      initial={{ opacity: 0, y: 40 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true }}
+      transition={{ duration: 0.7 }}
+      className={`group relative rounded-3xl border border-white/10 overflow-hidden bg-gradient-to-br from-gray-900/70 to-gray-900/40 backdrop-blur-xl`}
+    >
+      <div className={`absolute inset-0 bg-gradient-to-br ${gradient} opacity-0 group-hover:opacity-100 transition-opacity duration-700`} />
+      <div className="relative z-10 p-8 sm:p-10 space-y-10">
+        <div>
+          {featured && (
+            <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-cyan-500/10 border border-cyan-500/30 text-cyan-300 text-sm font-semibold mb-4">
+              <Star className="h-4 w-4" />
+              Featured Project
+            </span>
+          )}
+          <h3 className="text-3xl sm:text-4xl font-bold text-text-primary mb-3 group-hover:text-cyan-400 transition-colors">
+            {title}
+          </h3>
+          <p className="text-lg text-cyan-300/80 font-medium mb-6">{subtitle}</p>
+          <p className="text-text-muted leading-relaxed max-w-3xl">{description}</p>
+        </div>
+
+        <div
+          role="region"
+          aria-label={`${title} - Interactive Power BI Dashboard`}
+          className="rounded-2xl overflow-hidden border-2 border-white/10 group-hover:border-cyan-400/40 transition-colors"
+        >
+          <div className="relative w-full bg-black/80">
+            <div className="relative pt-[56.25%] sm:pt-[59.77%] overflow-hidden">
+              <iframe
+                title={title}
+                src={embedUrl}
+                className="absolute inset-0 h-full w-full [transform:translateX(0%)_scaleX(1.05)] origin-center"
+                style={{ border: 0, backgroundColor: "#000" }}
+                allowFullScreen
+                aria-label={description}
+                loading="lazy"
+                referrerPolicy="no-referrer-when-downgrade"
+              />
+            </div>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 p-6 rounded-2xl bg-white/5 border border-white/10">
+          {metrics.map(({ label, value }) => (
+            <div key={label} className="text-center">
+              <p className="text-2xl font-bold text-cyan-300">{value}</p>
+              <p className="text-xs uppercase tracking-[0.2em] text-text-muted mt-1">{label}</p>
+            </div>
+          ))}
+        </div>
+
+        <div className="space-y-4">
+          <h4 className="text-lg font-semibold flex items-center gap-2 text-text-primary">
+            <Lightbulb className="h-5 w-5 text-amber-300" />
+            Key insights &amp; features
+          </h4>
+          <ul className="grid md:grid-cols-2 gap-3">
+            {insights.map((insight) => (
+              <li key={insight} className="flex items-start gap-3 text-sm text-text-muted">
+                <span className="text-cyan-400 mt-1">▹</span>
+                <span>{insight}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+
+        <div className="flex flex-wrap gap-3">
+          {tech.map((item) => (
+            <span
+              key={item}
+              className="px-4 py-2 rounded-full border border-cyan-500/30 bg-cyan-500/10 text-cyan-200 text-sm font-medium"
+            >
+              {item}
+            </span>
+          ))}
+        </div>
+      </div>
+    </motion.article>
+  );
+}
+
+type TechHighlightProps = {
+  icon: string;
+  title: string;
+  description: string;
+};
+
+function TechHighlight({ icon, title, description }: TechHighlightProps) {
+  return (
+    <div className="rounded-2xl border border-white/10 bg-white/5 p-5 backdrop-blur-md">
+      <div className="text-3xl mb-3">{icon}</div>
+      <h4 className="text-lg font-semibold text-text-primary mb-2">{title}</h4>
+      <p className="text-sm text-text-muted">{description}</p>
+    </div>
+  );
 }

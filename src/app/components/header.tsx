@@ -20,37 +20,39 @@ function Header() {
       const currentScrollY = window.scrollY;
       const scrolledPastHero = currentScrollY > 50;
 
-      // Update the glass effect state
+      // Update state for glass effect
       setIsScrolled(scrolledPastHero);
 
-      // Close mobile menu when scrolling
+      // Close mobile menu if user starts scrolling
       if (isMobileMenuOpen) {
         setIsMobileMenuOpen(false);
       }
 
-      // Clear any existing timer on scroll activity
-      if (hideHeaderTimeout.current) {
-        clearTimeout(hideHeaderTimeout.current);
+      if (!scrolledPastHero) {
+        if (hideHeaderTimeout.current) {
+          clearTimeout(hideHeaderTimeout.current);
+          hideHeaderTimeout.current = null;
+        }
+        setIsVisible(true);
+        lastScrollY.current = currentScrollY;
+        return;
       }
 
-      // Determine visibility based on scroll direction and position
-      if (!scrolledPastHero) {
-        // Always show header in the hero section
+      if (currentScrollY < lastScrollY.current) {
+        if (hideHeaderTimeout.current) {
+          clearTimeout(hideHeaderTimeout.current);
+          hideHeaderTimeout.current = null;
+        }
         setIsVisible(true);
-      } else if (currentScrollY < lastScrollY.current) {
-        // Show header immediately on scroll up
-        setIsVisible(true);
-      } else {
-        // When scrolling down past the hero, set a timer to hide the header
-        // But only if not hovered and not on mobile (mobile should always be visible when scrolled)
-        if (!isHovered && window.innerWidth >= 768) {
+      } else if (!isHovered && window.innerWidth >= 768) {
+        if (!hideHeaderTimeout.current) {
           hideHeaderTimeout.current = setTimeout(() => {
             setIsVisible(false);
-          }, 700); // Hide after 0.7 seconds of inactivity
+            hideHeaderTimeout.current = null;
+          }, 250);
         }
       }
 
-      // Update last scroll position
       lastScrollY.current = currentScrollY;
     };
 
@@ -179,7 +181,7 @@ function Header() {
       onMouseLeave={() => {
         setIsHovered(false);
         // If scrolled past hero, start the hide timer again
-        if (isScrolled && window.scrollY > lastScrollY.current) {
+        if (isScrolled && window.scrollY > lastScrollY.current && !isMobileMenuOpen) {
           hideHeaderTimeout.current = setTimeout(() => {
             setIsVisible(false);
           }, 700);
