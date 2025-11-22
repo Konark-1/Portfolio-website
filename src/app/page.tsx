@@ -1,9 +1,7 @@
 "use client";
 
-import { lazy, Suspense } from 'react';
 import GlassSurface from "@/components/react-bits/GlassSurface/GlassSurface";
-import LoadingSkeleton from "@/components/ui/LoadingSkeleton";
-import { motion } from "framer-motion";
+import { motion, useReducedMotion } from "framer-motion";
 import { Card, CardContent } from "@/components/ui/card";
 import {
   BarChart3,
@@ -22,12 +20,20 @@ import {
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import BlurText from "@/components/react-bits/BlurText/BlurText";
+import dynamic from "next/dynamic";
 
-
-// Lazy load the heavy WebGL component
-const LiquidChrome = lazy(() => import("@/components/react-bits/LiquidChrome/LiquidChrome"));
+// Dynamically import LiquidChrome to reduce initial bundle size and avoid SSR issues
+const LiquidChrome = dynamic(
+  () => import("@/components/react-bits/LiquidChrome/LiquidChrome"),
+  {
+    ssr: false,
+    loading: () => null, // No loading state needed for background
+  }
+);
 
 export default function HomePage() {
+  // Respect reduced motion preference
+  const shouldReduceMotion = useReducedMotion();
 
   const skillsShowcase = [
     {
@@ -215,11 +221,11 @@ export default function HomePage() {
     <main className="relative min-h-screen overflow-hidden bg-gradient-to-br from-gray-900 via-black to-gray-800">
       {/* Connection warming handled via preconnect/dns-prefetch in layout */}
 
-      {/* Hero section with LiquidChrome background - limited to hero only */}
-      <div className="relative min-h-screen overflow-hidden">
-        {/* LiquidChrome background only for hero section */}
-        <div className="absolute inset-0 w-full h-full pointer-events-none">
-          <Suspense fallback={<LoadingSkeleton className="absolute inset-0" />}>
+      {/* Hero section */}
+      <div className="relative min-h-screen overflow-hidden bg-gradient-to-br from-gray-900 via-black to-gray-800">
+        {/* Liquid Chrome Background */}
+        {!shouldReduceMotion && (
+          <div className="absolute inset-0 z-0">
             <LiquidChrome
               baseColor={[0, 0.05, 0.05]}
               speed={0.85}
@@ -228,9 +234,12 @@ export default function HomePage() {
               frequencyY={2}
               interactive={true}
             />
-          </Suspense>
-        </div>
-
+          </div>
+        )}
+        
+        {/* Subtle gradient overlay for text readability (lighter) */}
+        <div className="absolute inset-0 z-[1] bg-gradient-to-b from-transparent via-transparent to-gray-900/20 pointer-events-none" />
+        
         {/* Content container with proper spacing from header */}
       <div className="relative z-10 flex flex-col items-center justify-center min-h-screen pt-20 sm:pt-24 lg:pt-28 px-4 sm:px-6">
         {/* Main heading */}
@@ -349,10 +358,10 @@ export default function HomePage() {
 
           {/* 2. Name - Simple fade */}
           <motion.h1
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
+            initial={shouldReduceMotion ? { opacity: 1 } : { opacity: 0, y: 20 }}
+            whileInView={shouldReduceMotion ? {} : { opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            transition={{ duration: 0.8, delay: 0.2 }}
+            transition={shouldReduceMotion ? {} : { duration: 0.8, delay: 0.2 }}
             className="text-5xl sm:text-6xl md:text-7xl font-bold tracking-tight text-white"
           >
             KONARK PARIHAR
@@ -376,10 +385,10 @@ export default function HomePage() {
 
           {/* 5. Bio - Static */}
           <motion.p
-            initial={{ opacity: 0 }}
-            whileInView={{ opacity: 1 }}
+            initial={shouldReduceMotion ? { opacity: 1 } : { opacity: 0 }}
+            whileInView={shouldReduceMotion ? {} : { opacity: 1 }}
             viewport={{ once: true }}
-            transition={{ duration: 1, delay: 0.6 }}
+            transition={shouldReduceMotion ? {} : { duration: 1, delay: 0.6 }}
             className="text-gray-400 leading-relaxed text-lg max-w-2xl mx-auto"
           >
             Data analyst with commerce background specializing in Power BI, SQL, and AI-powered workflows. 6+ months
@@ -477,7 +486,7 @@ export default function HomePage() {
 
       {/* Projects Section - Premium minimalist redesign */}
       <section id="projects" className="relative py-24 sm:py-32 px-4 overflow-hidden border-t border-white/5">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,#22d3ee1a,transparent_45%)] blur-3xl pointer-events-none" />
+        <div className={`absolute inset-0 bg-[radial-gradient(circle_at_top,#22d3ee1a,transparent_45%)] ${shouldReduceMotion ? 'blur-xl' : 'blur-3xl'} pointer-events-none`} />
         <div className="absolute inset-0 bg-gradient-to-b from-transparent via-background/80 to-background pointer-events-none" />
 
         <div className="max-w-7xl mx-auto relative z-10 space-y-16">
@@ -742,10 +751,10 @@ function DashboardCard({
 }: DashboardCardProps) {
   return (
     <motion.article
-      initial={{ opacity: 0, y: 40 }}
+      initial={{ opacity: 0, y: 20 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true }}
-      transition={{ duration: 0.7 }}
+      transition={{ duration: 0.5 }}
       className={`group relative rounded-3xl border border-white/10 overflow-hidden bg-gradient-to-br from-gray-900/70 to-gray-900/40 backdrop-blur-xl`}
     >
       <div className={`absolute inset-0 bg-gradient-to-br ${gradient} opacity-0 group-hover:opacity-100 transition-opacity duration-700`} />
@@ -769,17 +778,24 @@ function DashboardCard({
           aria-label={`${title} - Interactive Power BI Dashboard`}
           className="rounded-2xl overflow-hidden border-2 border-white/10 group-hover:border-cyan-400/40 transition-colors"
         >
-          <div className="relative w-full bg-black/80">
+          <div className="relative w-full bg-black">
             <div className="relative pt-[56.25%] sm:pt-[59.77%] overflow-hidden">
               <iframe
                 title={title}
                 src={embedUrl}
-                className="absolute inset-0 h-full w-full [transform:translateX(0%)_scaleX(1.05)] origin-center"
-                style={{ border: 0, backgroundColor: "#000" }}
+                className="absolute inset-0 h-full w-full border-0"
+                style={{ 
+                  border: 'none',
+                  margin: 0,
+                  padding: 0,
+                  backgroundColor: "#000",
+                  display: 'block'
+                }}
                 allowFullScreen
                 aria-label={description}
-                loading="lazy"
                 referrerPolicy="no-referrer-when-downgrade"
+                frameBorder="0"
+                scrolling="no"
               />
             </div>
           </div>

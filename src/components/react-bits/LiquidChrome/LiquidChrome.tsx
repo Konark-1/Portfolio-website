@@ -1,43 +1,41 @@
 "use client";
 
-import React, { useRef, useEffect, memo } from "react";
-import { Renderer, Program, Mesh, Triangle } from "ogl";
+import { useRef, useEffect } from 'react';
+import { Renderer, Program, Mesh, Triangle } from 'ogl';
 
-interface LiquidChromeProps extends React.HTMLAttributes<HTMLDivElement> {
+import './LiquidChrome.css';
+
+interface LiquidChromeProps {
   baseColor?: [number, number, number];
   speed?: number;
   amplitude?: number;
   frequencyX?: number;
   frequencyY?: number;
   interactive?: boolean;
+  className?: string;
+  style?: React.CSSProperties;
 }
 
-export const LiquidChrome: React.FC<LiquidChromeProps> = ({
+export const LiquidChrome = ({
   baseColor = [0.1, 0.1, 0.1],
   speed = 0.2,
-  amplitude = 0.5,
+  amplitude = 0.3,
   frequencyX = 3,
-  frequencyY = 2,
+  frequencyY = 3,
   interactive = true,
+  className = '',
+  style,
   ...props
-}) => {
-  const containerRef = useRef<HTMLDivElement | null>(null);
+}: LiquidChromeProps) => {
+  const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (!containerRef.current) return;
 
     const container = containerRef.current;
-
-    try {
-      const renderer = new Renderer({ antialias: true });
-      const gl = renderer.gl;
-
-      if (!gl) {
-        console.warn('WebGL not supported, LiquidChrome will not render');
-        return;
-      }
-
-      gl.clearColor(0.1, 0.1, 0.1, 1);
+    const renderer = new Renderer({ antialias: true });
+    const gl = renderer.gl;
+    gl.clearColor(1, 1, 1, 1);
 
     const vertexShader = `
       attribute vec2 position;
@@ -100,34 +98,36 @@ export const LiquidChrome: React.FC<LiquidChromeProps> = ({
       uniforms: {
         uTime: { value: 0 },
         uResolution: {
-          value: new Float32Array([
-            gl.canvas.width,
-            gl.canvas.height,
-            gl.canvas.width / gl.canvas.height,
-          ]),
+          value: new Float32Array([gl.canvas.width, gl.canvas.height, gl.canvas.width / gl.canvas.height])
         },
         uBaseColor: { value: new Float32Array(baseColor) },
         uAmplitude: { value: amplitude },
         uFrequencyX: { value: frequencyX },
         uFrequencyY: { value: frequencyY },
-        uMouse: { value: new Float32Array([0, 0]) },
-      },
+        uMouse: { value: new Float32Array([0, 0]) }
+      }
     });
     const mesh = new Mesh(gl, { geometry, program });
 
     function resize() {
       const scale = 1;
-      renderer.setSize(
-        container.offsetWidth * scale,
-        container.offsetHeight * scale
-      );
+      renderer.setSize(container.offsetWidth * scale, container.offsetHeight * scale);
       const resUniform = program.uniforms.uResolution.value as Float32Array;
       resUniform[0] = gl.canvas.width;
       resUniform[1] = gl.canvas.height;
       resUniform[2] = gl.canvas.width / gl.canvas.height;
     }
-    window.addEventListener("resize", resize);
+    window.addEventListener('resize', resize);
     resize();
+
+    function handleMouseMove(event: MouseEvent) {
+      const rect = container.getBoundingClientRect();
+      const x = (event.clientX - rect.left) / rect.width;
+      const y = 1 - (event.clientY - rect.top) / rect.height;
+      const mouseUniform = program.uniforms.uMouse.value as Float32Array;
+      mouseUniform[0] = x;
+      mouseUniform[1] = y;
+    }
 
     function handleTouchMove(event: TouchEvent) {
       if (event.touches.length > 0) {
@@ -141,100 +141,45 @@ export const LiquidChrome: React.FC<LiquidChromeProps> = ({
       }
     }
 
-    // Global mouse tracking to avoid flickering when hovering over text
-    function handleGlobalMouseMove(event: MouseEvent) {
-      const rect = container.getBoundingClientRect();
-      const x = (event.clientX - rect.left) / rect.width;
-      const y = 1 - (event.clientY - rect.top) / rect.height;
-
-      // Only update if mouse is within the container bounds
-      if (x >= 0 && x <= 1 && y >= 0 && y <= 1) {
-        const mouseUniform = program.uniforms.uMouse.value as Float32Array;
-        mouseUniform[0] = x;
-        mouseUniform[1] = y;
-      }
-    }
-
-    // Animation timing vars
-    let animationId: number;
-    let lastTime = 0;
-    const targetFPS = 60;
-    const frameInterval = 1000 / targetFPS;
-    // Maintain time only while visible to avoid jumps when pausing
-    let accumulatedTime = 0;
-    const isVisibleRef = { current: true };
-
     if (interactive) {
-      // Use global mouse tracking to prevent flickering
-      document.addEventListener("mousemove", handleGlobalMouseMove, { passive: true });
-      container.addEventListener("touchmove", handleTouchMove, { passive: true });
+      container.addEventListener('mousemove', handleMouseMove);
+      container.addEventListener('touchmove', handleTouchMove);
     }
 
+    let animationId: number;
     function update(t: number) {
       animationId = requestAnimationFrame(update);
-
-      // Throttle to target FPS for better performance
-      if (t - lastTime >= frameInterval) {
-        if (isVisibleRef.current) {
-          accumulatedTime += (t - lastTime);
-          program.uniforms.uTime.value = (accumulatedTime * 0.001) * speed;
-          renderer.render({ scene: mesh });
-        }
-        lastTime = t;
-      }
+      program.uniforms.uTime.value = t * 0.001 * speed;
+      renderer.render({ scene: mesh });
     }
     animationId = requestAnimationFrame(update);
-
-    // Pause when offscreen, resume smoothly when onscreen
-    const io = new IntersectionObserver(
-      (entries) => {
-        const entry = entries[0];
-        const now = performance.now();
-        if (entry && typeof entry.isIntersecting === 'boolean') {
-          if (entry.isIntersecting) {
-            isVisibleRef.current = true;
-            lastTime = now; // reset baseline to avoid large deltas
-            if (!animationId) {
-              animationId = requestAnimationFrame(update);
-            }
-          } else {
-            isVisibleRef.current = false;
-          }
-        }
-      },
-      { root: null, threshold: 0.01 }
-    );
-    io.observe(container);
 
     container.appendChild(gl.canvas);
 
     return () => {
       cancelAnimationFrame(animationId);
-      window.removeEventListener("resize", resize);
+      window.removeEventListener('resize', resize);
       if (interactive) {
-        document.removeEventListener("mousemove", handleGlobalMouseMove);
-        container.removeEventListener("touchmove", handleTouchMove);
+        container.removeEventListener('mousemove', handleMouseMove);
+        container.removeEventListener('touchmove', handleTouchMove);
       }
-      io.disconnect();
       if (gl.canvas.parentElement) {
         gl.canvas.parentElement.removeChild(gl.canvas);
       }
-      gl.getExtension("WEBGL_lose_context")?.loseContext();
+      gl.getExtension('WEBGL_lose_context')?.loseContext();
     };
-
-    } catch (error) {
-      console.error('Error initializing LiquidChrome:', error);
-    }
   }, [baseColor, speed, amplitude, frequencyX, frequencyY, interactive]);
 
   return (
-    <div
-      ref={containerRef}
-      className="absolute inset-0 w-full h-full pointer-events-none"
-      style={{ zIndex: 0 }}
-      {...props}
+    <div 
+      ref={containerRef} 
+      className={`liquidChrome-container ${className}`} 
+      style={style}
+      {...props} 
     />
   );
 };
 
-export default memo(LiquidChrome);
+export default LiquidChrome;
+
+

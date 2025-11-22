@@ -2,6 +2,7 @@
 
 import { motion, useSpring } from "framer-motion";
 import { FC, useEffect, useRef } from "react";
+import { shouldDisableHeavyAnimations } from "@/lib/performance";
 
 interface Position {
   x: number;
@@ -113,6 +114,18 @@ export function SmoothCursor({
     // Respect reduced motion and touch devices: disable custom cursor for UX
     const prefersReducedMotion = typeof window !== 'undefined' && window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     const isTouchLike = typeof window !== 'undefined' && !!window.matchMedia && window.matchMedia('(hover: none), (pointer: coarse)').matches;
+    
+    // Disable on low-end devices for better performance
+    if (typeof window !== 'undefined') {
+      try {
+        if (shouldDisableHeavyAnimations()) {
+          return;
+        }
+      } catch {
+        // Performance module not available, continue
+      }
+    }
+    
     if (prefersReducedMotion || isTouchLike) {
       return;
     }
@@ -179,8 +192,18 @@ export function SmoothCursor({
       }
     };
 
+    // Throttle mouse move events more aggressively for better performance
     let rafId: number;
+    let lastMouseMoveTime = 0;
+    const mouseMoveThrottle = 16; // ~60fps, but can be reduced for low-end devices
+    
     const throttledMouseMove = (e: MouseEvent) => {
+      const now = performance.now();
+      if (now - lastMouseMoveTime < mouseMoveThrottle) {
+        return;
+      }
+      lastMouseMoveTime = now;
+      
       if (rafId) return;
 
       rafId = requestAnimationFrame(() => {
