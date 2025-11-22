@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useEffect, useRef, useState, useId, useCallback } from "react";
+import { shouldDisableHeavyAnimations, detectDeviceCapabilities } from "@/lib/performance";
 
 export interface GlassSurfaceProps {
   children?: React.ReactNode;
@@ -97,8 +98,15 @@ const GlassSurface: React.FC<GlassSurfaceProps> = ({
   const gaussianBlurRef = useRef<SVGFEGaussianBlurElement>(null);
 
   const isDarkMode = useDarkMode();
+  const deviceCaps = detectDeviceCapabilities();
+  const useSimplifiedMode = shouldDisableHeavyAnimations() || deviceCaps.isLowEndDevice;
 
   const generateDisplacementMap = useCallback(() => {
+    // Skip expensive SVG generation for low-end devices
+    if (useSimplifiedMode) {
+      return '';
+    }
+
     const rect = containerRef.current?.getBoundingClientRect();
     const actualWidth = rect?.width || 400;
     const actualHeight = rect?.height || 200;
@@ -124,13 +132,18 @@ const GlassSurface: React.FC<GlassSurfaceProps> = ({
     `;
 
     return `data:image/svg+xml,${encodeURIComponent(svgContent)}`;
-  }, [borderWidth, borderRadius, brightness, opacity, blur, mixBlendMode, redGradId, blueGradId]);
+  }, [borderWidth, borderRadius, brightness, opacity, blur, mixBlendMode, redGradId, blueGradId, useSimplifiedMode]);
 
   const updateDisplacementMap = useCallback(() => {
     feImageRef.current?.setAttribute("href", generateDisplacementMap());
   }, [generateDisplacementMap]);
 
   useEffect(() => {
+    // Skip expensive SVG filter updates for low-end devices
+    if (useSimplifiedMode) {
+      return;
+    }
+
     updateDisplacementMap();
     [
       { ref: redChannelRef, offset: redOffset },
@@ -165,24 +178,31 @@ const GlassSurface: React.FC<GlassSurfaceProps> = ({
     xChannel,
     yChannel,
     mixBlendMode,
+    useSimplifiedMode,
   ]);
 
   useEffect(() => {
-    if (!containerRef.current) return;
+    if (!containerRef.current || useSimplifiedMode) return;
 
+    // Debounce resize observer to reduce CPU usage
+    let timeoutId: NodeJS.Timeout;
     const resizeObserver = new ResizeObserver(() => {
-      setTimeout(updateDisplacementMap, 0);
+      clearTimeout(timeoutId);
+      timeoutId = setTimeout(updateDisplacementMap, 200); // Increased debounce for better performance
     });
 
     resizeObserver.observe(containerRef.current);
 
     return () => {
+      clearTimeout(timeoutId);
       resizeObserver.disconnect();
     };
-  }, [updateDisplacementMap]);
+  }, [updateDisplacementMap, useSimplifiedMode]);
 
   useEffect(() => {
-    setTimeout(updateDisplacementMap, 0);
+    // Debounce updates to reduce CPU usage
+    const timeoutId = setTimeout(updateDisplacementMap, 50);
+    return () => clearTimeout(timeoutId);
   }, [updateDisplacementMap, width, height]);
 
 
@@ -198,13 +218,43 @@ const GlassSurface: React.FC<GlassSurfaceProps> = ({
       "--glass-saturation": saturation,
     } as React.CSSProperties;
 
+    // Reduce blur intensity for low-end devices
+    const effectiveBlur = useSimplifiedMode ? Math.min(blur, 4) : blur;
+    const effectiveSaturation = useSimplifiedMode ? Math.min(saturation, 1.2) : saturation;
+
+    // For low-end devices without GPU, use solid background instead of backdrop-filter
+    if (useSimplifiedMode && !deviceCaps.hasGPU) {
+      if (isDarkMode) {
+        return {
+          ...baseStyles,
+          background: `rgba(255, 255, 255, ${backgroundOpacity * 0.15})`,
+          border: "1px solid rgba(255, 255, 255, 0.2)",
+          boxShadow: disableShadow
+            ? 'none'
+            : `inset 0 1px 0 0 rgba(255, 255, 255, 0.2),
+                      inset 0 -1px 0 0 rgba(255, 255, 255, 0.1)`,
+        };
+      }
+      return {
+        ...baseStyles,
+        background: `rgba(255, 255, 255, ${backgroundOpacity * 0.15})`,
+        border: "1px solid rgba(255, 255, 255, 0.3)",
+        boxShadow: disableShadow
+          ? 'none'
+          : `0 8px 32px 0 rgba(31, 38, 135, 0.2),
+                    0 2px 16px 0 rgba(31, 38, 135, 0.1),
+                    inset 0 1px 0 0 rgba(255, 255, 255, 0.4),
+                    inset 0 -1px 0 0 rgba(255, 255, 255, 0.2)`,
+      };
+    }
+
     // Always prefer CSS backdrop-filter for reliability; browsers that don't support it will ignore it
     if (isDarkMode) {
       return {
         ...baseStyles,
         background: `hsl(0 0% 100% / ${backgroundOpacity})`,
-        backdropFilter: `blur(${blur}px) saturate(${saturation}) brightness(1.2)`,
-        WebkitBackdropFilter: `blur(${blur}px) saturate(${saturation}) brightness(1.2)`,
+        backdropFilter: `blur(${effectiveBlur}px) saturate(${effectiveSaturation}) brightness(1.2)`,
+        WebkitBackdropFilter: `blur(${effectiveBlur}px) saturate(${effectiveSaturation}) brightness(1.2)`,
         border: "1px solid rgba(255, 255, 255, 0.2)",
         boxShadow: disableShadow
           ? 'none'
@@ -215,8 +265,8 @@ const GlassSurface: React.FC<GlassSurfaceProps> = ({
     return {
       ...baseStyles,
       background: `hsl(0 0% 100% / ${backgroundOpacity})`,
-      backdropFilter: `blur(${blur}px) saturate(${saturation}) brightness(1.1)`,
-      WebkitBackdropFilter: `blur(${blur}px) saturate(${saturation}) brightness(1.1)`,
+      backdropFilter: `blur(${effectiveBlur}px) saturate(${effectiveSaturation}) brightness(1.1)`,
+      WebkitBackdropFilter: `blur(${effectiveBlur}px) saturate(${effectiveSaturation}) brightness(1.1)`,
       border: "1px solid rgba(255, 255, 255, 0.3)",
       boxShadow: disableShadow
         ? 'none'
@@ -240,10 +290,11 @@ const GlassSurface: React.FC<GlassSurfaceProps> = ({
       className={`${glassSurfaceClasses} ${focusVisibleClasses} ${className}`}
       style={getContainerStyles()}
     >
-      <svg
-        className="w-full h-full pointer-events-none absolute inset-0 opacity-0 -z-10"
-        xmlns="http://www.w3.org/2000/svg"
-      >
+      {!useSimplifiedMode && (
+        <svg
+          className="w-full h-full pointer-events-none absolute inset-0 opacity-0 -z-10"
+          xmlns="http://www.w3.org/2000/svg"
+        >
         <defs>
           <filter
             id={filterId}
@@ -324,6 +375,7 @@ const GlassSurface: React.FC<GlassSurfaceProps> = ({
           </filter>
         </defs>
       </svg>
+      )}
 
       <div className="w-full h-full flex items-center justify-center p-2 rounded-[inherit] relative z-10">
         {children}

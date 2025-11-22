@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import React, { memo } from "react";
+import { shouldDisableHeavyAnimations, detectDeviceCapabilities } from "@/lib/performance";
 
 type LiquidGlassGroupProps = {
   children: React.ReactNode;
@@ -9,13 +10,22 @@ type LiquidGlassGroupProps = {
 };
 
 export const LiquidGlassGroup = memo(function LiquidGlassGroup({ children, className = "" }: LiquidGlassGroupProps) {
+  const deviceCaps = detectDeviceCapabilities();
+  const useSimplifiedMode = shouldDisableHeavyAnimations() || deviceCaps.isLowEndDevice;
+  
+  // Reduce blur for low-end devices
+  const blurClass = useSimplifiedMode ? 'backdrop-blur-sm' : 'backdrop-blur-md';
+  const bgBlurClass = useSimplifiedMode ? 'blur-xl' : 'blur-2xl';
+  
   return (
     <div
-      className={`liquid-animated relative inline-flex items-center gap-0.5 rounded-full border border-white/10 bg-white/5/\[.04\] px-0.5 py-0.5 backdrop-blur-md overflow-hidden ${className}`}
+      className={`liquid-animated relative inline-flex items-center gap-0.5 rounded-full border border-white/10 bg-white/5/\[.04\] px-0.5 py-0.5 ${blurClass} overflow-hidden ${className}`}
     >
-      <div className="pointer-events-none absolute -inset-10 -z-10 opacity-40 blur-2xl">
-        <div className="liquid-bg h-full w-full" />
-      </div>
+      {!useSimplifiedMode && (
+        <div className={`pointer-events-none absolute -inset-10 -z-10 opacity-40 ${bgBlurClass}`}>
+          <div className="liquid-bg h-full w-full" />
+        </div>
+      )}
       {children}
     </div>
   );
