@@ -19,16 +19,15 @@ import {
   Star,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
+import BlurText from "@/components/react-bits/BlurText/BlurText";
 import dynamic from "next/dynamic";
-import AboutSection from "@/app/components/AboutSection";
-import SectionWrapper from "@/app/components/SectionWrapper";
 
-// Dynamically import NetworkBackground to avoid SSR issues with R3F
-const NetworkBackground = dynamic(
-  () => import("@/components/three/NetworkBackground"),
+// Dynamically import LiquidChrome to reduce initial bundle size and avoid SSR issues
+const LiquidChrome = dynamic(
+  () => import("@/components/react-bits/LiquidChrome/LiquidChrome"),
   {
     ssr: false,
-    loading: () => <div className="absolute inset-0 bg-black" />, 
+    loading: () => null, // No loading state needed for background
   }
 );
 
@@ -218,34 +217,23 @@ export default function HomePage() {
     },
   ];
 
-  const testimonials = [
-    {
-      quote: "Konark demonstrates exceptional attention to detail and analytical thinking. His ability to transform raw data into actionable insights is impressive.",
-      name: "Senior Manager",
-      role: "Xceedance Consulting",
-    },
-    {
-      quote: "Working with Konark was a pleasure. He consistently delivered accurate reports and showed great initiative in improving our data processes.",
-      name: "Team Lead",
-      role: "Data Operations",
-    },
-    {
-      quote: "Konark's technical skills combined with his business acumen make him a valuable asset to any data-driven organization.",
-      name: "Colleague",
-      role: "Business Intelligence",
-    },
-  ];
-
   return (
     <main className="relative min-h-screen overflow-hidden bg-gradient-to-br from-gray-900 via-black to-gray-800">
       {/* Connection warming handled via preconnect/dns-prefetch in layout */}
 
       {/* Hero section */}
       <div className="relative min-h-screen overflow-hidden bg-gradient-to-br from-gray-900 via-black to-gray-800">
-        {/* Network Graph Background */}
+        {/* Liquid Chrome Background */}
         {!shouldReduceMotion && (
           <div className="absolute inset-0 z-0">
-            <NetworkBackground />
+            <LiquidChrome
+              baseColor={[0, 0.05, 0.05]}
+              speed={0.85}
+              amplitude={0.3}
+              frequencyX={3}
+              frequencyY={2}
+              interactive={true}
+            />
           </div>
         )}
         
@@ -255,26 +243,13 @@ export default function HomePage() {
         {/* Content container with proper spacing from header */}
       <div className="relative z-10 flex flex-col items-center justify-center min-h-screen pt-20 sm:pt-24 lg:pt-28 px-4 sm:px-6">
         {/* Main heading */}
-        <div className="text-center max-w-7xl relative">
-          <h1 className="pointer-events-none select-none mb-6 sm:mb-8 lg:mb-10">
-            {/* Background oversized text for authority */}
-            <span className="block text-[12vw] sm:text-[10vw] lg:text-[9vw] font-bold tracking-tighter leading-[0.85] text-center font-heading mix-blend-overlay text-white/10 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full whitespace-nowrap z-0 select-none">
-              KONARK PARIHAR
-            </span>
-            
-            {/* Foreground functional text */}
-            <div className="relative z-10 space-y-4">
-              <span className="block text-4xl sm:text-6xl lg:text-8xl font-bold tracking-tight text-center text-white drop-shadow-2xl font-heading">
-                I find the signal <br />
-                <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-blue-500 to-purple-600">
-                  in the noise.
-                </span>
-              </span>
-              <span className="block text-lg sm:text-xl lg:text-2xl font-light tracking-wide text-center text-gray-300 max-w-3xl mx-auto mt-6 font-sans">
-                Turning complex data into actionable <span className="text-white font-medium">business intelligence</span>.
-              </span>
-            </div>
+        <div className="text-center max-w-7xl">
+          <h1 className="text-3xl font-bold sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl 2xl:text-8xl tracking-tight leading-tight hero-chrome-text text-white min-h-[3rem] sm:min-h-[4rem] md:min-h-[5rem] lg:min-h-[6rem] xl:min-h-[7rem] flex items-center justify-center px-2">
+            Data Analyst & Business Intelligence Specialist
           </h1>
+          <p className="mt-6 sm:mt-8 max-w-4xl mx-auto text-base sm:text-lg md:text-xl lg:text-2xl leading-relaxed font-medium min-h-[2.5rem] sm:min-h-[3rem] px-2 text-white/80">
+            Specializing in transforming complex data into actionable insights with Power BI, SQL, and advanced Excel to drive business growth.
+          </p>
         </div>
 
         {/* Action buttons */}
@@ -358,13 +333,110 @@ export default function HomePage() {
       </div>
       </div>
 
-      {/* About Section - Redesigned Premium Layout */}
-      <SectionWrapper>
-        <AboutSection />
-      </SectionWrapper>
+      {/* About Section - Minimal single-screen layout */}
+      <section
+        id="about"
+        className="relative min-h-screen flex items-center justify-center px-6 sm:px-8 py-24 overflow-hidden"
+      >
+        {/* Gradient transition from hero */}
+        <div className="absolute inset-0 bg-gradient-to-b from-[#0A192F]/0 via-[#0A192F]/50 to-[#0A192F]" />
+        {/* Ambient glows + accents */}
+        <div className="pointer-events-none absolute inset-0">
+          <div className="absolute -top-40 left-1/2 h-[480px] w-[480px] -translate-x-1/2 rounded-full bg-cyan-500/20 blur-[210px]" />
+          <div className="absolute bottom-[-120px] right-1/4 h-[360px] w-[360px] rounded-full bg-sky-500/10 blur-[200px]" />
+          <div className="absolute inset-x-8 top-10 h-px bg-gradient-to-r from-transparent via-white/20 to-transparent" />
+        </div>
+
+        <div className="max-w-3xl mx-auto w-full text-center space-y-16 relative z-10">
+          {/* 1. Section Label - Blur Text */}
+          <BlurText
+            className="text-xs tracking-[0.4em] uppercase text-gray-500"
+            delay={0}
+          >
+            Get to Know Me
+          </BlurText>
+
+          {/* 2. Name - Simple fade */}
+          <motion.h1
+            initial={shouldReduceMotion ? { opacity: 1 } : { opacity: 0, y: 20 }}
+            whileInView={shouldReduceMotion ? {} : { opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={shouldReduceMotion ? {} : { duration: 0.8, delay: 0.2 }}
+            className="text-5xl sm:text-6xl md:text-7xl font-bold tracking-tight text-white"
+          >
+            KONARK PARIHAR
+          </motion.h1>
+
+          {/* 3. Role - Blur Text */}
+          <BlurText
+            className="text-xl md:text-2xl text-cyan-400/90 font-medium"
+            delay={400}
+          >
+            Data Analyst &amp; Business Intelligence Specialist
+          </BlurText>
+
+          {/* 4. Availability Badge */}
+          <div className="flex justify-center">
+            <div className="inline-flex items-center gap-2 px-4 py-2 border border-emerald-400/30 bg-emerald-400/5 rounded-full shadow-[0_0_30px_rgba(16,185,129,0.15)]">
+              <div className="w-2 h-2 bg-emerald-400 rounded-full animate-pulse" />
+              <span className="text-sm text-emerald-300">Available for opportunities</span>
+            </div>
+          </div>
+
+          {/* 5. Bio - Static */}
+          <motion.p
+            initial={shouldReduceMotion ? { opacity: 1 } : { opacity: 0 }}
+            whileInView={shouldReduceMotion ? {} : { opacity: 1 }}
+            viewport={{ once: true }}
+            transition={shouldReduceMotion ? {} : { duration: 1, delay: 0.6 }}
+            className="text-gray-400 leading-relaxed text-lg max-w-2xl mx-auto"
+          >
+            Data analyst with commerce background specializing in Power BI, SQL, and AI-powered workflows. 6+ months
+            managing healthcare databases at Xceedance (100% accuracy). Recent certification focused on turning messy
+            datasets into clear, decision-ready insights.
+          </motion.p>
+
+          <div className="rounded-[36px] border border-white/10 bg-white/5 px-6 sm:px-10 py-10 space-y-10 shadow-[0_20px_80px_rgba(0,0,0,0.35)] backdrop-blur-sm">
+            {/* 6. Metrics - Horizontal row */}
+            <div className="flex flex-col sm:flex-row justify-center gap-8 sm:gap-12 md:gap-16">
+              {[
+                { value: "6+", label: "Months Experience" },
+                { value: "100%", label: "Data Accuracy" },
+                { value: "Nov 2025", label: "Certified" },
+              ].map(({ value, label }) => (
+                <div key={label} className="text-center space-y-1">
+                  <div className="text-4xl md:text-5xl font-semibold text-cyan-300/80">{value}</div>
+                  <div className="text-xs uppercase tracking-[0.35em] text-gray-500">{label}</div>
+                </div>
+              ))}
+            </div>
+
+            {/* 7. Skills - Pills */}
+            <div className="flex flex-wrap justify-center gap-3 max-w-2xl mx-auto">
+              {[
+                "Power BI",
+                "SQL",
+                "Python",
+                "Excel",
+                "DAX",
+                "AI Workflow",
+                "Healthcare Analytics",
+                "Business Intelligence",
+              ].map((skill) => (
+                <span
+                  key={skill}
+                  className="px-4 py-1.5 text-sm text-gray-200/90 border border-white/10 rounded-full hover:text-cyan-300 hover:border-cyan-400/40 transition-colors cursor-default"
+                >
+                  {skill}
+                </span>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
 
       {/* Skills / Technical Expertise Section (base framework) */}
-      <SectionWrapper id="skills" className="relative z-10 bg-slate-950/60 text-foreground border-t border-white/5">
+      <section id="skills" className="relative z-10 bg-slate-950/60 text-foreground border-t border-white/5">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-16 sm:py-20 lg:py-28 space-y-10">
           <div className="text-center space-y-4">
             <p className="text-xs uppercase tracking-[0.6em] text-text-muted">Technical expertise</p>
@@ -392,10 +464,10 @@ export default function HomePage() {
             </p>
           </div>
         </div>
-      </SectionWrapper>
+      </section>
 
       {/* Experience Section (base framework) */}
-      <SectionWrapper id="experience" className="relative z-10 bg-background text-foreground border-t border-white/5">
+      <section id="experience" className="relative z-10 bg-background text-foreground border-t border-white/5">
         <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 py-16 sm:py-20 lg:py-28">
           <div className="space-y-4 mb-12">
             <p className="text-xs uppercase tracking-[0.55em] text-text-muted">Experience</p>
@@ -410,10 +482,10 @@ export default function HomePage() {
             ))}
           </div>
         </div>
-      </SectionWrapper>
+      </section>
 
       {/* Projects Section - Premium minimalist redesign */}
-      <SectionWrapper id="projects" className="relative py-24 sm:py-32 px-4 overflow-hidden border-t border-white/5">
+      <section id="projects" className="relative py-24 sm:py-32 px-4 overflow-hidden border-t border-white/5">
         <div className={`absolute inset-0 bg-[radial-gradient(circle_at_top,#22d3ee1a,transparent_45%)] ${shouldReduceMotion ? 'blur-xl' : 'blur-3xl'} pointer-events-none`} />
         <div className="absolute inset-0 bg-gradient-to-b from-transparent via-background/80 to-background pointer-events-none" />
 
@@ -446,50 +518,20 @@ export default function HomePage() {
             </div>
           </div>
         </div>
-      </SectionWrapper>
+      </section>
 
       {/* Certificates Section */}
-      <SectionWrapper id="certificates" className="relative z-10 bg-gray-900 text-white py-16 sm:py-24 lg:py-32 cv-auto">
+      <section id="certificates" className="relative z-10 bg-gray-900 text-white py-16 sm:py-24 lg:py-32 cv-auto">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <h2 className="text-3xl font-bold tracking-tight sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl chrome-text">Professional Certificates</h2>
           <p className="mt-4 sm:mt-6 text-base sm:text-lg leading-6 sm:leading-8 text-gray-300 px-2">
             This section will contain my professional certificates and qualifications. Content to be added soon.
           </p>
         </div>
-      </SectionWrapper>
-
-      {/* Social Proof / Testimonials Section */}
-      <SectionWrapper id="testimonials" className="relative z-10 bg-background border-t border-white/5 py-24">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <p className="text-xs uppercase tracking-[0.6em] text-text-muted mb-4">Social Proof</p>
-            <h2 className="text-3xl sm:text-5xl font-bold text-white font-heading">Colleague Recommendations</h2>
-          </div>
-          
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {testimonials.map((item, index) => (
-              <div key={index} className="p-8 rounded-3xl border border-white/5 bg-white/[0.02] hover:bg-white/[0.04] transition-colors relative">
-                <div className="text-4xl text-cyan-500/20 font-serif absolute top-6 left-6">&ldquo;</div>
-                <p className="text-lg text-gray-300 leading-relaxed mb-8 relative z-10 pt-4">
-                  {item.quote}
-                </p>
-                <div className="flex items-center gap-4">
-                  <div className="h-10 w-10 rounded-full bg-gradient-to-br from-cyan-400 to-blue-500 flex items-center justify-center text-white font-bold text-sm">
-                    {item.name.charAt(0)}
-                  </div>
-                  <div>
-                    <h4 className="font-semibold text-white">{item.name}</h4>
-                    <p className="text-sm text-gray-400">{item.role}</p>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </SectionWrapper>
+      </section>
 
       {/* Contact CTA / Form framework */}
-      <SectionWrapper id="contact" className="relative z-10 bg-slate-950 text-foreground border-t border-white/5">
+      <section id="contact" className="relative z-10 bg-slate-950 text-foreground border-t border-white/5">
         <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 py-16 sm:py-20 lg:py-28 grid gap-10 lg:grid-cols-2">
           <div className="space-y-6">
             <p className="text-xs uppercase tracking-[0.55em] text-text-muted">Contact</p>
@@ -550,10 +592,10 @@ export default function HomePage() {
             </CardContent>
           </Card>
         </div>
-      </SectionWrapper>
+      </section>
 
       {/* Connect Section requested */}
-      <SectionWrapper id="connect" className="relative z-10 bg-background text-foreground border-t border-white/5">
+      <section id="connect" className="relative z-10 bg-background text-foreground border-t border-white/5">
         <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 py-16 sm:py-20 lg:py-24 space-y-10">
           <div className="text-center space-y-4">
             <p className="text-xs uppercase tracking-[0.6em] text-text-muted">Connect to me</p>
@@ -568,7 +610,7 @@ export default function HomePage() {
             ))}
           </div>
         </div>
-      </SectionWrapper>
+      </section>
     </main>
   );
 }

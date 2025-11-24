@@ -666,6 +666,12 @@ body::-webkit-scrollbar {
 }
 
 :root {
+  --font-geist-sans: "Inter", "Space Grotesk", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --font-geist-mono: "JetBrains Mono", "SFMono-Regular", "Segoe UI Mono", monospace;
+  --font-sans: var(--font-geist-sans);
+  --font-heading: "Inter", "Space Grotesk", system-ui, sans-serif;
+  --font-mono: var(--font-geist-mono);
+
   /* Brand palette */
   --background: #0A192F;
   --surface: #0D2241;
