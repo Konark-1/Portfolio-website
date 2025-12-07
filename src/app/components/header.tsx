@@ -134,7 +134,7 @@ function Header() {
       <div className="flex-shrink-0">
         <Link href="/" className="flex items-center gap-2">
           <span 
-            className="text-xl sm:text-2xl md:text-3xl lg:text-4xl xl:text-4xl font-bold metallic-text"
+            className="text-xl sm:text-2xl md:text-3xl lg:text-4xl xl:text-4xl font-bold metallic-text font-serif"
             style={{ fontSize: 'clamp(1.25rem, 2.5rem, 2.5rem)' }}
           >
             Konark Parihar
@@ -258,25 +258,25 @@ function Header() {
             <div className="px-4 py-6 space-y-4 text-center">
               <button 
                 onClick={scrollToTop}
-                className="block text-white hover:text-gray-300 transition-colors text-lg font-medium w-full"
+                className="block text-white hover:text-gray-300 transition-colors text-lg font-medium w-full font-sans"
               >
                 Home
               </button>
               <button 
                 onClick={() => scrollToSection('about')}
-                className="block text-white hover:text-gray-300 transition-colors text-lg font-medium w-full"
+                className="block text-white hover:text-gray-300 transition-colors text-lg font-medium w-full font-sans"
               >
                 About
               </button>
               <button 
                 onClick={scrollToPortfolio}
-                className="block text-white hover:text-gray-300 transition-colors text-lg font-medium w-full"
+                className="block text-white hover:text-gray-300 transition-colors text-lg font-medium w-full font-sans"
               >
                 Portfolio
               </button>
               <button 
                 onClick={() => scrollToSection('certificates')}
-                className="block text-white hover:text-gray-300 transition-colors text-lg font-medium w-full"
+                className="block text-white hover:text-gray-300 transition-colors text-lg font-medium w-full font-sans"
               >
                 Certificates
               </button>
