@@ -1,11 +1,17 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import { Inter, Playfair_Display } from "next/font/google";
 import "./globals.css";
 import Header from "./components/header"; // Import the header
 import Script from "next/script";
 import CursorMount from "./components/CursorMount";
 
-const inter = Inter({ subsets: ["latin"], display: "swap" });
+const inter = Inter({ subsets: ["latin"], display: "swap", variable: "--font-sans" });
+const playfair = Playfair_Display({ 
+  subsets: ["latin"], 
+  display: "swap", 
+  variable: "--font-serif",
+  weight: ["400", "500", "600", "700", "800", "900"]
+});
 
 export const metadata: Metadata = {
   title: "Konark - Data Analyst Portfolio",
@@ -32,7 +38,7 @@ export default function RootLayout({
         <link rel="preconnect" href="https://wabi-us-east2-redirect.analysis.windows.net" crossOrigin="anonymous" />
         <link rel="dns-prefetch" href="https://wabi-us-east2-redirect.analysis.windows.net" />
       </head>
-      <body className={`${inter.className} dark`}>
+      <body className={`${inter.variable} ${playfair.variable} ${inter.className} dark`}>
         <Script src="/pbi-resize.js" strategy="afterInteractive" />
         <CursorMount />
         <Header /> {/* Add the header here */}

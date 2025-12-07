@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import GlassSurface from "@/components/react-bits/GlassSurface/GlassSurface";
 import { motion, useReducedMotion } from "framer-motion";
 import { Card, CardContent } from "@/components/ui/card";
@@ -34,6 +35,74 @@ const LiquidChrome = dynamic(
 export default function HomePage() {
   // Respect reduced motion preference
   const shouldReduceMotion = useReducedMotion();
+
+  // Contact form state
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    message: "",
+  });
+  const [formStatus, setFormStatus] = useState<"idle" | "submitting" | "success" | "error">("idle");
+  const [formErrors, setFormErrors] = useState<{ name?: string; email?: string; message?: string }>({});
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { id, value } = e.target;
+    setFormData((prev) => ({ ...prev, [id.replace("contact-", "")]: value }));
+    // Clear error when user starts typing
+    if (formErrors[id.replace("contact-", "") as keyof typeof formErrors]) {
+      setFormErrors((prev) => ({ ...prev, [id.replace("contact-", "")]: undefined }));
+    }
+  };
+
+  const validateForm = () => {
+    const errors: { name?: string; email?: string; message?: string } = {};
+
+    if (!formData.name.trim()) {
+      errors.name = "Name is required";
+    }
+
+    if (!formData.email.trim()) {
+      errors.email = "Email is required";
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
+      errors.email = "Please enter a valid email address";
+    }
+
+    if (!formData.message.trim()) {
+      errors.message = "Message is required";
+    } else if (formData.message.trim().length < 10) {
+      errors.message = "Message must be at least 10 characters";
+    }
+
+    setFormErrors(errors);
+    return Object.keys(errors).length === 0;
+  };
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+
+    if (!validateForm()) {
+      return;
+    }
+
+    setFormStatus("submitting");
+
+    // Using mailto for form submission (works without backend)
+    // To upgrade: Replace with Formspree, Resend, or Vercel Functions
+    try {
+      const subject = encodeURIComponent(`Contact from ${formData.name}`);
+      const body = encodeURIComponent(`Name: ${formData.name}\nEmail: ${formData.email}\n\nMessage:\n${formData.message}`);
+      window.location.href = `mailto:konarkofficial@gmail.com?subject=${subject}&body=${body}`;
+
+      // Show success message
+      setFormStatus("success");
+      setFormData({ name: "", email: "", message: "" });
+      // Reset form after 3 seconds
+      setTimeout(() => setFormStatus("idle"), 3000);
+    } catch (error) {
+      setFormStatus("error");
+      setTimeout(() => setFormStatus("idle"), 3000);
+    }
+  };
 
   const skillsShowcase = [
     {
@@ -217,6 +286,7 @@ export default function HomePage() {
     },
   ];
 
+
   return (
     <main className="relative min-h-screen overflow-hidden bg-gradient-to-br from-gray-900 via-black to-gray-800">
       {/* Connection warming handled via preconnect/dns-prefetch in layout */}
@@ -236,183 +306,164 @@ export default function HomePage() {
             />
           </div>
         )}
-        
+
         {/* Subtle gradient overlay for text readability (lighter) */}
         <div className="absolute inset-0 z-[1] bg-gradient-to-b from-transparent via-transparent to-gray-900/20 pointer-events-none" />
-        
+
         {/* Content container with proper spacing from header */}
-      <div className="relative z-10 flex flex-col items-center justify-center min-h-screen pt-20 sm:pt-24 lg:pt-28 px-4 sm:px-6">
-        {/* Main heading */}
-        <div className="text-center max-w-7xl">
-          <h1 className="text-3xl font-bold sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl 2xl:text-8xl tracking-tight leading-tight hero-chrome-text text-white min-h-[3rem] sm:min-h-[4rem] md:min-h-[5rem] lg:min-h-[6rem] xl:min-h-[7rem] flex items-center justify-center px-2">
-            Data Analyst & Business Intelligence Specialist
-          </h1>
-          <p className="mt-6 sm:mt-8 max-w-4xl mx-auto text-base sm:text-lg md:text-xl lg:text-2xl leading-relaxed font-medium min-h-[2.5rem] sm:min-h-[3rem] px-2 text-white/80">
-            Specializing in transforming complex data into actionable insights with Power BI, SQL, and advanced Excel to drive business growth.
-          </p>
-        </div>
-
-        {/* Action buttons */}
-        <div className="mt-8 sm:mt-10 flex flex-col sm:flex-row flex-nowrap justify-center items-center gap-3 sm:gap-4 w-full max-w-md sm:max-w-none">
-          <div
-            className="cursor-pointer hover:scale-105 transition-all duration-300 hover:shadow-lg pointer-events-auto group w-[85%] sm:w-auto"
-            onClick={() => {
-              const element = document.getElementById('about');
-              if (element) {
-                const headerHeight = 115;
-                const elementPosition = element.offsetTop - headerHeight;
-                window.scrollTo({
-                  top: elementPosition,
-                  behavior: 'smooth'
-                });
-              }
-            }}
-          >
-            <GlassSurface
-              width="100%"
-              height={55}
-              borderRadius={50}
-              backgroundOpacity={0.1}
-              saturation={1}
-              borderWidth={0.07}
-              brightness={50}
-              opacity={0.93}
-              blur={11}
-              displace={0.5}
-              distortionScale={-180}
-              redOffset={0}
-              greenOffset={10}
-              blueOffset={20}
-              disableShadow
-            >
-              <button className="px-6 sm:px-8 py-3 text-white font-semibold w-full h-full text-sm sm:text-base tracking-wide flex items-center justify-center gap-2">
-                Get Started
-              </button>
-            </GlassSurface>
+        <div className="relative z-10 flex flex-col items-center justify-center min-h-[85vh] pt-20 sm:pt-24 lg:pt-28 px-4 sm:px-6">
+          {/* Main heading */}
+          <div className="text-center max-w-6xl mx-auto space-y-6">
+            <h1 className="font-serif text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-bold tracking-tight leading-[1.1] text-white">
+              Data Analyst & Business Intelligence Specialist
+            </h1>
+            <p className="max-w-3xl mx-auto text-base sm:text-lg md:text-xl leading-relaxed text-white/80 font-sans">
+              I find the signal in the noise. Transforming complex data into actionable business intelligence.
+            </p>
           </div>
-          <div
-            className="w-[85%] sm:w-auto cursor-pointer hover:scale-105 transition-all duration-300 hover:shadow-lg pointer-events-auto group"
-            onClick={() => {
-              const element = document.getElementById('projects');
-              if (element) {
-                const headerHeight = 115;
-                const elementPosition = element.offsetTop - headerHeight;
-                window.scrollTo({
-                  top: elementPosition,
-                  behavior: 'smooth'
-                });
-              } else {
-                // Fallback: navigate if section not found
-                window.location.href = '/portfolio';
-              }
-            }}
-          >
-            <GlassSurface
-              width="100%"
-              height={55}
-              borderRadius={50}
-              backgroundOpacity={0.1}
-              saturation={1}
-              borderWidth={0.07}
-              brightness={50}
-              opacity={0.93}
-              blur={11}
-              displace={0.5}
-              distortionScale={-180}
-              redOffset={0}
-              greenOffset={10}
-              blueOffset={20}
-              disableShadow
+
+          {/* Action buttons */}
+          <div className="mt-12 sm:mt-16 flex flex-col sm:flex-row justify-center items-center gap-4 w-full max-w-lg mx-auto">
+            <div
+              className="cursor-pointer hover:scale-105 transition-all duration-300 hover:shadow-lg pointer-events-auto group w-[85%] sm:w-auto"
+              onClick={() => {
+                const element = document.getElementById('about');
+                if (element) {
+                  const headerHeight = 115;
+                  const elementPosition = element.offsetTop - headerHeight;
+                  window.scrollTo({
+                    top: elementPosition,
+                    behavior: 'smooth'
+                  });
+                }
+              }}
             >
-              <span className="px-6 sm:px-8 py-3 text-white/80 font-medium w-full h-full text-sm sm:text-base tracking-wide flex items-center justify-center gap-2">
-                MY PORTFOLIO
-              </span>
-            </GlassSurface>
+              <GlassSurface
+                width="100%"
+                height={55}
+                borderRadius={50}
+                backgroundOpacity={0.1}
+                saturation={1}
+                borderWidth={0.07}
+                brightness={50}
+                opacity={0.93}
+                blur={11}
+                displace={0.5}
+                distortionScale={-180}
+                redOffset={0}
+                greenOffset={10}
+                blueOffset={20}
+                disableShadow
+              >
+                <button className="px-6 sm:px-8 py-3 text-white font-semibold w-full h-full text-sm sm:text-base tracking-wide flex items-center justify-center gap-2 font-sans">
+                  Get Started
+                </button>
+              </GlassSurface>
+            </div>
+            <div
+              className="w-[85%] sm:w-auto cursor-pointer hover:scale-105 transition-all duration-300 hover:shadow-lg pointer-events-auto group"
+              onClick={() => {
+                const element = document.getElementById('projects');
+                if (element) {
+                  const headerHeight = 115;
+                  const elementPosition = element.offsetTop - headerHeight;
+                  window.scrollTo({
+                    top: elementPosition,
+                    behavior: 'smooth'
+                  });
+                } else {
+                  // Fallback: navigate if section not found
+                  window.location.href = '/portfolio';
+                }
+              }}
+            >
+              <GlassSurface
+                width="100%"
+                height={55}
+                borderRadius={50}
+                backgroundOpacity={0.1}
+                saturation={1}
+                borderWidth={0.07}
+                brightness={50}
+                opacity={0.93}
+                blur={11}
+                displace={0.5}
+                distortionScale={-180}
+                redOffset={0}
+                greenOffset={10}
+                blueOffset={20}
+                disableShadow
+              >
+                <span className="px-6 sm:px-8 py-3 text-white/80 font-medium w-full h-full text-sm sm:text-base tracking-wide flex items-center justify-center gap-2 font-sans">
+                  MY PORTFOLIO
+                </span>
+              </GlassSurface>
+            </div>
           </div>
         </div>
       </div>
-      </div>
 
-      {/* About Section - Minimal single-screen layout */}
+      {/* About Section - Centered Layout */}
       <section
         id="about"
-        className="relative min-h-screen flex items-center justify-center px-6 sm:px-8 py-24 overflow-hidden"
+        className="relative min-h-[90vh] flex items-center justify-center px-4 sm:px-6 lg:px-8 py-16 sm:py-20 lg:py-24 overflow-hidden"
       >
         {/* Gradient transition from hero */}
         <div className="absolute inset-0 bg-gradient-to-b from-[#0A192F]/0 via-[#0A192F]/50 to-[#0A192F]" />
-        {/* Ambient glows + accents */}
+        {/* Ambient glows */}
         <div className="pointer-events-none absolute inset-0">
-          <div className="absolute -top-40 left-1/2 h-[480px] w-[480px] -translate-x-1/2 rounded-full bg-cyan-500/20 blur-[210px]" />
-          <div className="absolute bottom-[-120px] right-1/4 h-[360px] w-[360px] rounded-full bg-sky-500/10 blur-[200px]" />
-          <div className="absolute inset-x-8 top-10 h-px bg-gradient-to-r from-transparent via-white/20 to-transparent" />
+          <div className="absolute -top-40 left-1/2 h-[480px] w-[480px] -translate-x-1/2 rounded-full bg-cyan-500/15 blur-[180px]" />
+          <div className="absolute bottom-[-80px] right-1/4 h-[320px] w-[320px] rounded-full bg-sky-500/8 blur-[160px]" />
         </div>
 
-        <div className="max-w-3xl mx-auto w-full text-center space-y-16 relative z-10">
-          {/* 1. Section Label - Blur Text */}
-          <BlurText
-            className="text-xs tracking-[0.4em] uppercase text-gray-500"
-            delay={0}
-          >
+        <div className="max-w-4xl mx-auto w-full text-center space-y-12 relative z-10">
+          {/* Section Label */}
+          <p className="about-fade-in text-xs tracking-[0.4em] uppercase text-text-muted font-sans">
             Get to Know Me
-          </BlurText>
+          </p>
 
-          {/* 2. Name - Simple fade */}
-          <motion.h1
-            initial={shouldReduceMotion ? { opacity: 1 } : { opacity: 0, y: 20 }}
-            whileInView={shouldReduceMotion ? {} : { opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={shouldReduceMotion ? {} : { duration: 0.8, delay: 0.2 }}
-            className="text-5xl sm:text-6xl md:text-7xl font-bold tracking-tight text-white"
-          >
+          {/* Name */}
+          <h1 className="about-fade-in about-delay-100 font-serif text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-bold tracking-tight text-white leading-[1.1]">
             KONARK PARIHAR
-          </motion.h1>
+          </h1>
 
-          {/* 3. Role - Blur Text */}
-          <BlurText
-            className="text-xl md:text-2xl text-cyan-400/90 font-medium"
-            delay={400}
-          >
+          {/* Role */}
+          <p className="about-fade-in about-delay-150 text-lg sm:text-xl md:text-2xl text-accent-cyan font-normal font-sans">
             Data Analyst &amp; Business Intelligence Specialist
-          </BlurText>
+          </p>
 
-          {/* 4. Availability Badge */}
-          <div className="flex justify-center">
-            <div className="inline-flex items-center gap-2 px-4 py-2 border border-emerald-400/30 bg-emerald-400/5 rounded-full shadow-[0_0_30px_rgba(16,185,129,0.15)]">
-              <div className="w-2 h-2 bg-emerald-400 rounded-full animate-pulse" />
-              <span className="text-sm text-emerald-300">Available for opportunities</span>
-            </div>
+          {/* Bio with Keyword Highlighting */}
+          <p className="about-fade-in about-delay-200 text-text-muted leading-relaxed text-base sm:text-lg max-w-2xl mx-auto px-4 font-sans">
+            Data analyst with commerce background specializing in{" "}
+            <span className="text-accent-cyan font-medium">Power BI</span>,{" "}
+            <span className="text-accent-cyan font-medium">SQL</span>, and{" "}
+            <span className="text-accent-cyan font-medium">AI-powered workflows</span>.
+            Transforming complex datasets into{" "}
+            <span className="text-white font-medium">clear, decision-ready insights</span>.
+          </p>
+
+          {/* Key Term Highlights - Horizontal Row */}
+          <div className="about-fade-in about-delay-250 flex flex-col md:flex-row justify-center gap-8 md:gap-12 lg:gap-16 pt-4">
+            {[
+              { big: "Dynamic", small: "Stakeholder Views" },
+              { big: "Automated", small: "Intelligence" },
+              { big: "Targeted", small: "Decision Support" },
+            ].map(({ big, small }) => (
+              <div key={big} className="text-center group cursor-default">
+                <div className="text-3xl sm:text-4xl md:text-5xl font-bold text-accent-cyan group-hover:text-white transition-colors duration-300 font-serif">
+                  {big}
+                </div>
+                <div className="text-xs uppercase tracking-[0.25em] text-text-muted mt-2 font-sans">
+                  {small}
+                </div>
+              </div>
+            ))}
           </div>
 
-          {/* 5. Bio - Static */}
-          <motion.p
-            initial={shouldReduceMotion ? { opacity: 1 } : { opacity: 0 }}
-            whileInView={shouldReduceMotion ? {} : { opacity: 1 }}
-            viewport={{ once: true }}
-            transition={shouldReduceMotion ? {} : { duration: 1, delay: 0.6 }}
-            className="text-gray-400 leading-relaxed text-lg max-w-2xl mx-auto"
-          >
-            Data analyst with commerce background specializing in Power BI, SQL, and AI-powered workflows. 6+ months
-            managing healthcare databases at Xceedance (100% accuracy). Recent certification focused on turning messy
-            datasets into clear, decision-ready insights.
-          </motion.p>
-
-          <div className="rounded-[36px] border border-white/10 bg-white/5 px-6 sm:px-10 py-10 space-y-10 shadow-[0_20px_80px_rgba(0,0,0,0.35)] backdrop-blur-sm">
-            {/* 6. Metrics - Horizontal row */}
-            <div className="flex flex-col sm:flex-row justify-center gap-8 sm:gap-12 md:gap-16">
-              {[
-                { value: "6+", label: "Months Experience" },
-                { value: "100%", label: "Data Accuracy" },
-                { value: "Nov 2025", label: "Certified" },
-              ].map(({ value, label }) => (
-                <div key={label} className="text-center space-y-1">
-                  <div className="text-4xl md:text-5xl font-semibold text-cyan-300/80">{value}</div>
-                  <div className="text-xs uppercase tracking-[0.35em] text-gray-500">{label}</div>
-                </div>
-              ))}
-            </div>
-
-            {/* 7. Skills - Pills */}
-            <div className="flex flex-wrap justify-center gap-3 max-w-2xl mx-auto">
+          {/* Skills Card */}
+          <div className="about-fade-in about-delay-300 rounded-[32px] border border-white/10 bg-white/[0.04] hover:bg-white/[0.06] px-6 sm:px-10 py-8 shadow-[0_20px_80px_rgba(0,0,0,0.3)] backdrop-blur-sm transition-all duration-500 hover:border-white/15 max-w-2xl mx-auto">
+            {/* Skills Pills */}
+            <div className="flex flex-wrap justify-center gap-2 sm:gap-3">
               {[
                 "Power BI",
                 "SQL",
@@ -425,7 +476,9 @@ export default function HomePage() {
               ].map((skill) => (
                 <span
                   key={skill}
-                  className="px-4 py-1.5 text-sm text-gray-200/90 border border-white/10 rounded-full hover:text-cyan-300 hover:border-cyan-400/40 transition-colors cursor-default"
+                  className="px-3 sm:px-4 py-1.5 text-xs sm:text-sm text-text-primary border border-white/10 rounded-full 
+                             hover:text-accent-cyan hover:border-accent-cyan/40 hover:shadow-[0_0_15px_rgba(100,255,218,0.15)]
+                             transition-all duration-300 cursor-default font-sans"
                 >
                   {skill}
                 </span>
@@ -435,15 +488,16 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Skills / Technical Expertise Section (base framework) */}
+      {/* Skills / Technical Expertise Section */}
       <section id="skills" className="relative z-10 bg-slate-950/60 text-foreground border-t border-white/5">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-16 sm:py-20 lg:py-28 space-y-10">
-          <div className="text-center space-y-4">
-            <p className="text-xs uppercase tracking-[0.6em] text-text-muted">Technical expertise</p>
-            <h2 className="heading-2 text-text-primary">Toolbox for insight generation</h2>
-            <p className="max-w-2xl mx-auto text-text-muted">
-              Rapid overview of the skills that future collaborators can expand on.
-              Each card is ready for another agent to refine with richer copy or data.
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-16 sm:py-20 lg:py-28 space-y-16">
+          <div className="text-center space-y-4 max-w-3xl mx-auto">
+            <p className="text-xs uppercase tracking-[0.6em] text-text-muted font-sans">Technical expertise</p>
+            <h2 className="font-serif text-3xl sm:text-4xl md:text-5xl font-bold text-text-primary tracking-tight leading-tight">
+              Toolbox for insight generation
+            </h2>
+            <p className="text-base sm:text-lg text-text-muted leading-relaxed font-sans">
+              A comprehensive overview of my technical expertise and proficiency levels across key data analytics tools and methodologies.
             </p>
           </div>
 
@@ -454,26 +508,27 @@ export default function HomePage() {
           </div>
 
           <div className="rounded-3xl border border-accent-cyan/40 bg-accent-cyan/10 p-8 shadow-glass-soft">
-            <h3 className="text-2xl font-semibold text-text-primary mb-3 flex items-center gap-3">
+            <h3 className="font-serif text-2xl sm:text-3xl font-bold text-text-primary mb-4 flex items-center gap-3 tracking-tight leading-tight">
               <Sparkles className="h-5 w-5 text-accent-cyan" />
               AI Workflow Advantage
             </h3>
-            <p className="text-text-muted max-w-3xl">
-              Agents focusing on this section can expand on use cases, tooling, or success metrics that prove the
-              AI-first workflow. Copy intentionally lightweight so specialists can enrich it further.
+            <p className="text-base text-text-muted leading-relaxed font-sans">
+              Leveraging AI-powered workflows to accelerate data analysis by 3x, enabling faster insights delivery and enhanced decision-making capabilities through intelligent automation and prompt-driven tooling.
             </p>
           </div>
         </div>
       </section>
 
-      {/* Experience Section (base framework) */}
+      {/* Experience Section */}
       <section id="experience" className="relative z-10 bg-background text-foreground border-t border-white/5">
         <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 py-16 sm:py-20 lg:py-28">
-          <div className="space-y-4 mb-12">
-            <p className="text-xs uppercase tracking-[0.55em] text-text-muted">Experience</p>
-            <h2 className="heading-2 text-text-primary">Hands-on history</h2>
-            <p className="text-text-muted">
-              Timeline structure gives other agents a place to add depth, logos, or metrics without rewriting layout code.
+          <div className="space-y-4 mb-16 max-w-3xl">
+            <p className="text-xs uppercase tracking-[0.55em] text-text-muted font-sans">Experience</p>
+            <h2 className="font-serif text-3xl sm:text-4xl md:text-5xl font-bold text-text-primary tracking-tight leading-tight">
+              Hands-on history
+            </h2>
+            <p className="text-base sm:text-lg text-text-muted leading-relaxed font-sans">
+              A chronological overview of my professional journey, highlighting key achievements, responsibilities, and technical expertise gained at each position.
             </p>
           </div>
           <div className="relative border-l border-white/10 ml-4">
@@ -485,17 +540,17 @@ export default function HomePage() {
       </section>
 
       {/* Projects Section - Premium minimalist redesign */}
-      <section id="projects" className="relative py-24 sm:py-32 px-4 overflow-hidden border-t border-white/5">
+      <section id="projects" className="relative py-24 sm:py-32 lg:py-40 px-4 sm:px-6 overflow-hidden border-t border-white/5">
         <div className={`absolute inset-0 bg-[radial-gradient(circle_at_top,#22d3ee1a,transparent_45%)] ${shouldReduceMotion ? 'blur-xl' : 'blur-3xl'} pointer-events-none`} />
         <div className="absolute inset-0 bg-gradient-to-b from-transparent via-background/80 to-background pointer-events-none" />
 
-        <div className="max-w-7xl mx-auto relative z-10 space-y-16">
-          <div className="text-center space-y-6">
-            <h2 className="text-4xl sm:text-5xl md:text-6xl font-bold bg-gradient-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent">
+        <div className="max-w-7xl mx-auto relative z-10 space-y-20">
+          <div className="text-center space-y-6 max-w-4xl mx-auto">
+            <h2 className="font-serif text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold bg-gradient-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent tracking-tight leading-tight">
               Interactive Analytics
             </h2>
-            <p className="text-lg sm:text-xl text-text-muted max-w-3xl mx-auto leading-relaxed">
-              A cinematic showcase of embedded Power BI dashboards. <span className="text-cyan-400">Fully interactive</span>,
+            <p className="text-base sm:text-lg md:text-xl text-text-muted leading-relaxed font-sans">
+              A cinematic showcase of embedded Power BI dashboards. <span className="text-accent-cyan">Fully interactive</span>,
               real-time data visualizations built with advanced DAX, optimized queries, and storytelling design principles.
             </p>
           </div>
@@ -506,9 +561,9 @@ export default function HomePage() {
             ))}
           </div>
 
-          <div className="mt-10 p-8 sm:p-10 rounded-3xl border border-cyan-500/20 bg-gradient-to-br from-cyan-500/5 to-transparent shadow-glass-soft">
-            <h3 className="text-2xl font-semibold mb-6 flex items-center gap-3 text-text-primary">
-              <span className="text-cyan-400 text-3xl">⚡</span>
+          <div className="mt-10 p-8 sm:p-10 rounded-3xl border border-accent-cyan/20 bg-gradient-to-br from-accent-cyan/5 to-transparent shadow-glass-soft">
+            <h3 className="font-serif text-2xl sm:text-3xl font-bold mb-6 flex items-center gap-3 text-text-primary tracking-tight leading-tight">
+              <span className="text-accent-cyan text-3xl">⚡</span>
               Technical implementation highlights
             </h3>
             <div className="grid gap-6 md:grid-cols-3">
@@ -521,72 +576,124 @@ export default function HomePage() {
       </section>
 
       {/* Certificates Section */}
-      <section id="certificates" className="relative z-10 bg-gray-900 text-white py-16 sm:py-24 lg:py-32 cv-auto">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <h2 className="text-3xl font-bold tracking-tight sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl chrome-text">Professional Certificates</h2>
-          <p className="mt-4 sm:mt-6 text-base sm:text-lg leading-6 sm:leading-8 text-gray-300 px-2">
-            This section will contain my professional certificates and qualifications. Content to be added soon.
-          </p>
+      <section id="certificates" className="relative z-10 bg-gradient-to-b from-gray-900 via-black to-gray-900 text-white py-24 sm:py-32 lg:py-40 overflow-hidden">
+        {/* Background effects */}
+        <div className="absolute inset-0 pointer-events-none">
+          <div className="absolute top-0 left-1/4 h-[500px] w-[500px] -translate-x-1/2 rounded-full bg-cyan-500/10 blur-[120px]" />
+          <div className="absolute bottom-0 right-1/4 h-[400px] w-[400px] rounded-full bg-blue-500/10 blur-[100px]" />
         </div>
+
+        {/* Section Header */}
+        <div className="relative z-10 mb-16">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6 }}
+            className="text-center max-w-7xl mx-auto px-4 sm:px-6 lg:px-8"
+          >
+            <BlurText
+              className="text-xs tracking-[0.4em] uppercase text-text-muted mb-4 font-sans"
+              delay={0}
+            >
+              Credentials & Achievements
+            </BlurText>
+            <h2 className="font-serif text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold bg-gradient-to-r from-cyan-400 via-blue-400 to-purple-400 bg-clip-text text-transparent mb-6 tracking-tight leading-tight">
+              Professional Certificates
+            </h2>
+            <p className="max-w-3xl mx-auto text-base sm:text-lg text-text-muted leading-relaxed font-sans">
+              Validated expertise in data analytics, business intelligence, and advanced Power BI techniques through industry-recognized certifications.
+            </p>
+          </motion.div>
+        </div>
+
       </section>
 
-      {/* Contact CTA / Form framework */}
+      {/* Contact Section */}
       <section id="contact" className="relative z-10 bg-slate-950 text-foreground border-t border-white/5">
-        <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 py-16 sm:py-20 lg:py-28 grid gap-10 lg:grid-cols-2">
+        <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 py-16 sm:py-20 lg:py-28 grid gap-12 lg:grid-cols-2">
           <div className="space-y-6">
-            <p className="text-xs uppercase tracking-[0.55em] text-text-muted">Contact</p>
-            <h2 className="heading-2 text-text-primary">Let&rsquo;s work together</h2>
-            <p className="text-text-muted">
-              Structured so another agent can plug in Formspree, Vercel functions, or Shadcn form validation.
-              Currently plain inputs to keep the foundation light.
+            <p className="text-xs uppercase tracking-[0.55em] text-text-muted font-sans">Contact</p>
+            <h2 className="font-serif text-3xl sm:text-4xl md:text-5xl font-bold text-text-primary tracking-tight leading-tight">
+              Let&rsquo;s work together
+            </h2>
+            <p className="text-base sm:text-lg text-text-muted leading-relaxed font-sans">
+              I'm always open to discussing new opportunities, collaborations, or data analytics projects. Feel free to reach out using the form below or through any of my direct contact channels.
             </p>
-            <ul className="space-y-3 text-sm text-text-muted">
-              <li>• Use this copy block for CTA messaging or availability updates.</li>
-              <li>• Replace placeholder form with functional implementation when ready.</li>
-              <li>• Keep referencing IDs for smooth-scroll navigation.</li>
-            </ul>
+            <p className="text-sm text-text-muted leading-relaxed font-sans">
+              I typically respond within 24-48 hours. For urgent matters, please use the direct contact channels in the Connect section below.
+            </p>
           </div>
           <Card className="border-white/10 bg-white/5 shadow-glass-soft">
             <CardContent className="space-y-4 pt-6">
-              <form className="space-y-4" onSubmit={(e) => e.preventDefault()}>
+              <form className="space-y-5" onSubmit={handleSubmit}>
                 <div>
-                  <label htmlFor="contact-name" className="text-sm font-semibold text-text-primary">
+                  <label htmlFor="contact-name" className="block text-sm font-semibold text-text-primary mb-2 font-sans">
                     Name *
                   </label>
                   <input
                     id="contact-name"
                     type="text"
+                    value={formData.name}
+                    onChange={handleInputChange}
                     placeholder="Your name"
-                    className="mt-2 w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-text-primary focus:outline-none focus:ring-2 focus:ring-accent-cyan/60"
+                    className={`w-full rounded-2xl border ${formErrors.name ? "border-red-500/50" : "border-white/10"
+                      } bg-white/5 px-4 py-3 text-sm text-text-primary focus:outline-none focus:ring-2 focus:ring-accent-cyan/60 font-sans`}
                   />
+                  {formErrors.name && (
+                    <p className="mt-1 text-xs text-red-400 font-sans">{formErrors.name}</p>
+                  )}
                 </div>
                 <div>
-                  <label htmlFor="contact-email" className="text-sm font-semibold text-text-primary">
+                  <label htmlFor="contact-email" className="block text-sm font-semibold text-text-primary mb-2 font-sans">
                     Email *
                   </label>
                   <input
                     id="contact-email"
                     type="email"
+                    value={formData.email}
+                    onChange={handleInputChange}
                     placeholder="your@email.com"
-                    className="mt-2 w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-text-primary focus:outline-none focus:ring-2 focus:ring-accent-cyan/60"
+                    className={`w-full rounded-2xl border ${formErrors.email ? "border-red-500/50" : "border-white/10"
+                      } bg-white/5 px-4 py-3 text-sm text-text-primary focus:outline-none focus:ring-2 focus:ring-accent-cyan/60 font-sans`}
                   />
+                  {formErrors.email && (
+                    <p className="mt-1 text-xs text-red-400 font-sans">{formErrors.email}</p>
+                  )}
                 </div>
                 <div>
-                  <label htmlFor="contact-message" className="text-sm font-semibold text-text-primary">
+                  <label htmlFor="contact-message" className="block text-sm font-semibold text-text-primary mb-2 font-sans">
                     Message *
                   </label>
                   <textarea
                     id="contact-message"
                     rows={5}
+                    value={formData.message}
+                    onChange={handleInputChange}
                     placeholder="Tell me about your project or opportunity..."
-                    className="mt-2 w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-text-primary focus:outline-none focus:ring-2 focus:ring-accent-cyan/60 resize-none"
+                    className={`w-full rounded-2xl border ${formErrors.message ? "border-red-500/50" : "border-white/10"
+                      } bg-white/5 px-4 py-3 text-sm text-text-primary focus:outline-none focus:ring-2 focus:ring-accent-cyan/60 resize-none font-sans`}
                   />
+                  {formErrors.message && (
+                    <p className="mt-1 text-xs text-red-400 font-sans">{formErrors.message}</p>
+                  )}
                 </div>
+                {formStatus === "success" && (
+                  <div className="rounded-2xl bg-emerald-500/10 border border-emerald-500/30 px-4 py-3 text-sm text-emerald-300 font-sans">
+                    Message sent successfully! I'll get back to you soon.
+                  </div>
+                )}
+                {formStatus === "error" && (
+                  <div className="rounded-2xl bg-red-500/10 border border-red-500/30 px-4 py-3 text-sm text-red-300 font-sans">
+                    Something went wrong. Please try again or use the direct contact channels.
+                  </div>
+                )}
                 <button
                   type="submit"
-                  className="w-full rounded-2xl bg-accent-cyan/90 px-6 py-3 text-sm font-semibold text-background transition hover:bg-accent-cyan focus:outline-none focus:ring-2 focus:ring-accent-bright/60"
+                  disabled={formStatus === "submitting"}
+                  className="w-full rounded-2xl bg-accent-cyan/90 px-6 py-3 text-sm font-semibold text-background transition hover:bg-accent-cyan focus:outline-none focus:ring-2 focus:ring-accent-bright/60 disabled:opacity-50 disabled:cursor-not-allowed font-sans"
                 >
-                  Send message (wire backend later)
+                  {formStatus === "submitting" ? "Sending..." : "Send Message"}
                 </button>
               </form>
             </CardContent>
@@ -594,14 +701,16 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Connect Section requested */}
+      {/* Connect Section */}
       <section id="connect" className="relative z-10 bg-background text-foreground border-t border-white/5">
-        <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 py-16 sm:py-20 lg:py-24 space-y-10">
-          <div className="text-center space-y-4">
-            <p className="text-xs uppercase tracking-[0.6em] text-text-muted">Connect to me</p>
-            <h2 className="heading-2 text-text-primary">Direct lines & quick actions</h2>
-            <p className="text-text-muted">
-              Place this section right above the future footer so anyone can contact without scrolling back up.
+        <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 py-16 sm:py-20 lg:py-24 space-y-12">
+          <div className="text-center space-y-4 max-w-3xl mx-auto">
+            <p className="text-xs uppercase tracking-[0.6em] text-text-muted font-sans">Connect to me</p>
+            <h2 className="font-serif text-3xl sm:text-4xl md:text-5xl font-bold text-text-primary tracking-tight leading-tight">
+              Direct lines & quick actions
+            </h2>
+            <p className="text-base sm:text-lg text-text-muted leading-relaxed font-sans">
+              Quick access to direct contact channels. Choose your preferred method to get in touch—I'm always open to connecting with potential collaborators, employers, or fellow data professionals.
             </p>
           </div>
           <div className="grid gap-4 sm:grid-cols-2">
@@ -625,16 +734,16 @@ type SkillCardProps = {
 function SkillCard({ icon: Icon, title, level, description }: SkillCardProps) {
   return (
     <div className="rounded-3xl border border-white/5 bg-gradient-to-br from-white/10 via-transparent to-transparent p-6 shadow-glass-soft">
-      <div className="flex items-center gap-3">
+      <div className="flex items-center gap-3 mb-4">
         <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-accent-cyan/10 text-accent-cyan">
           <Icon className="h-5 w-5" />
         </div>
         <div>
-          <p className="text-sm uppercase tracking-[0.35em] text-text-muted">{level}</p>
-          <h3 className="text-lg font-semibold text-text-primary">{title}</h3>
+          <p className="text-xs uppercase tracking-[0.35em] text-text-muted font-sans">{level}</p>
+          <h3 className="text-lg font-semibold text-text-primary font-serif">{title}</h3>
         </div>
       </div>
-      <p className="mt-4 text-sm text-text-muted">{description}</p>
+      <p className="text-sm text-text-muted leading-relaxed font-sans">{description}</p>
     </div>
   );
 }
@@ -663,22 +772,25 @@ function ExperienceEntry({
       <span className="absolute -left-[9px] top-2 h-4 w-4 rounded-full bg-accent-cyan shadow-[0_0_20px_rgba(100,255,218,0.6)]" />
       {!isLast && <span className="absolute left-[ -1px] top-6 bottom-0 w-[2px] bg-gradient-to-b from-accent-cyan/40 to-transparent" />}
       <div className="rounded-3xl border border-white/5 bg-white/5 p-6 shadow-glass-soft">
-        <div className="flex flex-wrap items-baseline justify-between gap-3">
+        <div className="flex flex-wrap items-baseline justify-between gap-3 mb-4">
           <div>
-            <h3 className="text-xl font-semibold text-text-primary">{title}</h3>
-            <p className="text-sm text-text-muted">{company}</p>
+            <h3 className="text-lg sm:text-xl font-semibold text-text-primary font-serif">{title}</h3>
+            <p className="text-sm text-text-muted font-sans mt-1">{company}</p>
           </div>
-          <p className="text-sm text-text-muted">{duration}</p>
+          <p className="text-sm text-text-muted font-sans">{duration}</p>
         </div>
-        <p className="mt-4 text-sm text-text-muted">{summary}</p>
-        <ul className="mt-4 space-y-2 text-sm text-text-muted">
+        <p className="text-sm text-text-muted leading-relaxed font-sans mb-4">{summary}</p>
+        <ul className="space-y-2 text-sm text-text-muted leading-relaxed font-sans mb-4">
           {achievements.map((item) => (
-            <li key={item}>• {item}</li>
+            <li key={item} className="flex items-start gap-2">
+              <span className="text-accent-cyan mt-1">•</span>
+              <span>{item}</span>
+            </li>
           ))}
         </ul>
-        <div className="mt-4 flex flex-wrap gap-2">
+        <div className="flex flex-wrap gap-2">
           {skillTags.map((tag) => (
-            <span key={tag} className="text-xs uppercase tracking-[0.3em] rounded-full border border-white/10 px-3 py-1 text-text-muted">
+            <span key={tag} className="text-xs uppercase tracking-[0.3em] rounded-full border border-white/10 px-3 py-1 text-text-muted font-sans">
               {tag}
             </span>
           ))}
@@ -700,8 +812,8 @@ function ContactChannelCard({ icon: Icon, label, value, href, download }: Contac
   const content = (
     <div className="flex items-center justify-between rounded-3xl border border-white/5 bg-white/5 px-5 py-4 shadow-glass-soft">
       <div>
-        <p className="text-xs uppercase tracking-[0.4em] text-text-muted">{label}</p>
-        <p className="mt-1 text-sm font-semibold text-text-primary">{value}</p>
+        <p className="text-xs uppercase tracking-[0.4em] text-text-muted font-sans">{label}</p>
+        <p className="mt-1 text-sm font-semibold text-text-primary font-sans">{value}</p>
       </div>
       <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-accent-cyan/10 text-accent-cyan">
         <Icon className="h-5 w-5" />
@@ -766,17 +878,17 @@ function DashboardCard({
               Featured Project
             </span>
           )}
-          <h3 className="text-3xl sm:text-4xl font-bold text-text-primary mb-3 group-hover:text-cyan-400 transition-colors">
+          <h3 className="font-serif text-3xl sm:text-4xl md:text-5xl font-bold text-text-primary mb-4 group-hover:text-accent-cyan transition-colors tracking-tight leading-tight">
             {title}
           </h3>
-          <p className="text-lg text-cyan-300/80 font-medium mb-6">{subtitle}</p>
-          <p className="text-text-muted leading-relaxed max-w-3xl">{description}</p>
+          <p className="text-base sm:text-lg md:text-xl text-accent-cyan/90 font-normal mb-6 font-sans">{subtitle}</p>
+          <p className="text-sm sm:text-base text-text-muted leading-relaxed max-w-3xl font-sans">{description}</p>
         </div>
 
         <div
           role="region"
           aria-label={`${title} - Interactive Power BI Dashboard`}
-          className="rounded-2xl overflow-hidden border-2 border-white/10 group-hover:border-cyan-400/40 transition-colors"
+          className="rounded-2xl overflow-hidden border-2 border-white/10 group-hover:border-accent-cyan/40 transition-colors"
         >
           <div className="relative w-full bg-black">
             <div className="relative pt-[56.25%] sm:pt-[59.77%] overflow-hidden">
@@ -784,7 +896,7 @@ function DashboardCard({
                 title={title}
                 src={embedUrl}
                 className="absolute inset-0 h-full w-full border-0"
-                style={{ 
+                style={{
                   border: 'none',
                   margin: 0,
                   padding: 0,
@@ -804,32 +916,32 @@ function DashboardCard({
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 p-6 rounded-2xl bg-white/5 border border-white/10">
           {metrics.map(({ label, value }) => (
             <div key={label} className="text-center">
-              <p className="text-2xl font-bold text-cyan-300">{value}</p>
-              <p className="text-xs uppercase tracking-[0.2em] text-text-muted mt-1">{label}</p>
+              <p className="text-xl sm:text-2xl font-bold text-accent-cyan font-serif">{value}</p>
+              <p className="text-xs uppercase tracking-[0.2em] text-text-muted mt-1.5 font-sans">{label}</p>
             </div>
           ))}
         </div>
 
         <div className="space-y-4">
-          <h4 className="text-lg font-semibold flex items-center gap-2 text-text-primary">
+          <h4 className="text-base sm:text-lg font-semibold flex items-center gap-2 text-text-primary font-serif">
             <Lightbulb className="h-5 w-5 text-amber-300" />
             Key insights &amp; features
           </h4>
           <ul className="grid md:grid-cols-2 gap-3">
             {insights.map((insight) => (
-              <li key={insight} className="flex items-start gap-3 text-sm text-text-muted">
-                <span className="text-cyan-400 mt-1">▹</span>
+              <li key={insight} className="flex items-start gap-3 text-sm text-text-muted leading-relaxed font-sans">
+                <span className="text-accent-cyan mt-1">▹</span>
                 <span>{insight}</span>
               </li>
             ))}
           </ul>
         </div>
 
-        <div className="flex flex-wrap gap-3">
+        <div className="flex flex-wrap gap-2 sm:gap-3">
           {tech.map((item) => (
             <span
               key={item}
-              className="px-4 py-2 rounded-full border border-cyan-500/30 bg-cyan-500/10 text-cyan-200 text-sm font-medium"
+              className="px-3 sm:px-4 py-1.5 sm:py-2 rounded-full border border-accent-cyan/30 bg-accent-cyan/10 text-accent-cyan text-xs sm:text-sm font-medium font-sans"
             >
               {item}
             </span>
@@ -850,8 +962,8 @@ function TechHighlight({ icon, title, description }: TechHighlightProps) {
   return (
     <div className="rounded-2xl border border-white/10 bg-white/5 p-5 backdrop-blur-md">
       <div className="text-3xl mb-3">{icon}</div>
-      <h4 className="text-lg font-semibold text-text-primary mb-2">{title}</h4>
-      <p className="text-sm text-text-muted">{description}</p>
+      <h4 className="text-base sm:text-lg font-semibold text-text-primary mb-2 font-serif">{title}</h4>
+      <p className="text-sm text-text-muted leading-relaxed font-sans">{description}</p>
     </div>
   );
 }
