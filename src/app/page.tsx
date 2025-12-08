@@ -1,8 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef } from "react";
 import GlassSurface from "@/components/react-bits/GlassSurface/GlassSurface";
-import { motion, useReducedMotion } from "framer-motion";
+import { motion, useReducedMotion, useScroll, useTransform, useSpring, useInView } from "framer-motion";
 import { Card, CardContent } from "@/components/ui/card";
 import {
   BarChart3,
@@ -21,6 +21,7 @@ import {
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import BlurText from "@/components/react-bits/BlurText/BlurText";
+import { CertificateCarousel } from "@/components/ui/certificate-carousel";
 import dynamic from "next/dynamic";
 
 // Dynamically import LiquidChrome to reduce initial bundle size and avoid SSR issues
@@ -145,28 +146,40 @@ export default function HomePage() {
 
   const experienceTimeline = [
     {
+      title: "Certified Data Analyst Trainee",
+      company: "Ducat, Noida",
+      duration: "Jul 2024 – Nov 2025",
+      summary:
+        "Undertook an intensive, practical upskilling program focused on modern data architecture, bridging the gap between business logic and technical execution using AI-augmented workflows.",
+      achievements: [
+        "Mastered the full data lifecycle: Extraction (SQL), Transformation (Python/Excel), and Visualization (Power BI).",
+        "Developed AI-assisted coding protocols to accelerate query generation and complex DAX formulation.",
+      ],
+      skillTags: ["SQL", "Python", "Power BI", "Excel", "VBA", "Generative AI"],
+    },
+    {
       title: "Claims Analyst",
       company: "Xceedance Consulting India Pvt. Ltd.",
       duration: "Jul 2023 – Jan 2024",
       summary:
-        "Delivered 100% accuracy while maintaining the Medical Provider Network database and daily executive reports.",
+        "Delivered high-velocity data processing and database maintenance for US-based healthcare clients, consistently outperforming production targets through rapid process adaptation.",
       achievements: [
-        "Operationalised updates/creation of critical provider records.",
-        "Produced daily reports for offshore managers on schedule.",
+        "Maintained 99% data integrity for the Medical Provider Network (MPN) database with zero compliance errors.",
+        "Surpassed daily production KPIs by 15% within the first month of operations.",
       ],
-      skillTags: ["Data Management", "Excel", "Healthcare Ops"],
+      skillTags: ["Data Integrity", "SLA Management", "Healthcare Ops"],
     },
     {
       title: "Marketing & Sales Trainee",
       company: "IFortis Corporate",
       duration: "May 2021 – Jul 2021",
       summary:
-        "Built foundational business intelligence through consumer trend analysis and campaign alignment tasks.",
+        "Built foundational business intelligence skills through consumer trend analysis, market segmentation, and the alignment of sales operations with corporate strategy.",
       achievements: [
-        "Supported segmentation research for active campaigns.",
-        "Helped sync sales ops with marketing experiments.",
+        "Leveraged market segmentation analysis to refine targeting approaches for active campaigns.",
+        "Managed sales operations to ensure seamless execution of strategic promotional plans.",
       ],
-      skillTags: ["Market Analysis", "Reporting", "Stakeholder Ops"],
+      skillTags: ["Market Analysis", "Consumer Behavior", "Stakeholder Ops"],
     },
   ];
 
@@ -187,7 +200,7 @@ export default function HomePage() {
       icon: FileText,
       label: "Resume",
       value: "Download resume (PDF)",
-      href: "/Konark%20Resume.pdf",
+      href: "/Resume.pdf",
       download: true,
     },
     {
@@ -288,7 +301,7 @@ export default function HomePage() {
 
 
   return (
-    <main className="relative min-h-screen overflow-hidden bg-gradient-to-br from-gray-900 via-black to-gray-800">
+    <main className="relative min-h-screen bg-gradient-to-br from-gray-900 via-black to-gray-800">
       {/* Connection warming handled via preconnect/dns-prefetch in layout */}
 
       {/* Hero section */}
@@ -403,93 +416,11 @@ export default function HomePage() {
         </div>
       </div>
 
-      {/* About Section - Centered Layout */}
-      <section
-        id="about"
-        className="relative min-h-[90vh] flex items-center justify-center px-4 sm:px-6 lg:px-8 py-16 sm:py-20 lg:py-24 overflow-hidden"
-      >
-        {/* Gradient transition from hero */}
-        <div className="absolute inset-0 bg-gradient-to-b from-[#0A192F]/0 via-[#0A192F]/50 to-[#0A192F]" />
-        {/* Ambient glows */}
-        <div className="pointer-events-none absolute inset-0">
-          <div className="absolute -top-40 left-1/2 h-[480px] w-[480px] -translate-x-1/2 rounded-full bg-cyan-500/15 blur-[180px]" />
-          <div className="absolute bottom-[-80px] right-1/4 h-[320px] w-[320px] rounded-full bg-sky-500/8 blur-[160px]" />
-        </div>
-
-        <div className="max-w-4xl mx-auto w-full text-center space-y-12 relative z-10">
-          {/* Section Label */}
-          <p className="about-fade-in text-xs tracking-[0.4em] uppercase text-text-muted font-sans">
-            Get to Know Me
-          </p>
-
-          {/* Name */}
-          <h1 className="about-fade-in about-delay-100 font-serif text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-bold tracking-tight text-white leading-[1.1]">
-            KONARK PARIHAR
-          </h1>
-
-          {/* Role */}
-          <p className="about-fade-in about-delay-150 text-lg sm:text-xl md:text-2xl text-accent-cyan font-normal font-sans">
-            Data Analyst &amp; Business Intelligence Specialist
-          </p>
-
-          {/* Bio with Keyword Highlighting */}
-          <p className="about-fade-in about-delay-200 text-text-muted leading-relaxed text-base sm:text-lg max-w-2xl mx-auto px-4 font-sans">
-            Data analyst with commerce background specializing in{" "}
-            <span className="text-accent-cyan font-medium">Power BI</span>,{" "}
-            <span className="text-accent-cyan font-medium">SQL</span>, and{" "}
-            <span className="text-accent-cyan font-medium">AI-powered workflows</span>.
-            Transforming complex datasets into{" "}
-            <span className="text-white font-medium">clear, decision-ready insights</span>.
-          </p>
-
-          {/* Key Term Highlights - Horizontal Row */}
-          <div className="about-fade-in about-delay-250 flex flex-col md:flex-row justify-center gap-8 md:gap-12 lg:gap-16 pt-4">
-            {[
-              { big: "Dynamic", small: "Stakeholder Views" },
-              { big: "Automated", small: "Intelligence" },
-              { big: "Targeted", small: "Decision Support" },
-            ].map(({ big, small }) => (
-              <div key={big} className="text-center group cursor-default">
-                <div className="text-3xl sm:text-4xl md:text-5xl font-bold text-accent-cyan group-hover:text-white transition-colors duration-300 font-serif">
-                  {big}
-                </div>
-                <div className="text-xs uppercase tracking-[0.25em] text-text-muted mt-2 font-sans">
-                  {small}
-                </div>
-              </div>
-            ))}
-          </div>
-
-          {/* Skills Card */}
-          <div className="about-fade-in about-delay-300 rounded-[32px] border border-white/10 bg-white/[0.04] hover:bg-white/[0.06] px-6 sm:px-10 py-8 shadow-[0_20px_80px_rgba(0,0,0,0.3)] backdrop-blur-sm transition-all duration-500 hover:border-white/15 max-w-2xl mx-auto">
-            {/* Skills Pills */}
-            <div className="flex flex-wrap justify-center gap-2 sm:gap-3">
-              {[
-                "Power BI",
-                "SQL",
-                "Python",
-                "Excel",
-                "DAX",
-                "AI Workflow",
-                "Healthcare Analytics",
-                "Business Intelligence",
-              ].map((skill) => (
-                <span
-                  key={skill}
-                  className="px-3 sm:px-4 py-1.5 text-xs sm:text-sm text-text-primary border border-white/10 rounded-full 
-                             hover:text-accent-cyan hover:border-accent-cyan/40 hover:shadow-[0_0_15px_rgba(100,255,218,0.15)]
-                             transition-all duration-300 cursor-default font-sans"
-                >
-                  {skill}
-                </span>
-              ))}
-            </div>
-          </div>
-        </div>
-      </section>
+      {/* About Section - Dynamic Scroll Animations */}
+      <AboutSection shouldReduceMotion={shouldReduceMotion} />
 
       {/* Skills / Technical Expertise Section */}
-      <section id="skills" className="relative z-10 bg-slate-950/60 text-foreground border-t border-white/5">
+      <section id="skills" className="relative z-10 bg-slate-950 text-foreground border-t border-white/5">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-16 sm:py-20 lg:py-28 space-y-16">
           <div className="text-center space-y-4 max-w-3xl mx-auto">
             <p className="text-xs uppercase tracking-[0.6em] text-text-muted font-sans">Technical expertise</p>
@@ -531,9 +462,16 @@ export default function HomePage() {
               A chronological overview of my professional journey, highlighting key achievements, responsibilities, and technical expertise gained at each position.
             </p>
           </div>
-          <div className="relative border-l border-white/10 ml-4">
+          {/* Stacked cards container - needs extra bottom padding for sticky effect */}
+          <div className="relative" style={{ paddingBottom: `${(experienceTimeline.length - 1) * 100}px` }}>
             {experienceTimeline.map((item, index) => (
-              <ExperienceEntry key={item.title} {...item} isLast={index === experienceTimeline.length - 1} />
+              <ExperienceEntry
+                key={item.title}
+                {...item}
+                index={index}
+                totalItems={experienceTimeline.length}
+                isLast={index === experienceTimeline.length - 1}
+              />
             ))}
           </div>
         </div>
@@ -607,6 +545,44 @@ export default function HomePage() {
           </motion.div>
         </div>
 
+        {/* Certificate Carousel */}
+        <CertificateCarousel
+          certificates={[
+            {
+              title: "Professional Training Certificate",
+              description: "Comprehensive training program in data analytics and business intelligence tools.",
+              filePath: "/Certificates/Konark Parihar ducat certificate.pdf",
+              imagePath: "/Certificates/Konark Parihar ducat certificate.png",
+              issuer: "DUCAT",
+              date: "2024",
+            },
+            {
+              title: "Create Visual Calculation",
+              description: "Advanced Power BI visual calculations and DAX formulations for dynamic reporting.",
+              filePath: "/Certificates/Create Visual Calculation.pdf",
+              imagePath: "/Certificates/Create Visual Calculation.png",
+              issuer: "Microsoft",
+              date: "2024",
+            },
+            {
+              title: "DAX Time Intelligence",
+              description: "Mastering time-based calculations and analysis using DAX functions in Power BI.",
+              filePath: "/Certificates/Dax time Intelligence.pdf",
+              imagePath: "/Certificates/Dax time Intelligence.png",
+              issuer: "Microsoft",
+              date: "2024",
+            },
+            {
+              title: "End to End Analytics",
+              description: "Complete data analytics workflow from data extraction to visualization and insights.",
+              filePath: "/Certificates/end to end analytics.pdf",
+              imagePath: "/Certificates/end to end analytics.png",
+              issuer: "Microsoft",
+              date: "2024",
+            },
+          ]}
+        />
+
       </section>
 
       {/* Contact Section */}
@@ -626,7 +602,8 @@ export default function HomePage() {
           </div>
           <Card className="border-white/10 bg-white/5 shadow-glass-soft">
             <CardContent className="space-y-4 pt-6">
-              <form className="space-y-5" onSubmit={handleSubmit}>
+              {/* Suppress hydration warnings inside the form because some browser extensions (password managers, Grammarly, etc.) inject inline styles/attributes before React hydrates, which can trigger noisy hydration mismatches in dev. */}
+              <form className="space-y-5" onSubmit={handleSubmit} suppressHydrationWarning>
                 <div>
                   <label htmlFor="contact-name" className="block text-sm font-semibold text-text-primary mb-2 font-sans">
                     Name *
@@ -755,6 +732,8 @@ type ExperienceEntryProps = {
   summary: string;
   achievements: string[];
   skillTags: string[];
+  index: number;
+  totalItems: number;
   isLast?: boolean;
 };
 
@@ -765,38 +744,84 @@ function ExperienceEntry({
   summary,
   achievements,
   skillTags,
-  isLast,
+  index,
+  totalItems,
 }: ExperienceEntryProps) {
+  // Format index as 01, 02, 03
+  const formattedIndex = String(index + 1).padStart(2, '0');
+
+  // Calculate z-index - higher cards (later in list) should be on top
+  const zIndex = index + 1;
+
+  // All cards stick at the SAME position - this creates the "cover" effect
+  // where each new card scrolls up and completely overlaps the previous one
+  const topOffset = 100; // Same for all cards
+
   return (
-    <div className="pl-10 pb-12 relative">
-      <span className="absolute -left-[9px] top-2 h-4 w-4 rounded-full bg-accent-cyan shadow-[0_0_20px_rgba(100,255,218,0.6)]" />
-      {!isLast && <span className="absolute left-[ -1px] top-6 bottom-0 w-[2px] bg-gradient-to-b from-accent-cyan/40 to-transparent" />}
-      <div className="rounded-3xl border border-white/5 bg-white/5 p-6 shadow-glass-soft">
-        <div className="flex flex-wrap items-baseline justify-between gap-3 mb-4">
-          <div>
-            <h3 className="text-lg sm:text-xl font-semibold text-text-primary font-serif">{title}</h3>
-            <p className="text-sm text-text-muted font-sans mt-1">{company}</p>
-          </div>
-          <p className="text-sm text-text-muted font-sans">{duration}</p>
+    <motion.div
+      initial={{ opacity: 0, y: 100 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, margin: "-50px" }}
+      transition={{
+        duration: 0.6,
+        ease: [0.25, 0.46, 0.45, 0.94]
+      }}
+      className="sticky"
+      style={{
+        top: `${topOffset}px`,
+        zIndex: zIndex,
+      }}
+    >
+      {/* Card container with solid background to cover previous card */}
+      <div
+        className="rounded-3xl border border-white/10 bg-background p-6 sm:p-8 transition-all duration-500 hover:border-accent-cyan/30"
+        style={{
+          boxShadow: `0 -20px 50px -10px rgba(0,0,0,0.9), 0 0 0 1px rgba(255,255,255,0.05)`,
+        }}
+      >
+        {/* Numbered prefix - validgraphs.com style */}
+        <div className="mb-4">
+          <span className="text-sm text-accent-cyan/70 font-mono tracking-wide">« {formattedIndex}</span>
         </div>
-        <p className="text-sm text-text-muted leading-relaxed font-sans mb-4">{summary}</p>
-        <ul className="space-y-2 text-sm text-text-muted leading-relaxed font-sans mb-4">
+
+        {/* Title */}
+        <h3 className="text-xl sm:text-2xl md:text-3xl font-bold text-text-primary font-serif mb-2 group-hover:text-accent-cyan transition-colors duration-300">
+          {title}
+        </h3>
+
+        {/* Company and Duration */}
+        <div className="flex flex-wrap items-center gap-2 sm:gap-4 mb-4">
+          <p className="text-sm sm:text-base text-text-muted font-sans">{company}</p>
+          <span className="text-text-muted/40">|</span>
+          <p className="text-sm text-text-muted/70 font-sans">{duration}</p>
+        </div>
+
+        {/* Summary */}
+        <p className="text-sm sm:text-base text-text-muted leading-relaxed font-sans mb-6">{summary}</p>
+
+        {/* Achievements */}
+        <ul className="space-y-3 text-sm text-text-muted leading-relaxed font-sans mb-6">
           {achievements.map((item) => (
-            <li key={item} className="flex items-start gap-2">
-              <span className="text-accent-cyan mt-1">•</span>
+            <li key={item} className="flex items-start gap-3">
+              <span className="text-accent-cyan mt-0.5 flex-shrink-0">▹</span>
               <span>{item}</span>
             </li>
           ))}
         </ul>
+
+        {/* Skill Tags */}
         <div className="flex flex-wrap gap-2">
           {skillTags.map((tag) => (
-            <span key={tag} className="text-xs uppercase tracking-[0.3em] rounded-full border border-white/10 px-3 py-1 text-text-muted font-sans">
+            <span
+              key={tag}
+              className="text-xs uppercase tracking-[0.2em] rounded-full border border-accent-cyan/20 bg-accent-cyan/5 px-3 py-1.5 text-accent-cyan/80 font-sans hover:bg-accent-cyan/10 hover:border-accent-cyan/40 transition-all duration-300"
+            >
               {tag}
             </span>
           ))}
         </div>
       </div>
-    </div>
+    </motion.div>
   );
 }
 
@@ -965,5 +990,194 @@ function TechHighlight({ icon, title, description }: TechHighlightProps) {
       <h4 className="text-base sm:text-lg font-semibold text-text-primary mb-2 font-serif">{title}</h4>
       <p className="text-sm text-text-muted leading-relaxed font-sans">{description}</p>
     </div>
+  );
+}
+
+// About Section with Dynamic Scroll Animations
+type AboutSectionProps = {
+  shouldReduceMotion: boolean | null;
+};
+
+function AboutSection({ shouldReduceMotion }: AboutSectionProps) {
+  const sectionRef = useRef<HTMLElement>(null);
+  const nameRef = useRef<HTMLHeadingElement>(null);
+  const cardsRef = useRef<HTMLDivElement>(null);
+
+  // Scroll progress for the section
+  const { scrollYProgress } = useScroll({
+    target: sectionRef,
+    offset: ["start end", "end start"]
+  });
+
+  // Smooth spring-based transforms
+  const smoothProgress = useSpring(scrollYProgress, { stiffness: 100, damping: 30, restDelta: 0.001 });
+
+  // Scale animation for the name (scales up as you scroll)
+  const nameScale = useTransform(smoothProgress, [0, 0.3], [0.92, 1]);
+  const nameOpacity = useTransform(smoothProgress, [0, 0.25], [0.4, 1]);
+  const nameY = useTransform(smoothProgress, [0, 0.3], [30, 0]);
+
+  // Parallax for description
+  const descY = useTransform(smoothProgress, [0, 0.5], [60, 0]);
+  const descOpacity = useTransform(smoothProgress, [0.1, 0.35], [0, 1]);
+
+  // Cards stagger effect
+  const cardsInView = useInView(cardsRef, { once: true, margin: "-100px" });
+
+  const capabilities = [
+    {
+      num: "01",
+      title: "Dynamic",
+      subtitle: "Stakeholder Views",
+      desc: "Multi-user dashboards tailored for different decision-makers"
+    },
+    {
+      num: "02",
+      title: "Automated",
+      subtitle: "Intelligence",
+      desc: "AI-driven workflows that accelerate insight delivery"
+    },
+    {
+      num: "03",
+      title: "Targeted",
+      subtitle: "Decision Support",
+      desc: "Focused analytics that drive actionable outcomes"
+    },
+  ];
+
+  const skills = ["Power BI", "SQL", "DAX", "Python", "Excel", "VBA", "AI Workflow", "Healthcare Analytics"];
+
+  return (
+    <section
+      ref={sectionRef}
+      id="about"
+      className="sticky top-0 z-0 min-h-screen flex items-center justify-center px-4 sm:px-6 lg:px-8 py-20 sm:py-28 lg:py-32 overflow-hidden"
+    >
+      {/* Gradient transition from hero */}
+      <div className="absolute inset-0 bg-gradient-to-b from-[#0A192F]/0 via-[#0A192F]/60 to-[#0A192F]" />
+
+      {/* Subtle ambient glow - monochromatic */}
+      <div className="pointer-events-none absolute inset-0">
+        <motion.div
+          className="absolute top-0 left-1/2 -translate-x-1/2 h-[600px] w-[800px] rounded-full bg-cyan-500/10 blur-[250px]"
+          style={{ opacity: smoothProgress }}
+        />
+      </div>
+
+      <div className="max-w-5xl mx-auto w-full relative z-10">
+        {/* Header with Dynamic Scaling */}
+        <div className="text-center mb-20">
+          <motion.p
+            className="text-xs tracking-[0.5em] uppercase text-text-muted font-sans mb-6"
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6 }}
+          >
+            About
+          </motion.p>
+
+          {/* Dynamic Scaling Name */}
+          <motion.h1
+            ref={nameRef}
+            className="font-serif text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-bold text-white leading-[1.1] mb-8 origin-center whitespace-nowrap"
+            style={shouldReduceMotion ? {} : {
+              scale: nameScale,
+              opacity: nameOpacity,
+              y: nameY
+            }}
+          >
+            KONARK PARIHAR
+          </motion.h1>
+
+          {/* Parallax Description */}
+          <motion.p
+            className="text-lg sm:text-xl text-text-muted font-sans max-w-2xl mx-auto leading-relaxed"
+            style={shouldReduceMotion ? {} : { y: descY, opacity: descOpacity }}
+          >
+            Data Analyst specializing in{" "}
+            <span className="text-accent-cyan">Power BI</span>,{" "}
+            <span className="text-accent-cyan">SQL</span>, and{" "}
+            <span className="text-accent-cyan">AI-powered workflows</span> —
+            transforming complex data into strategic business decisions.
+          </motion.p>
+        </div>
+
+        {/* Key Capabilities - Staggered Slide In */}
+        <div ref={cardsRef} className="mb-20">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-px bg-white/5 rounded-2xl overflow-hidden">
+            {capabilities.map(({ num, title, subtitle, desc }, index) => (
+              <motion.div
+                key={num}
+                className="bg-[#0A192F] p-8 sm:p-10 group hover:bg-white/[0.02] transition-colors duration-500"
+                initial={{ opacity: 0, x: index === 0 ? -60 : index === 2 ? 60 : 0, y: index === 1 ? 40 : 0 }}
+                animate={cardsInView ? { opacity: 1, x: 0, y: 0 } : {}}
+                transition={{
+                  duration: 0.7,
+                  delay: index * 0.15,
+                  ease: [0.25, 0.46, 0.45, 0.94]
+                }}
+              >
+                <span className="text-xs text-text-muted/50 font-mono tracking-wider">{num}</span>
+                <motion.h3
+                  className="text-2xl sm:text-3xl font-bold text-white font-serif mt-4 mb-1 group-hover:text-accent-cyan transition-colors duration-300"
+                  whileHover={{ scale: 1.02 }}
+                  transition={{ type: "spring", stiffness: 400, damping: 10 }}
+                >
+                  {title}
+                </motion.h3>
+                <p className="text-xs uppercase tracking-[0.2em] text-accent-cyan/70 font-sans mb-4">
+                  {subtitle}
+                </p>
+                <p className="text-sm text-text-muted leading-relaxed font-sans">
+                  {desc}
+                </p>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+
+        {/* Skills - Cascading Fade In */}
+        <div className="overflow-hidden">
+          <motion.div
+            className="flex items-center justify-center gap-4 mb-8"
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.5 }}
+          >
+            <div className="h-px flex-1 max-w-[100px] bg-gradient-to-r from-transparent to-white/10" />
+            <p className="text-xs tracking-[0.4em] uppercase text-text-muted font-sans">Technical Stack</p>
+            <div className="h-px flex-1 max-w-[100px] bg-gradient-to-l from-transparent to-white/10" />
+          </motion.div>
+
+          <div className="flex flex-wrap justify-center gap-3">
+            {skills.map((skill, index) => (
+              <motion.span
+                key={skill}
+                className="px-4 py-2 text-sm text-text-muted border border-white/10 rounded-full 
+                           hover:text-white hover:border-white/30
+                           transition-all duration-300 cursor-default font-sans"
+                initial={{ opacity: 0, y: 20, scale: 0.9 }}
+                whileInView={{ opacity: 1, y: 0, scale: 1 }}
+                viewport={{ once: true }}
+                transition={{
+                  duration: 0.4,
+                  delay: 0.05 * index,
+                  ease: "easeOut"
+                }}
+                whileHover={{
+                  scale: 1.08,
+                  boxShadow: "0 0 20px rgba(100,255,218,0.2)",
+                  borderColor: "rgba(100,255,218,0.5)"
+                }}
+              >
+                {skill}
+              </motion.span>
+            ))}
+          </div>
+        </div>
+      </div>
+    </section>
   );
 }
