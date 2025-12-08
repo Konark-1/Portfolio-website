@@ -109,7 +109,7 @@ export default function HomePage() {
       setFormStatus("success");
       setFormData({ name: "", email: "", message: "" });
       setTimeout(() => setFormStatus("idle"), 3000);
-    } catch (error) {
+    } catch {
       setFormStatus("error");
       setTimeout(() => setFormStatus("idle"), 3000);
     }
@@ -473,13 +473,12 @@ export default function HomePage() {
             </p>
           </div>
           {/* Stacked cards container - needs extra bottom padding for sticky effect */}
-          <div className="relative" style={{ paddingBottom: `${(experienceTimeline.length - 1) * 100}px` }}>
+          <div className="relative" style={{ paddingBottom: `${(experienceTimeline.length - 1) * 132}px` }}>
             {experienceTimeline.map((item, index) => (
               <ExperienceEntry
                 key={item.title}
                 {...item}
                 index={index}
-                totalItems={experienceTimeline.length}
                 isLast={index === experienceTimeline.length - 1}
               />
             ))}
@@ -604,7 +603,7 @@ export default function HomePage() {
               Let&rsquo;s work together
             </h2>
             <p className="text-base sm:text-lg text-text-muted leading-relaxed font-sans">
-              I'm always open to discussing new opportunities, collaborations, or data analytics projects. Feel free to reach out using the form below or through any of my direct contact channels.
+              I&apos;m always open to discussing new opportunities, collaborations, or data analytics projects. Feel free to reach out using the form below or through any of my direct contact channels.
             </p>
             <p className="text-sm text-text-muted leading-relaxed font-sans">
               I typically respond within 24-48 hours. For urgent matters, please use the direct contact channels in the Connect section below.
@@ -672,7 +671,7 @@ export default function HomePage() {
                   </div>
                   {formStatus === "success" && (
                     <div className="rounded-2xl bg-emerald-500/10 border border-emerald-500/30 px-4 py-3 text-sm text-emerald-300 font-sans">
-                      Message sent successfully! I'll get back to you soon.
+                      Message sent successfully! I&apos;ll get back to you soon.
                     </div>
                   )}
                   {formStatus === "error" && (
@@ -707,7 +706,7 @@ export default function HomePage() {
               Direct lines & quick actions
             </h2>
             <p className="text-base sm:text-lg text-text-muted leading-relaxed font-sans">
-              Quick access to direct contact channels. Choose your preferred method to get in touch—I'm always open to connecting with potential collaborators, employers, or fellow data professionals.
+              Quick access to direct contact channels. Choose your preferred method to get in touch—I&apos;m always open to connecting with potential collaborators, employers, or fellow data professionals.
             </p>
           </div>
           <div className="grid gap-4 sm:grid-cols-2">
@@ -753,7 +752,6 @@ type ExperienceEntryProps = {
   achievements: string[];
   skillTags: string[];
   index: number;
-  totalItems: number;
   isLast?: boolean;
 };
 
@@ -765,7 +763,6 @@ function ExperienceEntry({
   achievements,
   skillTags,
   index,
-  totalItems,
 }: ExperienceEntryProps) {
   // Format index as 01, 02, 03
   const formattedIndex = String(index + 1).padStart(2, '0');
@@ -786,7 +783,7 @@ function ExperienceEntry({
         duration: 0.6,
         ease: [0.25, 0.46, 0.45, 0.94]
       }}
-      className="sticky"
+      className="sticky mb-8"
       style={{
         top: `${topOffset}px`,
         zIndex: zIndex,

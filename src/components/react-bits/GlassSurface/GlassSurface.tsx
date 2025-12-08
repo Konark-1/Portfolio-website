@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useRef, useState, useId, useCallback } from "react";
-import { shouldDisableHeavyAnimations, detectDeviceCapabilities } from "@/lib/performance";
+import { shouldDisableHeavyAnimations, detectDeviceCapabilities, type DeviceCapabilities } from "@/lib/performance";
 
 export interface GlassSurfaceProps {
   children?: React.ReactNode;
@@ -100,7 +100,7 @@ const GlassSurface: React.FC<GlassSurfaceProps> = ({
   const isDarkMode = useDarkMode();
 
   // Initialize with server-safe defaults to avoid hydration mismatch
-  const [deviceCaps, setDeviceCaps] = useState<any>({
+  const [deviceCaps, setDeviceCaps] = useState<DeviceCapabilities>({
     hasGPU: false,
     isLowEndDevice: true,
     isMobile: false,
