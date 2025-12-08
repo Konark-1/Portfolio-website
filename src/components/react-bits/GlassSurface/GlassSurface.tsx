@@ -22,24 +22,24 @@ export interface GlassSurfaceProps {
   xChannel?: "R" | "G" | "B";
   yChannel?: "R" | "G" | "B";
   mixBlendMode?:
-    | "normal"
-    | "multiply"
-    | "screen"
-    | "overlay"
-    | "darken"
-    | "lighten"
-    | "color-dodge"
-    | "color-burn"
-    | "hard-light"
-    | "soft-light"
-    | "difference"
-    | "exclusion"
-    | "hue"
-    | "saturation"
-    | "color"
-    | "luminosity"
-    | "plus-darker"
-    | "plus-lighter";
+  | "normal"
+  | "multiply"
+  | "screen"
+  | "overlay"
+  | "darken"
+  | "lighten"
+  | "color-dodge"
+  | "color-burn"
+  | "hard-light"
+  | "soft-light"
+  | "difference"
+  | "exclusion"
+  | "hue"
+  | "saturation"
+  | "color"
+  | "luminosity"
+  | "plus-darker"
+  | "plus-lighter";
   className?: string;
   style?: React.CSSProperties;
   disableShadow?: boolean;
@@ -98,8 +98,26 @@ const GlassSurface: React.FC<GlassSurfaceProps> = ({
   const gaussianBlurRef = useRef<SVGFEGaussianBlurElement>(null);
 
   const isDarkMode = useDarkMode();
-  const deviceCaps = detectDeviceCapabilities();
-  const useSimplifiedMode = shouldDisableHeavyAnimations() || deviceCaps.isLowEndDevice;
+
+  // Initialize with server-safe defaults to avoid hydration mismatch
+  const [deviceCaps, setDeviceCaps] = useState<any>({
+    hasGPU: false,
+    isLowEndDevice: true,
+    isMobile: false,
+    supportsWebGL: false,
+    estimatedFPS: 30,
+  });
+
+  const [useSimplifiedMode, setUseSimplifiedMode] = useState(true);
+
+  useEffect(() => {
+    // Get actual capabilities on client
+    const caps = detectDeviceCapabilities();
+    setDeviceCaps(caps);
+
+    const shouldSimplify = shouldDisableHeavyAnimations() || caps.isLowEndDevice;
+    setUseSimplifiedMode(shouldSimplify);
+  }, []);
 
   const generateDisplacementMap = useCallback(() => {
     // Skip expensive SVG generation for low-end devices
@@ -295,86 +313,86 @@ const GlassSurface: React.FC<GlassSurfaceProps> = ({
           className="w-full h-full pointer-events-none absolute inset-0 opacity-0 -z-10"
           xmlns="http://www.w3.org/2000/svg"
         >
-        <defs>
-          <filter
-            id={filterId}
-            colorInterpolationFilters="sRGB"
-            x="0%"
-            y="0%"
-            width="100%"
-            height="100%"
-          >
-            <feImage
-              ref={feImageRef}
-              x="0"
-              y="0"
+          <defs>
+            <filter
+              id={filterId}
+              colorInterpolationFilters="sRGB"
+              x="0%"
+              y="0%"
               width="100%"
               height="100%"
-              preserveAspectRatio="none"
-              result="map"
-            />
+            >
+              <feImage
+                ref={feImageRef}
+                x="0"
+                y="0"
+                width="100%"
+                height="100%"
+                preserveAspectRatio="none"
+                result="map"
+              />
 
-            <feDisplacementMap
-              ref={redChannelRef}
-              in="SourceGraphic"
-              in2="map"
-              id="redchannel"
-              result="dispRed"
-            />
-            <feColorMatrix
-              in="dispRed"
-              type="matrix"
-              values="1 0 0 0 0
+              <feDisplacementMap
+                ref={redChannelRef}
+                in="SourceGraphic"
+                in2="map"
+                id="redchannel"
+                result="dispRed"
+              />
+              <feColorMatrix
+                in="dispRed"
+                type="matrix"
+                values="1 0 0 0 0
                       0 0 0 0 0
                       0 0 0 0 0
                       0 0 0 1 0"
-              result="red"
-            />
+                result="red"
+              />
 
-            <feDisplacementMap
-              ref={greenChannelRef}
-              in="SourceGraphic"
-              in2="map"
-              id="greenchannel"
-              result="dispGreen"
-            />
-            <feColorMatrix
-              in="dispGreen"
-              type="matrix"
-              values="0 0 0 0 0
+              <feDisplacementMap
+                ref={greenChannelRef}
+                in="SourceGraphic"
+                in2="map"
+                id="greenchannel"
+                result="dispGreen"
+              />
+              <feColorMatrix
+                in="dispGreen"
+                type="matrix"
+                values="0 0 0 0 0
                       0 1 0 0 0
                       0 0 0 0 0
                       0 0 0 1 0"
-              result="green"
-            />
+                result="green"
+              />
 
-            <feDisplacementMap
-              ref={blueChannelRef}
-              in="SourceGraphic"
-              in2="map"
-              id="bluechannel"
-              result="dispBlue"
-            />
-            <feColorMatrix
-              in="dispBlue"
-              type="matrix"
-              values="0 0 0 0 0
+              <feDisplacementMap
+                ref={blueChannelRef}
+                in="SourceGraphic"
+                in2="map"
+                id="bluechannel"
+                result="dispBlue"
+              />
+              <feColorMatrix
+                in="dispBlue"
+                type="matrix"
+                values="0 0 0 0 0
                       0 0 0 0 0
                       0 0 1 0 0
                       0 0 0 1 0"
-              result="blue"
-            />
+                result="blue"
+              />
 
-            <feBlend in="red" in2="green" mode="screen" result="rg" />
-            <feBlend in="rg" in2="blue" mode="screen" result="output" />
-            <feGaussianBlur
-              ref={gaussianBlurRef}
-              in="output"
-              stdDeviation="0.7"
-            />
-          </filter>
-        </defs>
-      </svg>
+              <feBlend in="red" in2="green" mode="screen" result="rg" />
+              <feBlend in="rg" in2="blue" mode="screen" result="output" />
+              <feGaussianBlur
+                ref={gaussianBlurRef}
+                in="output"
+                stdDeviation="0.7"
+              />
+            </filter>
+          </defs>
+        </svg>
       )}
 
       <div className="w-full h-full flex items-center justify-center p-2 rounded-[inherit] relative z-10">
