@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import GlassSurface from "@/components/react-bits/GlassSurface/GlassSurface";
 import { motion, useReducedMotion, useScroll, useTransform, useSpring, useInView } from "framer-motion";
 import { Card, CardContent } from "@/components/ui/card";
@@ -45,6 +45,11 @@ export default function HomePage() {
   });
   const [formStatus, setFormStatus] = useState<"idle" | "submitting" | "success" | "error">("idle");
   const [formErrors, setFormErrors] = useState<{ name?: string; email?: string; message?: string }>({});
+  const [isMounted, setIsMounted] = useState(false);
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { id, value } = e.target;
@@ -87,17 +92,22 @@ export default function HomePage() {
 
     setFormStatus("submitting");
 
-    // Using mailto for form submission (works without backend)
-    // To upgrade: Replace with Formspree, Resend, or Vercel Functions
     try {
-      const subject = encodeURIComponent(`Contact from ${formData.name}`);
-      const body = encodeURIComponent(`Name: ${formData.name}\nEmail: ${formData.email}\n\nMessage:\n${formData.message}`);
-      window.location.href = `mailto:konarkofficial@gmail.com?subject=${subject}&body=${body}`;
+      const response = await fetch("/api/contact", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formData),
+      });
 
-      // Show success message
+      if (!response.ok) {
+        const data = await response.json().catch(() => ({}));
+        throw new Error(data.error || "Failed to send message");
+      }
+
       setFormStatus("success");
       setFormData({ name: "", email: "", message: "" });
-      // Reset form after 3 seconds
       setTimeout(() => setFormStatus("idle"), 3000);
     } catch (error) {
       setFormStatus("error");
@@ -368,7 +378,7 @@ export default function HomePage() {
                 blueOffset={20}
                 disableShadow
               >
-                <button className="px-6 sm:px-8 py-3 text-white font-semibold w-full h-full text-sm sm:text-base tracking-wide flex items-center justify-center gap-2 font-sans">
+                <button className="px-6 sm:px-8 py-3 text-text-primary font-semibold w-full h-full text-sm sm:text-base tracking-wide flex items-center justify-center gap-2 font-sans">
                   Get Started
                 </button>
               </GlassSurface>
@@ -407,7 +417,7 @@ export default function HomePage() {
                 blueOffset={20}
                 disableShadow
               >
-                <span className="px-6 sm:px-8 py-3 text-white/80 font-medium w-full h-full text-sm sm:text-base tracking-wide flex items-center justify-center gap-2 font-sans">
+                <span className="px-6 sm:px-8 py-3 text-text-primary font-medium w-full h-full text-sm sm:text-base tracking-wide flex items-center justify-center gap-2 font-sans">
                   MY PORTFOLIO
                 </span>
               </GlassSurface>
@@ -420,7 +430,7 @@ export default function HomePage() {
       <AboutSection shouldReduceMotion={shouldReduceMotion} />
 
       {/* Skills / Technical Expertise Section */}
-      <section id="skills" className="relative z-10 bg-slate-950 text-foreground border-t border-white/5">
+      <section id="skills" className="relative z-10 bg-slate-950 text-foreground border-t border-border">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-16 sm:py-20 lg:py-28 space-y-16">
           <div className="text-center space-y-4 max-w-3xl mx-auto">
             <p className="text-xs uppercase tracking-[0.6em] text-text-muted font-sans">Technical expertise</p>
@@ -451,7 +461,7 @@ export default function HomePage() {
       </section>
 
       {/* Experience Section */}
-      <section id="experience" className="relative z-10 bg-background text-foreground border-t border-white/5">
+      <section id="experience" className="relative z-10 bg-background text-foreground border-t border-border">
         <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 py-16 sm:py-20 lg:py-28">
           <div className="space-y-4 mb-16 max-w-3xl">
             <p className="text-xs uppercase tracking-[0.55em] text-text-muted font-sans">Experience</p>
@@ -478,7 +488,7 @@ export default function HomePage() {
       </section>
 
       {/* Projects Section - Premium minimalist redesign */}
-      <section id="projects" className="relative py-24 sm:py-32 lg:py-40 px-4 sm:px-6 overflow-hidden border-t border-white/5">
+      <section id="projects" className="relative py-24 sm:py-32 lg:py-40 px-4 sm:px-6 overflow-hidden border-t border-border">
         <div className={`absolute inset-0 bg-[radial-gradient(circle_at_top,#22d3ee1a,transparent_45%)] ${shouldReduceMotion ? 'blur-xl' : 'blur-3xl'} pointer-events-none`} />
         <div className="absolute inset-0 bg-gradient-to-b from-transparent via-background/80 to-background pointer-events-none" />
 
@@ -586,7 +596,7 @@ export default function HomePage() {
       </section>
 
       {/* Contact Section */}
-      <section id="contact" className="relative z-10 bg-slate-950 text-foreground border-t border-white/5">
+      <section id="contact" className="relative z-10 bg-slate-950 text-foreground border-t border-border">
         <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 py-16 sm:py-20 lg:py-28 grid gap-12 lg:grid-cols-2">
           <div className="space-y-6">
             <p className="text-xs uppercase tracking-[0.55em] text-text-muted font-sans">Contact</p>
@@ -600,86 +610,96 @@ export default function HomePage() {
               I typically respond within 24-48 hours. For urgent matters, please use the direct contact channels in the Connect section below.
             </p>
           </div>
-          <Card className="border-white/10 bg-white/5 shadow-glass-soft">
+          <Card className="border-border bg-card/80 shadow-glass-soft">
             <CardContent className="space-y-4 pt-6">
               {/* Suppress hydration warnings inside the form because some browser extensions (password managers, Grammarly, etc.) inject inline styles/attributes before React hydrates, which can trigger noisy hydration mismatches in dev. */}
-              <form className="space-y-5" onSubmit={handleSubmit} suppressHydrationWarning>
-                <div>
-                  <label htmlFor="contact-name" className="block text-sm font-semibold text-text-primary mb-2 font-sans">
-                    Name *
-                  </label>
-                  <input
-                    id="contact-name"
-                    type="text"
-                    value={formData.name}
-                    onChange={handleInputChange}
-                    placeholder="Your name"
-                    className={`w-full rounded-2xl border ${formErrors.name ? "border-red-500/50" : "border-white/10"
-                      } bg-white/5 px-4 py-3 text-sm text-text-primary focus:outline-none focus:ring-2 focus:ring-accent-cyan/60 font-sans`}
-                  />
-                  {formErrors.name && (
-                    <p className="mt-1 text-xs text-red-400 font-sans">{formErrors.name}</p>
-                  )}
-                </div>
-                <div>
-                  <label htmlFor="contact-email" className="block text-sm font-semibold text-text-primary mb-2 font-sans">
-                    Email *
-                  </label>
-                  <input
-                    id="contact-email"
-                    type="email"
-                    value={formData.email}
-                    onChange={handleInputChange}
-                    placeholder="your@email.com"
-                    className={`w-full rounded-2xl border ${formErrors.email ? "border-red-500/50" : "border-white/10"
-                      } bg-white/5 px-4 py-3 text-sm text-text-primary focus:outline-none focus:ring-2 focus:ring-accent-cyan/60 font-sans`}
-                  />
-                  {formErrors.email && (
-                    <p className="mt-1 text-xs text-red-400 font-sans">{formErrors.email}</p>
-                  )}
-                </div>
-                <div>
-                  <label htmlFor="contact-message" className="block text-sm font-semibold text-text-primary mb-2 font-sans">
-                    Message *
-                  </label>
-                  <textarea
-                    id="contact-message"
-                    rows={5}
-                    value={formData.message}
-                    onChange={handleInputChange}
-                    placeholder="Tell me about your project or opportunity..."
-                    className={`w-full rounded-2xl border ${formErrors.message ? "border-red-500/50" : "border-white/10"
-                      } bg-white/5 px-4 py-3 text-sm text-text-primary focus:outline-none focus:ring-2 focus:ring-accent-cyan/60 resize-none font-sans`}
-                  />
-                  {formErrors.message && (
-                    <p className="mt-1 text-xs text-red-400 font-sans">{formErrors.message}</p>
-                  )}
-                </div>
-                {formStatus === "success" && (
-                  <div className="rounded-2xl bg-emerald-500/10 border border-emerald-500/30 px-4 py-3 text-sm text-emerald-300 font-sans">
-                    Message sent successfully! I'll get back to you soon.
+              {/* Render form only on client to avoid hydration mismatches from extensions */}
+              {isMounted ? (
+                <form className="space-y-5" onSubmit={handleSubmit} suppressHydrationWarning>
+                  <div>
+                    <label htmlFor="contact-name" className="block text-sm font-semibold text-text-primary mb-2 font-sans">
+                      Name *
+                    </label>
+                    <input
+                      id="contact-name"
+                      type="text"
+                      value={formData.name}
+                      onChange={handleInputChange}
+                      placeholder="Your name"
+                      suppressHydrationWarning
+                      className={`w-full rounded-2xl border ${formErrors.name ? "border-red-500/50" : "border-border"
+                        } bg-white/5 px-4 py-3 text-sm text-text-primary focus:outline-none focus:ring-2 focus:ring-accent-cyan/60 font-sans`}
+                    />
+                    {formErrors.name && (
+                      <p className="mt-1 text-xs text-red-400 font-sans">{formErrors.name}</p>
+                    )}
                   </div>
-                )}
-                {formStatus === "error" && (
-                  <div className="rounded-2xl bg-red-500/10 border border-red-500/30 px-4 py-3 text-sm text-red-300 font-sans">
-                    Something went wrong. Please try again or use the direct contact channels.
+                  <div>
+                    <label htmlFor="contact-email" className="block text-sm font-semibold text-text-primary mb-2 font-sans">
+                      Email *
+                    </label>
+                    <input
+                      id="contact-email"
+                      type="email"
+                      value={formData.email}
+                      onChange={handleInputChange}
+                      placeholder="your@email.com"
+                      suppressHydrationWarning
+                      className={`w-full rounded-2xl border ${formErrors.email ? "border-red-500/50" : "border-border"
+                        } bg-white/5 px-4 py-3 text-sm text-text-primary focus:outline-none focus:ring-2 focus:ring-accent-cyan/60 font-sans`}
+                    />
+                    {formErrors.email && (
+                      <p className="mt-1 text-xs text-red-400 font-sans">{formErrors.email}</p>
+                    )}
                   </div>
-                )}
-                <button
-                  type="submit"
-                  disabled={formStatus === "submitting"}
-                  className="w-full rounded-2xl bg-accent-cyan/90 px-6 py-3 text-sm font-semibold text-background transition hover:bg-accent-cyan focus:outline-none focus:ring-2 focus:ring-accent-bright/60 disabled:opacity-50 disabled:cursor-not-allowed font-sans"
-                >
-                  {formStatus === "submitting" ? "Sending..." : "Send Message"}
-                </button>
-              </form>
+                  <div>
+                    <label htmlFor="contact-message" className="block text-sm font-semibold text-text-primary mb-2 font-sans">
+                      Message *
+                    </label>
+                    <textarea
+                      id="contact-message"
+                      rows={5}
+                      value={formData.message}
+                      onChange={handleInputChange}
+                      placeholder="Tell me about your project or opportunity..."
+                      suppressHydrationWarning
+                      className={`w-full rounded-2xl border ${formErrors.message ? "border-red-500/50" : "border-border"
+                        } bg-white/5 px-4 py-3 text-sm text-text-primary focus:outline-none focus:ring-2 focus:ring-accent-cyan/60 resize-none font-sans`}
+                    />
+                    {formErrors.message && (
+                      <p className="mt-1 text-xs text-red-400 font-sans">{formErrors.message}</p>
+                    )}
+                  </div>
+                  {formStatus === "success" && (
+                    <div className="rounded-2xl bg-emerald-500/10 border border-emerald-500/30 px-4 py-3 text-sm text-emerald-300 font-sans">
+                      Message sent successfully! I'll get back to you soon.
+                    </div>
+                  )}
+                  {formStatus === "error" && (
+                    <div className="rounded-2xl bg-red-500/10 border border-red-500/30 px-4 py-3 text-sm text-red-300 font-sans">
+                      Something went wrong. Please try again or use the direct contact channels.
+                    </div>
+                  )}
+                  <button
+                    type="submit"
+                    disabled={formStatus === "submitting"}
+                    className="w-full rounded-2xl bg-accent-cyan/90 px-6 py-3 text-sm font-semibold text-background transition hover:bg-accent-cyan focus:outline-none focus:ring-2 focus:ring-accent-bright/60 disabled:opacity-50 disabled:cursor-not-allowed font-sans"
+                  >
+                    {formStatus === "submitting" ? "Sending..." : "Send Message"}
+                  </button>
+                </form>
+              ) : (
+                <div className="h-[400px] flex items-center justify-center">
+                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-accent-cyan"></div>
+                </div>
+              )}
             </CardContent>
           </Card>
         </div>
       </section>
 
       {/* Connect Section */}
-      <section id="connect" className="relative z-10 bg-background text-foreground border-t border-white/5">
+      <section id="connect" className="relative z-10 bg-background text-foreground border-t border-border">
         <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 py-16 sm:py-20 lg:py-24 space-y-12">
           <div className="text-center space-y-4 max-w-3xl mx-auto">
             <p className="text-xs uppercase tracking-[0.6em] text-text-muted font-sans">Connect to me</p>
@@ -710,7 +730,7 @@ type SkillCardProps = {
 
 function SkillCard({ icon: Icon, title, level, description }: SkillCardProps) {
   return (
-    <div className="rounded-3xl border border-white/5 bg-gradient-to-br from-white/10 via-transparent to-transparent p-6 shadow-glass-soft">
+    <div className="rounded-3xl border border-border bg-card/80 p-6 shadow-glass-soft">
       <div className="flex items-center gap-3 mb-4">
         <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-accent-cyan/10 text-accent-cyan">
           <Icon className="h-5 w-5" />
@@ -774,7 +794,7 @@ function ExperienceEntry({
     >
       {/* Card container with solid background to cover previous card */}
       <div
-        className="rounded-3xl border border-white/10 bg-background p-6 sm:p-8 transition-all duration-500 hover:border-accent-cyan/30"
+        className="rounded-3xl border border-border bg-background p-6 sm:p-8 transition-all duration-500 hover:border-accent-cyan/30"
         style={{
           boxShadow: `0 -20px 50px -10px rgba(0,0,0,0.9), 0 0 0 1px rgba(255,255,255,0.05)`,
         }}

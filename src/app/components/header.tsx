@@ -134,7 +134,7 @@ function Header() {
       <div className="flex-shrink-0">
         <Link href="/" className="flex items-center gap-2">
           <span 
-            className="text-xl sm:text-2xl md:text-3xl lg:text-4xl xl:text-4xl font-bold metallic-text font-serif"
+            className="text-xl sm:text-2xl md:text-3xl lg:text-4xl xl:text-4xl font-bold text-text-primary font-serif tracking-tight"
             style={{ fontSize: 'clamp(1.25rem, 2.5rem, 2.5rem)' }}
           >
             Konark Parihar
@@ -142,7 +142,7 @@ function Header() {
         </Link>
       </div>
       <div className="hidden md:block">
-        <LiquidGlassGroup className="ring-1 ring-white/10">
+        <LiquidGlassGroup className="ring-1 ring-border">
           <LiquidGlassItem onClick={scrollToTop}>Home</LiquidGlassItem>
           <LiquidGlassItem onClick={() => scrollToSection('about')}>About</LiquidGlassItem>
           <LiquidGlassItem onClick={scrollToPortfolio}>Portfolio</LiquidGlassItem>
@@ -153,7 +153,7 @@ function Header() {
       <div className="md:hidden">
         <button
           onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-          className="p-2 text-white hover:text-gray-300 transition-all duration-200 hover:scale-105 active:scale-95"
+          className="p-2 text-text-primary hover:text-text-muted transition-all duration-200 hover:scale-105 active:scale-95"
           aria-label="Toggle mobile menu"
         >
           {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
