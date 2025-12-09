@@ -943,8 +943,12 @@ function DashboardCard({
   insights,
   gradient,
 }: DashboardCardProps) {
+  const cardRef = useRef(null);
+  const shouldLoad = useInView(cardRef, { once: true, margin: "200px" });
+
   return (
     <motion.article
+      ref={cardRef}
       initial={{ opacity: 0, y: 20 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true }}
@@ -976,7 +980,8 @@ function DashboardCard({
             <div className="relative pt-[56.25%] sm:pt-[59.77%] overflow-hidden">
               <iframe
                 title={title}
-                src={embedUrl}
+                src={shouldLoad ? embedUrl : ""}
+                loading="lazy"
                 className="absolute inset-0 h-full w-full border-0"
                 style={{
                   border: 'none',
