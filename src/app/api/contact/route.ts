@@ -122,8 +122,9 @@ export async function POST(request: Request) {
     return NextResponse.json({ success: true, message: "Message sent to Gmail." });
   } catch (error) {
     console.error("Contact API error:", error);
+    const errorMessage = error instanceof Error ? error.message : "Unknown error";
     return NextResponse.json(
-      { error: "Unable to send message right now. Please try again later." },
+      { error: errorMessage, details: error },
       { status: 500 }
     );
   }

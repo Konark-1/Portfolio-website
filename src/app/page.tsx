@@ -558,12 +558,31 @@ export default function HomePage() {
         <CertificateCarousel
           certificates={[
             {
+              title: "Data Analyst Professional",
+              description: "Professional certification validating core data analysis skills and methodologies.",
+              filePath: "/Certificates/Data Analyst-Certificate Data Analyst.pdf",
+              imagePath: "/Certificates/Data Analyst-Certificate Data Analyst-1.png",
+              issuer: "OneRoadMap",
+              date: "2024",
+              skills: ["Data Analysis", "SQL", "Python", "Visualization"],
+            },
+            {
               title: "Professional Training Certificate",
               description: "Comprehensive training program in data analytics and business intelligence tools.",
               filePath: "/Certificates/Konark Parihar ducat certificate.pdf",
               imagePath: "/Certificates/Konark Parihar ducat certificate.png",
               issuer: "DUCAT",
               date: "2024",
+              skills: ["Data Analytics", "BI Tools", "Business Intelligence"],
+            },
+            {
+              title: "Excel Specialist",
+              description: "Advanced proficiency in Microsoft Excel for complex data management and analysis.",
+              filePath: "/Certificates/Excel certificate.pdf",
+              imagePath: "/Certificates/Excel certificate-1.png",
+              issuer: "OneRoadMap",
+              date: "2024",
+              skills: ["Advanced Excel", "Data Management", "Pivot Tables"],
             },
             {
               title: "Create Visual Calculation",
@@ -572,6 +591,16 @@ export default function HomePage() {
               imagePath: "/Certificates/Create Visual Calculation.png",
               issuer: "Microsoft",
               date: "2024",
+              skills: ["Power BI", "DAX", "Visual Calculations"],
+            },
+            {
+              title: "Python for Data Science",
+              description: "Certification in Python programming for data analysis, manipulation, and visualization.",
+              filePath: "/Certificates/Python.pdf",
+              imagePath: "/Certificates/Python.png",
+              issuer: "OneRoadMap",
+              date: "2024",
+              skills: ["Python", "Pandas", "NumPy", "Data Visualization"],
             },
             {
               title: "DAX Time Intelligence",
@@ -580,6 +609,16 @@ export default function HomePage() {
               imagePath: "/Certificates/Dax time Intelligence.png",
               issuer: "Microsoft",
               date: "2024",
+              skills: ["Power BI", "DAX", "Time Intelligence"],
+            },
+            {
+              title: "SQL Advanced",
+              description: "Advanced SQL query writing, database management, and performance optimization.",
+              filePath: "/Certificates/sql certificate.pdf",
+              imagePath: "/Certificates/sql certificate-1.png",
+              issuer: "OneRoadMap",
+              date: "2024",
+              skills: ["SQL", "Database Management", "Query Optimization"],
             },
             {
               title: "End to End Analytics",
@@ -588,6 +627,7 @@ export default function HomePage() {
               imagePath: "/Certificates/end to end analytics.png",
               issuer: "Microsoft",
               date: "2024",
+              skills: ["Data Workflow", "ETL", "Visualization", "Insights"],
             },
           ]}
         />
