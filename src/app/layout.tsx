@@ -18,6 +18,8 @@ export const metadata: Metadata = {
   description: "Portfolio of Konark, a skilled data analyst.",
 };
 
+import { SpeedInsights } from "@vercel/speed-insights/next";
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -43,6 +45,7 @@ export default function RootLayout({
         <CursorMount />
         <Header /> {/* Add the header here */}
         {children}
+        <SpeedInsights />
       </body>
     </html>
   );
