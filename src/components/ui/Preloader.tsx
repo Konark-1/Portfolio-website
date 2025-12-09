@@ -18,7 +18,7 @@ export default function Preloader({ onComplete }: { onComplete: () => void }) {
 
   useEffect(() => {
     let currentIndex = 0;
-    
+
     const interval = setInterval(() => {
       if (currentIndex >= sequence.length) {
         clearInterval(interval);
@@ -34,7 +34,7 @@ export default function Preloader({ onComplete }: { onComplete: () => void }) {
     }, 300); // Speed of text appearing
 
     return () => clearInterval(interval);
-  }, []);
+  }, [onComplete, sequence]);
 
   return (
     <AnimatePresence>
@@ -83,6 +83,7 @@ export default function Preloader({ onComplete }: { onComplete: () => void }) {
     </AnimatePresence>
   );
 }
+
 
 
 
