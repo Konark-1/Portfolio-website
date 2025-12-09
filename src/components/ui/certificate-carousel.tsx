@@ -54,29 +54,46 @@ export function CertificateCarousel({ certificates }: CertificateCarouselProps) 
     const scrollContainer = scrollContainerRef.current;
     if (!scrollContainer) return;
 
-    const scrollSpeed = 0.5; // Adjust for speed
     const cardWidth = 344;
     const totalWidth = cardWidth * certificates.length;
 
-    const animate = () => {
-      // Boundary checks - seamless loop
-      if (scrollContainer.scrollLeft >= totalWidth * 2) {
-        scrollContainer.scrollLeft -= totalWidth;
-      } else if (scrollContainer.scrollLeft <= 0) {
-        scrollContainer.scrollLeft += totalWidth;
-      }
+    // Speed in pixels per second (e.g., 30px/s is slow and smooth)
+    const pixelsPerSecond = 30;
 
-      // Auto-scroll
+    let lastTime = performance.now();
+    let accumulatedScroll = scrollContainer.scrollLeft;
+
+    const animate = (currentTime: number) => {
+      const deltaTime = currentTime - lastTime;
+      lastTime = currentTime;
+
+      // Auto-scroll logic
       if (isAutoScrolling && !isHovered) {
-        scrollContainer.scrollLeft += scrollSpeed;
+        // Calculate how many pixels to move based on time passed
+        const moveAmount = (pixelsPerSecond * deltaTime) / 1000;
+        accumulatedScroll += moveAmount;
+
+        // Boundary checks - seamless loop
+        if (accumulatedScroll >= totalWidth * 2) {
+          accumulatedScroll -= totalWidth;
+        } else if (accumulatedScroll <= 0) {
+          accumulatedScroll += totalWidth;
+        }
+
+        scrollContainer.scrollLeft = accumulatedScroll;
+      } else {
+        // Sync accumulator with actual scroll position when paused/hovered
+        // This ensures no jump when resuming
+        accumulatedScroll = scrollContainer.scrollLeft;
       }
 
       animationRef.current = requestAnimationFrame(animate);
     };
 
-    // Initialize scroll position to the middle set
+    // Initialize scroll position to the middle set if at start
     if (scrollContainer.scrollLeft === 0) {
       scrollContainer.scrollLeft = totalWidth;
+      accumulatedScroll = totalWidth;
     }
 
     animationRef.current = requestAnimationFrame(animate);
@@ -141,8 +158,12 @@ export function CertificateCarousel({ certificates }: CertificateCarouselProps) 
       {/* Scrolling container - Increased padding to clear gradients */}
       <div
         ref={scrollContainerRef}
-        className="flex overflow-x-auto gap-6 px-12 sm:px-24 pb-8 pt-4 scrollbar-hide snap-x snap-proximity"
-        style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+        className="flex overflow-x-auto gap-6 px-12 sm:px-24 pb-8 pt-4 scrollbar-hide"
+        style={{
+          scrollbarWidth: 'none',
+          msOverflowStyle: 'none',
+          scrollBehavior: isAutoScrolling ? 'auto' : 'smooth'
+        }}
       >
         {extendedCertificates.map((cert, index) => (
           <div key={`${index}-${cert.title}`} className="snap-center">
