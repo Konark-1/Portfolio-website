@@ -1,6 +1,7 @@
 "use client";
 
 import { Award, Download, ExternalLink } from "lucide-react";
+import Image from "next/image";
 import { useState, useMemo } from "react";
 
 interface Certificate {
@@ -102,12 +103,14 @@ function CertificateItem({
         {/* Certificate Image/Preview */}
         <div className="relative w-full h-64 overflow-hidden bg-gradient-to-br from-gray-900 to-black">
           {showImage ? (
-            <img
+            <Image
               src={certificate.imagePath!}
               alt={certificate.title}
-              className="w-full h-full object-contain p-4 transition-transform duration-200 group-hover:scale-105"
-              loading="lazy"
+              fill
+              sizes="(max-width: 768px) 90vw, 320px"
+              className="object-contain p-4 transition-transform duration-200 group-hover:scale-105"
               onError={() => setImageError(true)}
+              priority={false}
             />
           ) : (
             <div className="w-full h-full flex items-center justify-center p-4">
