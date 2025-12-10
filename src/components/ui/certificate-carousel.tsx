@@ -111,6 +111,10 @@ export function CertificateCarousel({ certificates }: CertificateCarouselProps) 
         setIsHovered(false);
         setIsAutoScrolling(true);
       }}
+      onTouchStart={() => setIsAutoScrolling(false)}
+      onTouchEnd={() => {
+        setTimeout(() => setIsAutoScrolling(true), 3000);
+      }}
     >
       {/* Navigation Buttons */}
       <div className="absolute left-4 top-1/2 -translate-y-1/2 z-20 opacity-0 group-hover/carousel:opacity-100 transition-opacity duration-300 pointer-events-none">

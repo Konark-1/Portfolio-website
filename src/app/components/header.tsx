@@ -133,9 +133,9 @@ function Header() {
     <>
       <div className="flex-shrink-0">
         <Link href="/" className="flex items-center gap-2">
-          <span 
+          <span
             className="text-xl sm:text-2xl md:text-3xl lg:text-4xl xl:text-4xl font-bold text-text-primary font-serif tracking-tight"
-            style={{ fontSize: 'clamp(1.25rem, 2.5rem, 2.5rem)' }}
+            style={{ fontSize: 'clamp(1.5rem, 5vw, 2.5rem)' }}
           >
             Konark Parihar
           </span>
@@ -163,10 +163,9 @@ function Header() {
   );
 
   return (
-    <header 
-      className={`fixed top-0 left-0 right-0 z-50 transition-transform duration-300 ease-in-out ${
-        isScrolled && !isVisible ? '-translate-y-full' : 'translate-y-0'
-      }`}
+    <header
+      className={`fixed top-0 left-0 right-0 z-50 transition-transform duration-300 ease-in-out ${isScrolled && !isVisible ? '-translate-y-full' : 'translate-y-0'
+        }`}
       suppressHydrationWarning
       onMouseEnter={() => {
         setIsHovered(true);
@@ -189,21 +188,18 @@ function Header() {
       }}
     >
       {/* Container A - Top State: Full-width transparent */}
-      <div className={`absolute inset-0 transition-opacity duration-300 ease-in-out ${
-        !isScrolled ? 'opacity-100' : 'opacity-0 pointer-events-none'
-      }`}>
+      <div className={`absolute inset-0 transition-opacity duration-300 ease-in-out ${!isScrolled ? 'opacity-100' : 'opacity-0 pointer-events-none'
+        }`}>
         <div className="flex items-center justify-between w-full h-20 sm:h-24 lg:h-28 px-4 sm:px-6 lg:px-8">
           <HeaderContent />
         </div>
       </div>
 
       {/* Container B - Scrolled State: Centered GlassSurface */}
-      <div className={`transition-opacity duration-300 ease-in-out py-3.5 ${
-        isScrolled ? 'opacity-100' : 'opacity-0 pointer-events-none'
-      }`}>
-        <div className={`mx-auto transition-all duration-300 ease-in-out ${
-          isScrolled ? 'w-4/5 md:w-4/5' : 'w-full'
+      <div className={`transition-opacity duration-300 ease-in-out py-3.5 ${isScrolled ? 'opacity-100' : 'opacity-0 pointer-events-none'
         }`}>
+        <div className={`mx-auto transition-all duration-300 ease-in-out ${isScrolled ? 'w-4/5 md:w-4/5' : 'w-full'
+          }`}>
           <div className="relative">
             <GlassSurface
               width="114%"
@@ -222,20 +218,19 @@ function Header() {
               blueOffset={20}
               className="absolute left-1/2 transform -translate-x-1/2"
             >
-            <div className="flex items-center justify-between w-full h-full px-4">
-              <HeaderContent />
-            </div>
-          </GlassSurface>
+              <div className="flex items-center justify-between w-full h-full px-4">
+                <HeaderContent />
+              </div>
+            </GlassSurface>
           </div>
         </div>
       </div>
 
       {/* Mobile Menu Dropdown */}
-      <div 
+      <div
         ref={mobileMenuRef}
-        className={`md:hidden absolute top-full left-0 right-0 transition-all duration-300 ease-in-out ${
-          isMobileMenuOpen ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-4 pointer-events-none'
-        }`}
+        className={`md:hidden absolute top-full left-0 right-0 transition-all duration-300 ease-in-out ${isMobileMenuOpen ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-4 pointer-events-none'
+          }`}
       >
         <div className="relative px-4 py-6">
           <GlassSurface
@@ -256,25 +251,25 @@ function Header() {
             className="w-full"
           >
             <div className="px-4 py-6 space-y-4 text-center">
-              <button 
+              <button
                 onClick={scrollToTop}
                 className="block text-white hover:text-gray-300 transition-colors text-lg font-medium w-full font-sans"
               >
                 Home
               </button>
-              <button 
+              <button
                 onClick={() => scrollToSection('about')}
                 className="block text-white hover:text-gray-300 transition-colors text-lg font-medium w-full font-sans"
               >
                 About
               </button>
-              <button 
+              <button
                 onClick={scrollToPortfolio}
                 className="block text-white hover:text-gray-300 transition-colors text-lg font-medium w-full font-sans"
               >
                 Portfolio
               </button>
-              <button 
+              <button
                 onClick={() => scrollToSection('certificates')}
                 className="block text-white hover:text-gray-300 transition-colors text-lg font-medium w-full font-sans"
               >
