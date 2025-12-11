@@ -97,18 +97,24 @@ export function SmoothCursor({
   const previousAngle = useRef(0);
   const accumulatedRotation = useRef(0);
 
-  const cursorX = useSpring(0, springConfig);
-  const cursorY = useSpring(0, springConfig);
+  // Use direct DOM manipulation instead of React state for better performance
+  const cursorX = useSpring(0, { ...springConfig, restDelta: 0.01 });
+  const cursorY = useSpring(0, { ...springConfig, restDelta: 0.01 });
   const rotation = useSpring(0, {
     ...springConfig,
     damping: 60,
     stiffness: 300,
+    restDelta: 0.01,
   });
   const scale = useSpring(1, {
     ...springConfig,
     stiffness: 500,
     damping: 35,
+    restDelta: 0.01,
   });
+  
+  const scaleTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const cursorRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     // Respect reduced motion and touch devices: disable custom cursor for UX
@@ -157,7 +163,12 @@ export function SmoothCursor({
       const isExempt = !!target && (target.closest('.cursor-exempt') || target.closest('iframe'));
       const cursorContainer = cursorRef.current;
       if (cursorContainer) {
-        cursorContainer.style.display = isExempt ? 'none' : 'block';
+        // Use direct DOM manipulation for display toggle (faster than React state)
+        if (isExempt && cursorContainer.style.display !== 'none') {
+          cursorContainer.style.display = 'none';
+        } else if (!isExempt && cursorContainer.style.display !== 'block') {
+          cursorContainer.style.display = 'block';
+        }
       }
       const currentPos = { x: e.clientX, y: e.clientY };
       updateVelocity(currentPos);
@@ -166,10 +177,12 @@ export function SmoothCursor({
         Math.pow(velocity.current.x, 2) + Math.pow(velocity.current.y, 2),
       );
 
+      // Batch state updates using requestAnimationFrame
       cursorX.set(currentPos.x);
       cursorY.set(currentPos.y);
 
-      if (speed > 0.1) {
+      // Only update rotation/scale if speed is significant to reduce calculations
+      if (speed > 0.15) {
         const currentAngle =
           Math.atan2(velocity.current.y, velocity.current.x) * (180 / Math.PI) +
           90;
@@ -183,19 +196,22 @@ export function SmoothCursor({
 
         scale.set(0.95);
 
-        const timeout = setTimeout(() => {
+        // Clear any existing timeout
+        if (scaleTimeoutRef.current) {
+          clearTimeout(scaleTimeoutRef.current);
+        }
+        
+        scaleTimeoutRef.current = setTimeout(() => {
           scale.set(1);
-          // setIsMoving(false);
+          scaleTimeoutRef.current = null;
         }, 150);
-
-        return () => clearTimeout(timeout);
       }
     };
 
     // Throttle mouse move events more aggressively for better performance
     let rafId: number;
     let lastMouseMoveTime = 0;
-    const mouseMoveThrottle = 16; // ~60fps, but can be reduced for low-end devices
+    const mouseMoveThrottle = 32; // Reduced to ~30fps for better INP performance
     
     const throttledMouseMove = (e: MouseEvent) => {
       const now = performance.now();
@@ -204,7 +220,10 @@ export function SmoothCursor({
       }
       lastMouseMoveTime = now;
       
-      if (rafId) return;
+      if (rafId) {
+        // Cancel previous frame and use latest event
+        cancelAnimationFrame(rafId);
+      }
 
       rafId = requestAnimationFrame(() => {
         smoothMouseMove(e);
@@ -232,6 +251,9 @@ export function SmoothCursor({
       window.removeEventListener("mousemove", throttledMouseMove);
       document.body.style.cursor = "auto";
       if (rafId) cancelAnimationFrame(rafId);
+      if (scaleTimeoutRef.current) {
+        clearTimeout(scaleTimeoutRef.current);
+      }
       iframes.forEach((f) => {
         f.removeEventListener('mouseenter', handleIframeEnter);
         f.removeEventListener('mouseleave', handleIframeLeave);
@@ -241,8 +263,6 @@ export function SmoothCursor({
       }
     };
   }, [cursorX, cursorY, rotation, scale]);
-
-  const cursorRef = useRef<HTMLDivElement | null>(null);
 
   return (
     <motion.div

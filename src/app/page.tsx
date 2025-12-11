@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useDeferredValue, useTransition, useCallback } from "react";
 import GlassSurface from "@/components/react-bits/GlassSurface/GlassSurface";
 import { motion, useReducedMotion, useScroll, useTransform, useSpring, useInView } from "framer-motion";
 import { Card, CardContent } from "@/components/ui/card";
@@ -46,21 +46,41 @@ export default function HomePage() {
   const [formStatus, setFormStatus] = useState<"idle" | "submitting" | "success" | "error">("idle");
   const [formErrors, setFormErrors] = useState<{ name?: string; email?: string; message?: string }>({});
   const [isMounted, setIsMounted] = useState(false);
+  const [isPending, startTransition] = useTransition();
+  
+  // Use deferred value for form data to reduce input lag
+  const deferredFormData = useDeferredValue(formData);
+  
+  // Debounce timer ref for error clearing
+  const errorClearTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
     setIsMounted(true);
   }, []);
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  // Optimized input handler with debouncing for error clearing
+  const handleInputChange = useCallback((e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { id, value } = e.target;
-    setFormData((prev) => ({ ...prev, [id.replace("contact-", "")]: value }));
-    // Clear error when user starts typing
-    if (formErrors[id.replace("contact-", "") as keyof typeof formErrors]) {
-      setFormErrors((prev) => ({ ...prev, [id.replace("contact-", "")]: undefined }));
+    const fieldName = id.replace("contact-", "") as keyof typeof formErrors;
+    
+    // Update form data immediately for responsive UI
+    setFormData((prev) => ({ ...prev, [fieldName]: value }));
+    
+    // Debounce error clearing to reduce state updates
+    if (errorClearTimeoutRef.current) {
+      clearTimeout(errorClearTimeoutRef.current);
     }
-  };
+    
+    if (formErrors[fieldName]) {
+      errorClearTimeoutRef.current = setTimeout(() => {
+        startTransition(() => {
+          setFormErrors((prev) => ({ ...prev, [fieldName]: undefined }));
+        });
+      }, 150);
+    }
+  }, [formErrors]);
 
-  const validateForm = () => {
+  const validateForm = useCallback(() => {
     const errors: { name?: string; email?: string; message?: string } = {};
 
     if (!formData.name.trim()) {
@@ -81,16 +101,18 @@ export default function HomePage() {
 
     setFormErrors(errors);
     return Object.keys(errors).length === 0;
-  };
+  }, [formData]);
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = useCallback(async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     if (!validateForm()) {
       return;
     }
 
-    setFormStatus("submitting");
+    startTransition(() => {
+      setFormStatus("submitting");
+    });
 
     try {
       const response = await fetch("/api/contact", {
@@ -109,16 +131,24 @@ export default function HomePage() {
         throw new Error(data.error || "Failed to send message");
       }
 
-      setFormStatus("success");
-      setFormData({ name: "", email: "", message: "" });
-      setTimeout(() => setFormStatus("idle"), 3000);
+      startTransition(() => {
+        setFormStatus("success");
+        setFormData({ name: "", email: "", message: "" });
+      });
+      setTimeout(() => {
+        startTransition(() => setFormStatus("idle"));
+      }, 3000);
     } catch (error: any) {
       // Log error for debugging
       console.error("Contact form submission error:", error);
-      setFormStatus("error");
-      setTimeout(() => setFormStatus("idle"), 3000);
+      startTransition(() => {
+        setFormStatus("error");
+      });
+      setTimeout(() => {
+        startTransition(() => setFormStatus("idle"));
+      }, 3000);
     }
-  };
+  }, [validateForm]);
 
   const skillsShowcase = [
     {
@@ -354,14 +384,18 @@ export default function HomePage() {
           <div className="mt-12 sm:mt-16 flex flex-col sm:flex-row justify-center items-center gap-4 w-full max-w-lg mx-auto">
             <div
               className="cursor-pointer hover:scale-105 transition-all duration-300 hover:shadow-lg pointer-events-auto group w-[85%] sm:w-auto"
-              onClick={() => {
+              onClick={(e) => {
+                e.preventDefault();
                 const element = document.getElementById('about');
                 if (element) {
                   const headerHeight = 115;
                   const elementPosition = element.offsetTop - headerHeight;
-                  window.scrollTo({
-                    top: elementPosition,
-                    behavior: 'smooth'
+                  // Use requestAnimationFrame for smoother scroll
+                  requestAnimationFrame(() => {
+                    window.scrollTo({
+                      top: elementPosition,
+                      behavior: 'smooth'
+                    });
                   });
                 }
               }}
@@ -390,14 +424,18 @@ export default function HomePage() {
             </div>
             <div
               className="w-[85%] sm:w-auto cursor-pointer hover:scale-105 transition-all duration-300 hover:shadow-lg pointer-events-auto group"
-              onClick={() => {
+              onClick={(e) => {
+                e.preventDefault();
                 const element = document.getElementById('projects');
                 if (element) {
                   const headerHeight = 115;
                   const elementPosition = element.offsetTop - headerHeight;
-                  window.scrollTo({
-                    top: elementPosition,
-                    behavior: 'smooth'
+                  // Use requestAnimationFrame for smoother scroll
+                  requestAnimationFrame(() => {
+                    window.scrollTo({
+                      top: elementPosition,
+                      behavior: 'smooth'
+                    });
                   });
                 } else {
                   // Fallback: navigate if section not found
@@ -1076,14 +1114,18 @@ function AboutSection({ shouldReduceMotion }: AboutSectionProps) {
   const nameRef = useRef<HTMLHeadingElement>(null);
   const cardsRef = useRef<HTMLDivElement>(null);
 
-  // Scroll progress for the section
+  // Scroll progress for the section - optimized for better INP
   const { scrollYProgress } = useScroll({
     target: sectionRef,
     offset: ["start end", "end start"]
   });
 
-  // Smooth spring-based transforms
-  const smoothProgress = useSpring(scrollYProgress, { stiffness: 100, damping: 30, restDelta: 0.001 });
+  // Smooth spring-based transforms - reduced precision for better performance
+  const smoothProgress = useSpring(scrollYProgress, { 
+    stiffness: 100, 
+    damping: 30, 
+    restDelta: 0.01 // Increased from 0.001 to reduce calculations
+  });
 
   // Scale animation for the name (scales up as you scroll)
   const nameScale = useTransform(smoothProgress, [0, 0.3], [0.92, 1]);
@@ -1195,7 +1237,7 @@ function AboutSection({ shouldReduceMotion }: AboutSectionProps) {
                 <motion.h3
                   className="text-2xl sm:text-3xl font-bold text-white font-serif mt-4 mb-1 group-hover:text-accent-cyan transition-colors duration-300"
                   whileHover={{ scale: 1.02 }}
-                  transition={{ type: "spring", stiffness: 400, damping: 10 }}
+                  transition={{ type: "spring", stiffness: 300, damping: 20 }}
                 >
                   {title}
                 </motion.h3>
