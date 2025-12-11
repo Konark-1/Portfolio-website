@@ -101,15 +101,20 @@ export default function HomePage() {
         body: JSON.stringify(formData),
       });
 
+      const data = await response.json().catch(() => ({}));
+
       if (!response.ok) {
-        const data = await response.json().catch(() => ({}));
+        // Log the error for debugging
+        console.error("Contact form error:", data);
         throw new Error(data.error || "Failed to send message");
       }
 
       setFormStatus("success");
       setFormData({ name: "", email: "", message: "" });
       setTimeout(() => setFormStatus("idle"), 3000);
-    } catch {
+    } catch (error: any) {
+      // Log error for debugging
+      console.error("Contact form submission error:", error);
       setFormStatus("error");
       setTimeout(() => setFormStatus("idle"), 3000);
     }
@@ -978,24 +983,30 @@ function DashboardCard({
         >
           <div className="relative w-full bg-black">
             <div className="relative pt-[56.25%] sm:pt-[59.77%] overflow-hidden">
-              <iframe
-                title={title}
-                src={shouldLoad ? embedUrl : ""}
-                loading="lazy"
-                className="absolute inset-0 h-full w-full border-0"
-                style={{
-                  border: 'none',
-                  margin: 0,
-                  padding: 0,
-                  backgroundColor: "#000",
-                  display: 'block'
-                }}
-                allowFullScreen
-                aria-label={description}
-                referrerPolicy="no-referrer-when-downgrade"
-                frameBorder="0"
-                scrolling="no"
-              />
+              {shouldLoad ? (
+                <iframe
+                  title={title}
+                  src={embedUrl}
+                  loading="lazy"
+                  className="absolute inset-0 h-full w-full border-0"
+                  style={{
+                    border: 'none',
+                    margin: 0,
+                    padding: 0,
+                    backgroundColor: "#000",
+                    display: 'block'
+                  }}
+                  allowFullScreen
+                  aria-label={description}
+                  referrerPolicy="no-referrer-when-downgrade"
+                  frameBorder="0"
+                  scrolling="no"
+                />
+              ) : (
+                <div className="absolute inset-0 flex items-center justify-center bg-black">
+                  <div className="text-text-muted text-sm font-sans">Loading dashboard...</div>
+                </div>
+              )}
             </div>
           </div>
         </div>
