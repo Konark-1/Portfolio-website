@@ -1,10 +1,11 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useCallback } from "react";
 
 export default function ProjectsTabs() {
   const [activeTab, setActiveTab] = useState<'consistent' | 'seamless' | 'cinematic'>("cinematic");
   const [hoverTab, setHoverTab] = useState<null | 'consistent' | 'seamless' | 'cinematic'>(null);
+  const hoverTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const [loadedState, setLoadedState] = useState<Record<'consistent' | 'seamless' | 'cinematic', boolean>>({
     cinematic: false,
     seamless: false,
@@ -28,7 +29,12 @@ export default function ProjectsTabs() {
       { root: null, threshold: 0.01, rootMargin: "600px 0px 600px 0px" }
     );
     io.observe(el);
-    return () => io.disconnect();
+    return () => {
+      io.disconnect();
+      if (hoverTimeoutRef.current) {
+        clearTimeout(hoverTimeoutRef.current);
+      }
+    };
   }, []);
 
   const tabs = [
@@ -38,6 +44,28 @@ export default function ProjectsTabs() {
   ];
 
   const displayed = hoverTab ?? activeTab;
+  
+  // Optimized hover handlers to reduce INP
+  const handleMouseEnter = useCallback((key: 'consistent' | 'seamless' | 'cinematic') => {
+    if (hoverTimeoutRef.current) {
+      clearTimeout(hoverTimeoutRef.current);
+    }
+    setHoverTab(key);
+  }, []);
+  
+  const handleMouseLeave = useCallback(() => {
+    // Debounce hover leave to prevent flickering
+    hoverTimeoutRef.current = setTimeout(() => {
+      setHoverTab(null);
+    }, 50);
+  }, []);
+  
+  const handleTabClick = useCallback((key: 'consistent' | 'seamless' | 'cinematic') => {
+    if (hoverTimeoutRef.current) {
+      clearTimeout(hoverTimeoutRef.current);
+    }
+    setActiveTab(key);
+  }, []);
 
   return (
     <div ref={rootRef} className="mt-6 sm:mt-12 pointer-events-auto">
@@ -50,9 +78,9 @@ export default function ProjectsTabs() {
               return (
                 <h3
                   key={key}
-                  onMouseEnter={() => setHoverTab(key)}
-                  onMouseLeave={() => setHoverTab(null)}
-                  onClick={() => setActiveTab(key)}
+                  onMouseEnter={() => handleMouseEnter(key)}
+                  onMouseLeave={handleMouseLeave}
+                  onClick={() => handleTabClick(key)}
                   className={`text-sm sm:text-2xl md:text-3xl lg:text-4xl xl:text-5xl font-bold cursor-pointer select-none text-center
                     transition-all duration-300 ease-in-out
                     ${isDisplayed ? 'opacity-100 scale-105' : 'opacity-60 scale-100'}

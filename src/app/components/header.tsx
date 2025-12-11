@@ -16,49 +16,70 @@ function Header() {
   const mobileMenuRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
+    let rafId: number | null = null;
+    let lastScrollUpdate = 0;
+    const scrollThrottle = 16; // ~60fps but batched with RAF
+    
     const handleScroll = () => {
-      const currentScrollY = window.scrollY;
-      const scrolledPastHero = currentScrollY > 50;
-
-      // Update state for glass effect
-      setIsScrolled(scrolledPastHero);
-
-      // Close mobile menu if user starts scrolling
-      if (isMobileMenuOpen) {
-        setIsMobileMenuOpen(false);
-      }
-
-      if (!scrolledPastHero) {
-        if (hideHeaderTimeout.current) {
-          clearTimeout(hideHeaderTimeout.current);
-          hideHeaderTimeout.current = null;
-        }
-        setIsVisible(true);
-        lastScrollY.current = currentScrollY;
+      const now = performance.now();
+      if (now - lastScrollUpdate < scrollThrottle) {
         return;
       }
-
-      if (currentScrollY < lastScrollY.current) {
-        if (hideHeaderTimeout.current) {
-          clearTimeout(hideHeaderTimeout.current);
-          hideHeaderTimeout.current = null;
-        }
-        setIsVisible(true);
-      } else if (!isHovered && window.innerWidth >= 768) {
-        if (!hideHeaderTimeout.current) {
-          hideHeaderTimeout.current = setTimeout(() => {
-            setIsVisible(false);
-            hideHeaderTimeout.current = null;
-          }, 250);
-        }
+      lastScrollUpdate = now;
+      
+      if (rafId) {
+        return; // Already queued
       }
+      
+      rafId = requestAnimationFrame(() => {
+        const currentScrollY = window.scrollY;
+        const scrolledPastHero = currentScrollY > 50;
 
-      lastScrollY.current = currentScrollY;
+        // Update state for glass effect
+        setIsScrolled(scrolledPastHero);
+
+        // Close mobile menu if user starts scrolling
+        if (isMobileMenuOpen) {
+          setIsMobileMenuOpen(false);
+        }
+
+        if (!scrolledPastHero) {
+          if (hideHeaderTimeout.current) {
+            clearTimeout(hideHeaderTimeout.current);
+            hideHeaderTimeout.current = null;
+          }
+          setIsVisible(true);
+          lastScrollY.current = currentScrollY;
+          rafId = null;
+          return;
+        }
+
+        if (currentScrollY < lastScrollY.current) {
+          if (hideHeaderTimeout.current) {
+            clearTimeout(hideHeaderTimeout.current);
+            hideHeaderTimeout.current = null;
+          }
+          setIsVisible(true);
+        } else if (!isHovered && window.innerWidth >= 768) {
+          if (!hideHeaderTimeout.current) {
+            hideHeaderTimeout.current = setTimeout(() => {
+              setIsVisible(false);
+              hideHeaderTimeout.current = null;
+            }, 250);
+          }
+        }
+
+        lastScrollY.current = currentScrollY;
+        rafId = null;
+      });
     };
 
     window.addEventListener('scroll', handleScroll, { passive: true });
     return () => {
       window.removeEventListener('scroll', handleScroll);
+      if (rafId) {
+        cancelAnimationFrame(rafId);
+      }
       if (hideHeaderTimeout.current) {
         clearTimeout(hideHeaderTimeout.current);
       }

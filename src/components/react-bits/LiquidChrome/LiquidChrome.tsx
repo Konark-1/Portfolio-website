@@ -120,30 +120,63 @@ export const LiquidChrome = ({
     window.addEventListener('resize', resize);
     resize();
 
-    function handleMouseMove(event: MouseEvent) {
-      const rect = container.getBoundingClientRect();
-      const x = (event.clientX - rect.left) / rect.width;
-      const y = 1 - (event.clientY - rect.top) / rect.height;
+    // Throttle mouse/touch events to reduce main thread blocking
+    let rafId: number | null = null;
+    let lastMouseUpdate = 0;
+    const mouseThrottle = 32; // ~30fps for better INP
+    
+    function updateMouseUniform(x: number, y: number) {
       const mouseUniform = program.uniforms.uMouse.value as Float32Array;
       mouseUniform[0] = x;
       mouseUniform[1] = y;
     }
 
+    function handleMouseMove(event: MouseEvent) {
+      const now = performance.now();
+      if (now - lastMouseUpdate < mouseThrottle) {
+        return;
+      }
+      lastMouseUpdate = now;
+      
+      if (rafId) {
+        cancelAnimationFrame(rafId);
+      }
+      
+      rafId = requestAnimationFrame(() => {
+        const rect = container.getBoundingClientRect();
+        const x = (event.clientX - rect.left) / rect.width;
+        const y = 1 - (event.clientY - rect.top) / rect.height;
+        updateMouseUniform(x, y);
+        rafId = null;
+      });
+    }
+
     function handleTouchMove(event: TouchEvent) {
       if (event.touches.length > 0) {
-        const touch = event.touches[0];
-        const rect = container.getBoundingClientRect();
-        const x = (touch.clientX - rect.left) / rect.width;
-        const y = 1 - (touch.clientY - rect.top) / rect.height;
-        const mouseUniform = program.uniforms.uMouse.value as Float32Array;
-        mouseUniform[0] = x;
-        mouseUniform[1] = y;
+        const now = performance.now();
+        if (now - lastMouseUpdate < mouseThrottle) {
+          return;
+        }
+        lastMouseUpdate = now;
+        
+        if (rafId) {
+          cancelAnimationFrame(rafId);
+        }
+        
+        rafId = requestAnimationFrame(() => {
+          const touch = event.touches[0];
+          const rect = container.getBoundingClientRect();
+          const x = (touch.clientX - rect.left) / rect.width;
+          const y = 1 - (touch.clientY - rect.top) / rect.height;
+          updateMouseUniform(x, y);
+          rafId = null;
+        });
       }
     }
 
     if (interactive) {
-      container.addEventListener('mousemove', handleMouseMove);
-      container.addEventListener('touchmove', handleTouchMove);
+      container.addEventListener('mousemove', handleMouseMove, { passive: true });
+      container.addEventListener('touchmove', handleTouchMove, { passive: true });
     }
 
     let animationId: number;
@@ -158,6 +191,9 @@ export const LiquidChrome = ({
 
     return () => {
       cancelAnimationFrame(animationId);
+      if (rafId) {
+        cancelAnimationFrame(rafId);
+      }
       window.removeEventListener('resize', resize);
       if (interactive) {
         container.removeEventListener('mousemove', handleMouseMove);
@@ -181,6 +217,7 @@ export const LiquidChrome = ({
 };
 
 export default LiquidChrome;
+
 
 
 
