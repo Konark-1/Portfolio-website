@@ -179,21 +179,102 @@ export const LiquidChrome = ({
       container.addEventListener('touchmove', handleTouchMove, { passive: true });
     }
 
-    let animationId: number;
+    let animationId: number | null = null;
+    let isPaused = false;
+    let lastTime = 0;
+    let accumulatedTime = 0;
+    
     function update(t: number) {
+      if (isPaused) {
+        // If paused, don't request next frame but keep accumulated time
+        return;
+      }
+      
       animationId = requestAnimationFrame(update);
-      program.uniforms.uTime.value = t * 0.001 * speed;
+      const deltaTime = lastTime ? (t - lastTime) * 0.001 * speed : 0;
+      accumulatedTime += deltaTime;
+      program.uniforms.uTime.value = accumulatedTime;
       renderer.render({ scene: mesh });
+      lastTime = t;
     }
+    
+    // Start animation
+    lastTime = performance.now();
     animationId = requestAnimationFrame(update);
+
+    // IntersectionObserver to pause/resume based on visibility
+    // Resume when user is about to reach the section (300px before it's visible)
+    const observerOptions = {
+      root: null,
+      rootMargin: '300px 0px 300px 0px', // Start animating 300px before visible
+      threshold: 0
+    };
+    
+    const visibilityObserver = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          // Resume animation if paused
+          if (isPaused) {
+            isPaused = false;
+            lastTime = performance.now();
+            if (!animationId) {
+              animationId = requestAnimationFrame(update);
+            }
+          }
+        } else {
+          // Pause animation when not visible
+          if (!isPaused) {
+            isPaused = true;
+            if (animationId) {
+              cancelAnimationFrame(animationId);
+              animationId = null;
+            }
+          }
+        }
+      });
+    }, observerOptions);
+    
+    visibilityObserver.observe(container);
+    
+    // Also pause when tab is hidden
+    const handleVisibilityChange = () => {
+      if (document.hidden) {
+        if (!isPaused) {
+          isPaused = true;
+          if (animationId) {
+            cancelAnimationFrame(animationId);
+            animationId = null;
+          }
+        }
+      } else {
+        // Resume when tab becomes visible and component is in viewport
+        if (isPaused) {
+          const rect = container.getBoundingClientRect();
+          const isInViewport = rect.top < window.innerHeight + 300 && rect.bottom > -300;
+          if (isInViewport) {
+            isPaused = false;
+            lastTime = performance.now();
+            if (!animationId) {
+              animationId = requestAnimationFrame(update);
+            }
+          }
+        }
+      }
+    };
+    
+    document.addEventListener('visibilitychange', handleVisibilityChange);
 
     container.appendChild(gl.canvas);
 
     return () => {
-      cancelAnimationFrame(animationId);
+      if (animationId) {
+        cancelAnimationFrame(animationId);
+      }
       if (rafId) {
         cancelAnimationFrame(rafId);
       }
+      visibilityObserver.disconnect();
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
       window.removeEventListener('resize', resize);
       if (interactive) {
         container.removeEventListener('mousemove', handleMouseMove);

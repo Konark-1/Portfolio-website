@@ -115,6 +115,27 @@ function Header() {
     return () => window.removeEventListener('resize', handleResize);
   }, [isMobileMenuOpen]);
 
+  // Prevent body scroll and remove any blur effects when menu is open
+  useEffect(() => {
+    if (isMobileMenuOpen) {
+      // Prevent body scroll
+      document.body.style.overflow = 'hidden';
+      // Ensure no blur is applied to body or main content
+      document.body.classList.remove('backdrop-blur', 'backdrop-blur-sm', 'backdrop-blur-md', 'backdrop-blur-lg');
+      const mainElement = document.querySelector('main');
+      if (mainElement) {
+        mainElement.classList.remove('backdrop-blur', 'backdrop-blur-sm', 'backdrop-blur-md', 'backdrop-blur-lg', 'blur', 'blur-sm', 'blur-md', 'blur-lg');
+      }
+    } else {
+      // Restore body scroll
+      document.body.style.overflow = '';
+    }
+
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [isMobileMenuOpen]);
+
   const scrollToSection = useCallback((sectionId: string) => {
     const element = document.getElementById(sectionId);
     if (element) {
@@ -247,30 +268,21 @@ function Header() {
         </div>
       </div>
 
-      {/* Mobile Menu Dropdown */}
+      {/* Mobile Menu Dropdown - Simple styled div without blur */}
       <div
         ref={mobileMenuRef}
-        className={`md:hidden absolute top-full left-0 right-0 transition-all duration-300 ease-in-out ${isMobileMenuOpen ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-4 pointer-events-none'
+        className={`md:hidden fixed inset-0 z-50 transition-opacity duration-200 ${isMobileMenuOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'
           }`}
       >
-        <div className="relative px-4 py-6">
-          <GlassSurface
-            width="100%"
-            height="auto"
-            borderRadius={20}
-            backgroundOpacity={0.1}
-            saturation={1}
-            borderWidth={0.07}
-            brightness={50}
-            opacity={0.93}
-            blur={11}
-            displace={0.5}
-            distortionScale={-180}
-            redOffset={0}
-            greenOffset={10}
-            blueOffset={20}
-            className="w-full"
-          >
+        {/* Backdrop overlay - no blur, just darkening */}
+        <div 
+          className="absolute inset-0 bg-black/40 transition-opacity duration-200"
+          onClick={() => setIsMobileMenuOpen(false)}
+        />
+        
+        {/* Menu content - transparent background with subtle white shade */}
+        <div className={`absolute top-20 left-4 right-4 transition-transform duration-200 ease-out ${isMobileMenuOpen ? 'translate-y-0' : '-translate-y-4'}`}>
+          <div className="relative rounded-2xl bg-white/10 border border-white/30 shadow-2xl">
             <div className="px-4 py-6 space-y-4 text-center">
               <button
                 onClick={scrollToTop}
@@ -297,7 +309,7 @@ function Header() {
                 Certificates
               </button>
             </div>
-          </GlassSurface>
+          </div>
         </div>
       </div>
     </header>
