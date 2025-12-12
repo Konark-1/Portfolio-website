@@ -5,12 +5,14 @@ import Link from 'next/link';
 import { LiquidGlassGroup, LiquidGlassItem } from "@/components/ui/liquid-glass-group";
 import GlassSurface from "@/components/react-bits/GlassSurface/GlassSurface";
 import { Menu, X } from 'lucide-react';
+import { detectDeviceCapabilities, shouldDisableHeavyAnimations } from "@/lib/performance";
 
 function Header() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isVisible, setIsVisible] = useState(true);
   const [isHovered, setIsHovered] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [deviceCaps, setDeviceCaps] = useState<ReturnType<typeof detectDeviceCapabilities> | null>(null);
   const lastScrollY = useRef(0);
   const hideHeaderTimeout = useRef<NodeJS.Timeout | null>(null);
   const mobileMenuRef = useRef<HTMLDivElement>(null);
@@ -114,6 +116,12 @@ function Header() {
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
   }, [isMobileMenuOpen]);
+
+  // Detect device capabilities on mount
+  useEffect(() => {
+    const caps = detectDeviceCapabilities();
+    setDeviceCaps(caps);
+  }, []);
 
   // Prevent body scroll and remove any blur effects when menu is open
   useEffect(() => {
@@ -268,48 +276,136 @@ function Header() {
         </div>
       </div>
 
-      {/* Mobile Menu Dropdown - Simple styled div without blur */}
-      <div
-        ref={mobileMenuRef}
-        className={`md:hidden fixed inset-0 z-50 transition-opacity duration-200 ${isMobileMenuOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'
-          }`}
-      >
-        {/* Backdrop overlay - no blur, just darkening */}
+      {/* Backdrop overlay - no blur */}
+      {isMobileMenuOpen && (
         <div 
-          className="absolute inset-0 bg-black/40 transition-opacity duration-200"
+          className="fixed inset-0 bg-black/20 z-40 md:hidden"
           onClick={() => setIsMobileMenuOpen(false)}
         />
-        
-        {/* Menu content - transparent background with subtle white shade */}
-        <div className={`absolute top-20 left-4 right-4 transition-transform duration-200 ease-out ${isMobileMenuOpen ? 'translate-y-0' : '-translate-y-4'}`}>
-          <div className="relative rounded-2xl bg-white/10 border border-white/30 shadow-2xl">
-            <div className="px-4 py-6 space-y-4 text-center">
-              <button
-                onClick={scrollToTop}
-                className="block text-white hover:text-gray-300 transition-colors text-lg font-medium w-full font-sans"
+      )}
+
+      {/* Mobile Menu Dropdown */}
+      <div
+        ref={mobileMenuRef}
+        className={`md:hidden absolute top-full left-0 right-0 z-50 ${isMobileMenuOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'
+          }`}
+      >
+        <div 
+          className="relative px-4 py-6"
+          style={{
+            transform: isMobileMenuOpen ? 'translate3d(0, 0, 0)' : 'translate3d(0, -16px, 0)',
+            transition: 'transform 300ms cubic-bezier(0.4, 0, 0.2, 1)',
+            willChange: 'transform',
+          }}
+        >
+          {(() => {
+            // Calculate blur settings based on device capabilities
+            // Default to safe values (no blur) if device caps not detected yet
+            if (!deviceCaps) {
+              return (
+                <div 
+                  className="w-full rounded-[20px] px-4 py-6 space-y-4 text-center relative overflow-hidden"
+                  style={{
+                    background: isMobileMenuOpen ? 'rgba(0, 0, 0, 0.5)' : 'rgba(0, 0, 0, 0)',
+                    border: isMobileMenuOpen ? '1px solid rgba(255, 255, 255, 0.1)' : '1px solid rgba(255, 255, 255, 0)',
+                    boxShadow: isMobileMenuOpen ? '0 8px 32px 0 rgba(0, 0, 0, 0.37)' : '0 0px 0px 0 rgba(0, 0, 0, 0)',
+                    transition: 'background-color 300ms cubic-bezier(0.4, 0, 0.2, 1), border-color 300ms cubic-bezier(0.4, 0, 0.2, 1), box-shadow 300ms cubic-bezier(0.4, 0, 0.2, 1)',
+                    transform: 'translateZ(0)',
+                  }}
+                >
+                  <button
+                    onClick={scrollToTop}
+                    className="block text-white hover:text-gray-300 transition-colors text-lg font-medium w-full font-sans"
+                  >
+                    Home
+                  </button>
+                  <button
+                    onClick={() => scrollToSection('about')}
+                    className="block text-white hover:text-gray-300 transition-colors text-lg font-medium w-full font-sans"
+                  >
+                    About
+                  </button>
+                  <button
+                    onClick={scrollToPortfolio}
+                    className="block text-white hover:text-gray-300 transition-colors text-lg font-medium w-full font-sans"
+                  >
+                    Portfolio
+                  </button>
+                  <button
+                    onClick={() => scrollToSection('certificates')}
+                    className="block text-white hover:text-gray-300 transition-colors text-lg font-medium w-full font-sans"
+                  >
+                    Certificates
+                  </button>
+                </div>
+              );
+            }
+            
+            const shouldDisableBlur = deviceCaps.isLowEndDevice || !deviceCaps.hasGPU || !deviceCaps.supportsWebGL;
+            const isLowEnd = deviceCaps.isLowEndDevice;
+            const isMobile = deviceCaps.isMobile;
+            
+            // Determine blur amount: 0px (disabled), 8px (low-end), 12px (mobile), 16px (high-end)
+            let blurAmount = 16;
+            let saturation = 180;
+            
+            if (shouldDisableBlur) {
+              blurAmount = 0;
+              saturation = 100;
+            } else if (isLowEnd || isMobile) {
+              blurAmount = 8;
+              saturation = 150;
+            } else if (deviceCaps.estimatedFPS && deviceCaps.estimatedFPS < 45) {
+              blurAmount = 12;
+              saturation = 160;
+            }
+            
+            const blurValue = isMobileMenuOpen ? `blur(${blurAmount}px) saturate(${saturation}%)` : 'blur(0px) saturate(100%)';
+            const bgOpacity = blurAmount === 0 ? (isMobileMenuOpen ? 0.5 : 0) : (isMobileMenuOpen ? 0.3 : 0);
+            
+            return (
+              <div 
+                className="w-full rounded-[20px] px-4 py-6 space-y-4 text-center relative overflow-hidden"
+                style={{
+                  background: `rgba(0, 0, 0, ${bgOpacity})`,
+                  backdropFilter: blurValue,
+                  WebkitBackdropFilter: blurValue,
+                  border: isMobileMenuOpen ? '1px solid rgba(255, 255, 255, 0.1)' : '1px solid rgba(255, 255, 255, 0)',
+                  boxShadow: isMobileMenuOpen ? '0 8px 32px 0 rgba(0, 0, 0, 0.37)' : '0 0px 0px 0 rgba(0, 0, 0, 0)',
+                  transition: blurAmount > 0 
+                    ? 'backdrop-filter 300ms cubic-bezier(0.4, 0, 0.2, 1), -webkit-backdrop-filter 300ms cubic-bezier(0.4, 0, 0.2, 1), background-color 300ms cubic-bezier(0.4, 0, 0.2, 1), border-color 300ms cubic-bezier(0.4, 0, 0.2, 1), box-shadow 300ms cubic-bezier(0.4, 0, 0.2, 1)'
+                    : 'background-color 300ms cubic-bezier(0.4, 0, 0.2, 1), border-color 300ms cubic-bezier(0.4, 0, 0.2, 1), box-shadow 300ms cubic-bezier(0.4, 0, 0.2, 1)',
+                  willChange: blurAmount > 0 ? 'backdrop-filter, background-color' : 'background-color',
+                  transform: 'translateZ(0)',
+                }}
               >
-                Home
-              </button>
-              <button
-                onClick={() => scrollToSection('about')}
-                className="block text-white hover:text-gray-300 transition-colors text-lg font-medium w-full font-sans"
-              >
-                About
-              </button>
-              <button
-                onClick={scrollToPortfolio}
-                className="block text-white hover:text-gray-300 transition-colors text-lg font-medium w-full font-sans"
-              >
-                Portfolio
-              </button>
-              <button
-                onClick={() => scrollToSection('certificates')}
-                className="block text-white hover:text-gray-300 transition-colors text-lg font-medium w-full font-sans"
-              >
-                Certificates
-              </button>
-            </div>
-          </div>
+                <button
+                  onClick={scrollToTop}
+                  className="block text-white hover:text-gray-300 transition-colors text-lg font-medium w-full font-sans"
+                >
+                  Home
+                </button>
+                <button
+                  onClick={() => scrollToSection('about')}
+                  className="block text-white hover:text-gray-300 transition-colors text-lg font-medium w-full font-sans"
+                >
+                  About
+                </button>
+                <button
+                  onClick={scrollToPortfolio}
+                  className="block text-white hover:text-gray-300 transition-colors text-lg font-medium w-full font-sans"
+                >
+                  Portfolio
+                </button>
+                <button
+                  onClick={() => scrollToSection('certificates')}
+                  className="block text-white hover:text-gray-300 transition-colors text-lg font-medium w-full font-sans"
+                >
+                  Certificates
+                </button>
+              </div>
+            );
+          })()}
         </div>
       </div>
     </header>
