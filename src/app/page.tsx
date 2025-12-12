@@ -267,16 +267,16 @@ export default function HomePage() {
         "https://app.fabric.microsoft.com/view?r=eyJrIjoiNGQ0MzFkY2UtN2M1ZS00Mzg4LTk0YzAtZjc4MmVjMDhjY2ZhIiwidCI6IjE4YjExOTE3LTU2NGQtNDJhYi05M2M4LWMxY2JhZDlhNjRiMiJ9&config=eyJjbHVzdGVyVXJsIjoiaHR0cHM6Ly93YWJpLXVzLWVhc3QyLXJlZGlyZWN0LmFuYWx5c2lzLndpbmRvd3MubmV0LyIsImVtYmVkRmVhdHVyZXMiOnsibW9kZXJuRW1iZWQiOnRydWUsImhpZGVBbmdsZVBhbmVsIjpmYWxzZSwiaGlkZUZvb3RlciI6ZmFsc2UsImRpc2FibGVGaWx0ZXJQYW5lbCI6ZmFsc2UsImRpc2FibGVWaXN1YWxQYW5lbCI6ZmFsc2UsImRpc2FibGVXZWJDb250ZXh0TWVudSI6ZmFsc2UsImRpc2FibGVBbmFseXppbmdQYW5lbCI6ZmFsc2UsImRpc2FibGVGb2N1c01vZGUiOmZhbHNlLCJkaXNhYmxlU2VhcmNoUGFuZWwiOmZhbHNlLCJkaXNhYmxlUGFnZU5hdmlnYXRvciI6ZmFsc2UsImRpc2FibGVTbGljZXJzUGFuZWwiOmZhbHNlLCJkaXNhYmxlU2VsZWN0aW9uUGFuZWwiOmZhbHNlLCJkaXNhYmxlQm9va21hcmtzUGFuZWwiOmZhbHNlLCJkaXNhYmxlU2V0dGluZ3NQYW5lbCI6ZmFsc2UsImRpc2FibGVJbnNpZ2h0c1BhbmVsIjpmYWxzZX19",
       tech: ["Power BI", "DAX", "Weather API", "Real-Time Data", "Advanced Visuals"],
       metrics: [
-        { label: "Data Points", value: "Real-Time" },
-        { label: "Cities", value: "4+ Indian" },
+        { label: "Visualizations", value: "Adaptive Display" },
+        { label: "Cities", value: "10+ Indian" },
         { label: "Metrics", value: "15+ Environmental" },
-        { label: "Update", value: "Hourly Sync" },
+        { label: "Intelligence", value: "Actionable Insights" },
       ],
       insights: [
-        "Conditional formatting for AQI severity levels",
-        "Forecasted temperature trend analysis with 3-day predictions",
-        "Context-aware safety alerts for visibility/fog risk",
-        "Multi-city comparative weather visualization",
+        "Adaptive visualizations that dynamically change color and formatting based on environmental data severity (e.g., AQI levels, visibility warnings)",
+        "Actionable safety insights: Context-aware alerts convert raw metrics into practical guidance (e.g., 'Visibility reduced—drive slowly, use fog lights')",
+        "Multi-city comparative analysis across 10+ Indian cities with synchronized environmental metrics for strategic planning",
+        "Comprehensive environmental intelligence: 15+ metrics including air quality (PM10, PM2.5, O3), visibility, humidity, wind speed, and UV index",
       ],
       gradient: "from-teal-500/20 via-cyan-500/10 to-cyan-400/0",
     },
@@ -289,38 +289,39 @@ export default function HomePage() {
         "https://app.powerbi.com/view?r=eyJrIjoiNTg1OTYwMWYtNTdiZi00YjU2LWI3ZWMtMjkxZGZlMGYwZTVkIiwidCI6IjE4YjExOTE3LTU2NGQtNDJhYi05M2M4LWMxY2JhZDlhNjRiMiJ9&pageName=ReportSection&config=eyJjbHVzdGVyVXJsIjoiaHR0cHM6Ly93YWJpLXVzLWVhc3QyLXJlZGlyZWN0LmFuYWx5c2lzLndpbmRvd3MubmV0LyIsImVtYmVkRmVhdHVyZXMiOnsibW9kZXJuRW1iZWQiOnRydWUsImhpZGVBbmdsZVBhbmVsIjpmYWxzZSwiaGlkZUZvb3RlciI6ZmFsc2UsImRpc2FibGVGaWx0ZXJQYW5lbCI6ZmFsc2UsImRpc2FibGVWaXN1YWxQYW5lbCI6ZmFsc2UsImRpc2FibGVXZWJDb250ZXh0TWVudSI6ZmFsc2UsImRpc2FibGVBbmFseXppbmdQYW5lbCI6ZmFsc2UsImRpc2FibGVGb2N1c01vZGUiOmZhbHNlLCJkaXNhYmxlU2VhcmNoUGFuZWwiOmZhbHNlLCJkaXNhYmxlUGFnZU5hdmlnYXRvciI6ZmFsc2UsImRpc2FibGVTbGljZXJzUGFuZWwiOmZhbHNlLCJkaXNhYmxlU2VsZWN0aW9uUGFuZWwiOmZhbHNlLCJkaXNhYmxlQm9va21hcmtzUGFuZWwiOmZhbHNlLCJkaXNhYmxlU2V0dGluZ3NQYW5lbCI6ZmFsc2UsImRpc2FibGVJbnNpZ2h0c1BhbmVsIjpmYWxzZX19",
       tech: ["Power BI", "DAX", "Data Modeling", "Geographic Viz", "KPI Design"],
       metrics: [
-        { label: "Total Sales", value: "2.30M" },
-        { label: "Avg Order", value: "458.61" },
-        { label: "Segments", value: "3 Business" },
-        { label: "Categories", value: "Tech | Office | Furniture" },
+        { label: "Architecture", value: "Dual-Layer Intelligence" },
+        { label: "Focus", value: "Profit-Driven Decision Making" },
+        { label: "Analysis", value: "Product Level Performance" },
+        { label: "Logic", value: "Multi-Variate Correlation" },
       ],
       insights: [
-        "Executive dashboard with 15+ KPIs for strategic decisions",
-        "Geographic map visualization for regional performance",
-        "Category profit margin comparison (46.7% tech)",
-        "City-level order analysis with interactive filtering",
+        "Dual-layer intelligence architecture: Executive overview for strategic decisions and granular product-level analysis for operational managers",
+        "Profit-driven decision making: Prioritizes profitability metrics (Total Profit by Category, Profit Margin %) over revenue to guide bottom-line optimization",
+        "Product-level performance analysis: Drill-down from categories to individual products to identify winning products and underperformers",
+        "Multi-variate correlation analysis: Advanced scatter plots and combo charts correlate Profit, Sales, and Quantity to uncover hidden patterns",
       ],
       gradient: "from-blue-500/20 via-indigo-500/10 to-indigo-400/0",
     },
     {
       title: "Distribution & Trend Analysis",
-      subtitle: "Konark Business Intelligence System",
+      subtitle: "Profit Health Monitoring & Operational Control Platform",
       description:
         "Multi-dimensional business analysis dashboard examining quarterly performance, category distribution, expense ratios, and state-wise profit patterns. Features time-series profit trends, income categorization, and geographic bubble visualizations for India-specific insights.",
       embedUrl:
         "https://app.powerbi.com/view?r=eyJrIjoiNmE4MmRhMmItNTFlNC00MzMzLTkwZjQtNjc1NjEyZDI2ZTczIiwidCI6IjE4YjExOTE3LTU2NGQtNDJhYi05M2M4LWMxY2JhZDlhNjRiMiJ9&pageName=ReportSection&config=eyJjbHVzdGVyVXJsIjoiaHR0cHM6Ly93YWJpLXVzLWVhc3QyLXJlZGlyZWN0LmFuYWx5c2lzLndpbmRvd3MubmV0LyIsImVtYmVkRmVhdHVyZXMiOnsibW9kZXJuRW1iZWQiOnRydWUsImhpZGVBbmdsZVBhbmVsIjpmYWxzZSwiaGlkZUZvb3RlciI6ZmFsc2UsImRpc2FibGVGaWx0ZXJQYW5lbCI6ZmFsc2UsImRpc2FibGVWaXN1YWxQYW5lbCI6ZmFsc2UsImRpc2FibGVXZWJDb250ZXh0TWVudSI6ZmFsc2UsImRpc2FibGVBbmFseXppbmdQYW5lbCI6ZmFsc2UsImRpc2FibGVGb2N1c01vZGUiOmZhbHNlLCJkaXNhYmxlU2VhcmNoUGFuZWwiOmZhbHNlLCJkaXNhYmxlUGFnZU5hdmlnYXRvciI6ZmFsc2UsImRpc2FibGVTbGljZXJzUGFuZWwiOmZhbHNlLCJkaXNhYmxlU2VsZWN0aW9uUGFuZWwiOmZhbHNlLCJkaXNhYmxlQm9va21hcmtzUGFuZWwiOmZhbHNlLCJkaXNhYmxlU2V0dGluZ3NQYW5lbCI6ZmFsc2UsImRpc2FibGVJbnNpZ2h0c1BhbmVsIjpmYWxzZX19",
       tech: ["Power BI", "Time Series", "Statistical Analysis", "Map Visuals", "DAX Measures"],
       metrics: [
-        { label: "Total Profit", value: "37K" },
-        { label: "Expense Ratio", value: "0.99" },
-        { label: "States", value: "Multiple" },
-        { label: "Quarters", value: "4 Analyzed" },
+        { label: "Tracking", value: "Profit & Loss Monthly" },
+        { label: "Analytics", value: "Cost Efficiency Ratio" },
+        { label: "Dynamics", value: "Volume vs. Value Category" },
+        { label: "Analysis", value: "Quarterly Drill-Down" },
       ],
       insights: [
-        "Month-over-month profit trend identification (peaks in Jan, Aug, Nov)",
-        "Clothing dominates sales at 62% of total quantity",
-        "State-level profitability mapping with bubble chart",
-        "Quarterly performance tracking with comparisons",
+        "Profit & Loss monthly tracking: Color-coded bar chart (Green/Red) instantly identifies loss months (May, July, Sept) for proactive health monitoring",
+        "Cost efficiency ratio analytics: Expense ratio of 0.99 indicates tight margins, enabling operational control to prevent expenses from overtaking revenue",
+        "Volume vs. Value category dynamics: Reveals high-effort vs. high-value product lines (e.g., Clothing: 62% volume but only 37% income share)",
+        "Trend spotting seasonal patterns: Timeline analysis identifies seasonal dips and peaks to optimize inventory and marketing strategies",
+        "State-level profitability mapping: Geographic bubble visualization pinpoints high-performing regions for strategic expansion",
       ],
       gradient: "from-purple-500/20 via-pink-500/10 to-pink-400/0",
     },
@@ -475,15 +476,41 @@ export default function HomePage() {
       {/* Skills / Technical Expertise Section */}
       <section id="skills" className="relative z-10 bg-slate-950 text-foreground border-t border-border">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-16 sm:py-20 lg:py-28 space-y-16">
-          <div className="text-center space-y-4 max-w-3xl mx-auto">
-            <p className="text-xs uppercase tracking-[0.6em] text-text-muted font-sans">Technical expertise</p>
-            <h2 className="font-serif text-3xl sm:text-4xl md:text-5xl font-bold text-text-primary tracking-tight leading-tight">
+          <motion.div
+            className="text-center space-y-4 max-w-3xl mx-auto"
+            initial={{ opacity: 0, y: 40 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "-100px" }}
+            transition={{ duration: 0.6, ease: [0.25, 0.46, 0.45, 0.94] }}
+          >
+            <motion.p
+              className="text-xs uppercase tracking-[0.6em] text-text-muted font-sans"
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5, delay: 0.1 }}
+            >
+              Technical expertise
+            </motion.p>
+            <motion.h2
+              className="font-serif text-3xl sm:text-4xl md:text-5xl font-bold text-text-primary tracking-tight leading-tight"
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6, delay: 0.2 }}
+            >
               Toolbox for insight generation
-            </h2>
-            <p className="text-base sm:text-lg text-text-muted leading-relaxed font-sans">
+            </motion.h2>
+            <motion.p
+              className="text-base sm:text-lg text-text-muted leading-relaxed font-sans"
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6, delay: 0.3 }}
+            >
               A comprehensive overview of my technical expertise and proficiency levels across key data analytics tools and methodologies.
-            </p>
-          </div>
+            </motion.p>
+          </motion.div>
 
           <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
             {skillsShowcase.map((skill) => (
@@ -491,15 +518,55 @@ export default function HomePage() {
             ))}
           </div>
 
-          <div className="rounded-3xl border border-accent-cyan/40 bg-accent-cyan/10 p-8 shadow-glass-soft">
-            <h3 className="font-serif text-2xl sm:text-3xl font-bold text-text-primary mb-4 flex items-center gap-3 tracking-tight leading-tight">
-              <Sparkles className="h-5 w-5 text-accent-cyan" />
+          <motion.div
+            className="rounded-3xl border border-accent-cyan/40 bg-accent-cyan/10 p-8 shadow-glass-soft"
+            initial={{ opacity: 0, scale: 0.95, y: 30 }}
+            whileInView={{ opacity: 1, scale: 1, y: 0 }}
+            viewport={{ once: true, margin: "-50px" }}
+            transition={{
+              duration: 0.6,
+              delay: 0.4,
+              ease: [0.25, 0.46, 0.45, 0.94]
+            }}
+            whileHover={{
+              scale: 1.02,
+              borderColor: "rgba(6, 182, 212, 0.6)",
+              transition: { duration: 0.3 }
+            }}
+          >
+            <motion.h3
+              className="font-serif text-2xl sm:text-3xl font-bold text-text-primary mb-4 flex items-center gap-3 tracking-tight leading-tight"
+              initial={{ opacity: 0, x: -20 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5, delay: 0.5 }}
+            >
+              <motion.span
+                animate={{
+                  rotate: [0, 10, -10, 0],
+                  scale: [1, 1.1, 1]
+                }}
+                transition={{
+                  duration: 2,
+                  repeat: Infinity,
+                  repeatDelay: 3,
+                  ease: "easeInOut"
+                }}
+              >
+                <Sparkles className="h-5 w-5 text-accent-cyan" />
+              </motion.span>
               AI Workflow Advantage
-            </h3>
-            <p className="text-base text-text-muted leading-relaxed font-sans">
+            </motion.h3>
+            <motion.p
+              className="text-base text-text-muted leading-relaxed font-sans"
+              initial={{ opacity: 0 }}
+              whileInView={{ opacity: 1 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5, delay: 0.6 }}
+            >
               Leveraging AI-powered workflows to accelerate data analysis by 3x, enabling faster insights delivery and enhanced decision-making capabilities through intelligent automation and prompt-driven tooling.
-            </p>
-          </div>
+            </motion.p>
+          </motion.div>
         </div>
       </section>
 
@@ -535,13 +602,12 @@ export default function HomePage() {
         <div className="absolute inset-0 bg-gradient-to-b from-transparent via-background/80 to-background pointer-events-none" />
 
         <div className="max-w-7xl mx-auto relative z-10 space-y-20">
-          <div className="text-center space-y-6 max-w-4xl mx-auto">
-            <h2 className="font-serif text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold bg-gradient-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent tracking-tight leading-tight">
+          <div className="text-center space-y-8 max-w-7xl mx-auto px-4">
+            <h2 className="font-serif text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold bg-gradient-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent tracking-tight leading-[1.1] mb-4">
               Interactive Analytics
             </h2>
-            <p className="text-base sm:text-lg md:text-xl text-text-muted leading-relaxed font-sans">
-              A cinematic showcase of embedded Power BI dashboards. <span className="text-accent-cyan">Fully interactive</span>,
-              real-time data visualizations built with advanced DAX, optimized queries, and storytelling design principles.
+            <p className="text-base sm:text-lg md:text-xl lg:text-2xl text-text-muted leading-relaxed font-sans max-w-5xl mx-auto">
+              A cinematic showcase of embedded Power BI dashboards. <span className="text-accent-cyan font-medium whitespace-nowrap">Fully interactive</span>, real-time data visualizations built with advanced DAX, optimized queries, and storytelling design principles.
             </p>
           </div>
 
@@ -551,12 +617,12 @@ export default function HomePage() {
             ))}
           </div>
 
-          <div className="mt-10 p-8 sm:p-10 rounded-3xl border border-accent-cyan/20 bg-gradient-to-br from-accent-cyan/5 to-transparent shadow-glass-soft">
-            <h3 className="font-serif text-2xl sm:text-3xl font-bold mb-6 flex items-center gap-3 text-text-primary tracking-tight leading-tight">
-              <span className="text-accent-cyan text-3xl">⚡</span>
+          <div className="mt-12 sm:mt-16 p-8 sm:p-10 lg:p-12 rounded-3xl border border-accent-cyan/20 bg-gradient-to-br from-accent-cyan/5 to-transparent shadow-glass-soft">
+            <h3 className="font-serif text-2xl sm:text-3xl md:text-4xl font-bold mb-8 sm:mb-10 flex items-center gap-3 text-text-primary tracking-tight leading-tight">
+              <span className="text-accent-cyan text-3xl sm:text-4xl">⚡</span>
               Technical implementation highlights
             </h3>
-            <div className="grid gap-6 md:grid-cols-3">
+            <div className="grid gap-6 sm:gap-8 md:grid-cols-3">
               {techHighlights.map((highlight) => (
                 <TechHighlight key={highlight.title} {...highlight} />
               ))}
@@ -682,13 +748,13 @@ export default function HomePage() {
         <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 py-16 sm:py-20 lg:py-28 grid gap-12 lg:grid-cols-2">
           <div className="space-y-6">
             <p className="text-xs uppercase tracking-[0.55em] text-text-muted font-sans">Contact</p>
-            <h2 className="font-serif text-3xl sm:text-4xl md:text-5xl font-bold text-text-primary tracking-tight leading-tight">
+            <h2 className="font-serif text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold text-text-primary tracking-tight leading-tight">
               Let&rsquo;s work together
             </h2>
-            <p className="text-base sm:text-lg text-text-muted leading-relaxed font-sans">
+            <p className="text-base sm:text-lg md:text-xl text-text-muted leading-relaxed font-sans">
               I&apos;m always open to discussing new opportunities, collaborations, or data analytics projects. Feel free to reach out using the form below or through any of my direct contact channels.
             </p>
-            <p className="text-sm text-text-muted leading-relaxed font-sans">
+            <p className="text-sm sm:text-base text-text-muted leading-relaxed font-sans">
               I typically respond within 24-48 hours. For urgent matters, please use the direct contact channels in the Connect section below.
             </p>
           </div>
@@ -783,12 +849,12 @@ export default function HomePage() {
       {/* Connect Section */}
       <section id="connect" className="relative z-10 bg-background text-foreground border-t border-border">
         <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 py-16 sm:py-20 lg:py-24 space-y-12">
-          <div className="text-center space-y-4 max-w-3xl mx-auto">
+          <div className="text-center space-y-6 max-w-4xl mx-auto">
             <p className="text-xs uppercase tracking-[0.6em] text-text-muted font-sans">Connect to me</p>
-            <h2 className="font-serif text-3xl sm:text-4xl md:text-5xl font-bold text-text-primary tracking-tight leading-tight">
+            <h2 className="font-serif text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold text-text-primary tracking-tight leading-tight">
               Direct lines & quick actions
             </h2>
-            <p className="text-base sm:text-lg text-text-muted leading-relaxed font-sans">
+            <p className="text-base sm:text-lg md:text-xl text-text-muted leading-relaxed font-sans">
               Quick access to direct contact channels. Choose your preferred method to get in touch—I&apos;m always open to connecting with potential collaborators, employers, or fellow data professionals.
             </p>
           </div>
@@ -812,18 +878,69 @@ type SkillCardProps = {
 
 function SkillCard({ icon: Icon, title, level, description }: SkillCardProps) {
   return (
-    <div className="rounded-3xl border border-border bg-card/80 p-6 shadow-glass-soft">
-      <div className="flex items-center gap-3 mb-4">
-        <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-accent-cyan/10 text-accent-cyan">
+    <motion.div
+      initial={{ opacity: 0, y: 30, scale: 0.95 }}
+      whileInView={{ opacity: 1, y: 0, scale: 1 }}
+      viewport={{ once: true, margin: "-50px" }}
+      transition={{
+        duration: 0.5,
+        ease: [0.25, 0.46, 0.45, 0.94]
+      }}
+      whileHover={{
+        y: -8,
+        scale: 1.02,
+        transition: { duration: 0.3, ease: "easeOut" }
+      }}
+      className="rounded-3xl border border-border bg-card/80 p-6 shadow-glass-soft hover:border-accent-cyan/30 hover:bg-card/90 transition-colors duration-300"
+    >
+      <motion.div
+        className="flex items-center gap-3 mb-4"
+        initial={{ opacity: 0, x: -20 }}
+        whileInView={{ opacity: 1, x: 0 }}
+        viewport={{ once: true }}
+        transition={{ duration: 0.4, delay: 0.1 }}
+      >
+        <motion.div
+          className="flex h-11 w-11 items-center justify-center rounded-2xl bg-accent-cyan/10 text-accent-cyan"
+          whileHover={{
+            scale: 1.15,
+            rotate: 360,
+            transition: { duration: 0.5, ease: "easeInOut" }
+          }}
+        >
           <Icon className="h-5 w-5" />
-        </div>
+        </motion.div>
         <div>
-          <p className="text-xs uppercase tracking-[0.35em] text-text-muted font-sans">{level}</p>
-          <h3 className="text-lg font-semibold text-text-primary font-serif">{title}</h3>
+          <motion.p
+            className="text-xs uppercase tracking-[0.35em] text-text-muted font-sans"
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.4, delay: 0.2 }}
+          >
+            {level}
+          </motion.p>
+          <motion.h3
+            className="text-lg font-semibold text-text-primary font-serif"
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.4, delay: 0.15 }}
+          >
+            {title}
+          </motion.h3>
         </div>
-      </div>
-      <p className="text-sm text-text-muted leading-relaxed font-sans">{description}</p>
-    </div>
+      </motion.div>
+      <motion.p
+        className="text-sm text-text-muted leading-relaxed font-sans"
+        initial={{ opacity: 0 }}
+        whileInView={{ opacity: 1 }}
+        viewport={{ once: true }}
+        transition={{ duration: 0.4, delay: 0.25 }}
+      >
+        {description}
+      </motion.p>
+    </motion.div>
   );
 }
 
@@ -999,19 +1116,19 @@ function DashboardCard({
       className={`group relative rounded-3xl border border-white/10 overflow-hidden bg-gradient-to-br from-gray-900/70 to-gray-900/40 backdrop-blur-xl`}
     >
       <div className={`absolute inset-0 bg-gradient-to-br ${gradient} opacity-0 group-hover:opacity-100 transition-opacity duration-700`} />
-      <div className="relative z-10 p-8 sm:p-10 space-y-10">
-        <div>
+      <div className="relative z-10 p-8 sm:p-10 lg:p-12 space-y-8 sm:space-y-10">
+        <div className="space-y-4 sm:space-y-5">
           {featured && (
-            <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-cyan-500/10 border border-cyan-500/30 text-cyan-300 text-sm font-semibold mb-4">
-              <Star className="h-4 w-4" />
+            <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-cyan-500/10 border border-cyan-500/30 text-cyan-300 text-xs sm:text-sm font-semibold mb-2 font-sans tracking-wide">
+              <Star className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
               Featured Project
             </span>
           )}
-          <h3 className="font-serif text-3xl sm:text-4xl md:text-5xl font-bold text-text-primary mb-4 group-hover:text-accent-cyan transition-colors tracking-tight leading-tight">
+          <h3 className="font-serif text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-text-primary mb-3 sm:mb-4 group-hover:text-accent-cyan transition-colors tracking-tight leading-[1.15]">
             {title}
           </h3>
-          <p className="text-base sm:text-lg md:text-xl text-accent-cyan/90 font-normal mb-6 font-sans">{subtitle}</p>
-          <p className="text-sm sm:text-base text-text-muted leading-relaxed max-w-3xl font-sans">{description}</p>
+          <p className="text-lg sm:text-xl md:text-2xl text-accent-cyan/90 font-medium mb-4 sm:mb-5 font-sans leading-relaxed">{subtitle}</p>
+          <p className="text-sm sm:text-base md:text-lg text-text-muted leading-relaxed font-sans">{description}</p>
         </div>
 
         <div
@@ -1049,35 +1166,35 @@ function DashboardCard({
           </div>
         </div>
 
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 p-6 rounded-2xl bg-white/5 border border-white/10">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6 p-6 sm:p-8 rounded-2xl bg-white/5 border border-white/10">
           {metrics.map(({ label, value }) => (
-            <div key={label} className="text-center">
-              <p className="text-xl sm:text-2xl font-bold text-accent-cyan font-serif">{value}</p>
-              <p className="text-xs uppercase tracking-[0.2em] text-text-muted mt-1.5 font-sans">{label}</p>
+            <div key={label} className="text-center space-y-2">
+              <p className="text-2xl sm:text-3xl md:text-4xl font-bold text-accent-cyan font-serif leading-tight">{value}</p>
+              <p className="text-xs sm:text-sm uppercase tracking-[0.15em] sm:tracking-[0.2em] text-text-muted font-sans leading-tight">{label}</p>
             </div>
           ))}
         </div>
 
-        <div className="space-y-4">
-          <h4 className="text-base sm:text-lg font-semibold flex items-center gap-2 text-text-primary font-serif">
-            <Lightbulb className="h-5 w-5 text-amber-300" />
+        <div className="space-y-5 sm:space-y-6">
+          <h4 className="text-lg sm:text-xl md:text-2xl font-semibold flex items-center gap-3 text-text-primary font-serif tracking-tight">
+            <Lightbulb className="h-5 w-5 sm:h-6 sm:w-6 text-amber-300 flex-shrink-0" />
             Key insights &amp; features
           </h4>
-          <ul className="grid md:grid-cols-2 gap-3">
+          <ul className="grid md:grid-cols-2 gap-4 sm:gap-5">
             {insights.map((insight) => (
-              <li key={insight} className="flex items-start gap-3 text-sm text-text-muted leading-relaxed font-sans">
-                <span className="text-accent-cyan mt-1">▹</span>
+              <li key={insight} className="flex items-start gap-3 text-sm sm:text-base text-text-muted leading-relaxed font-sans">
+                <span className="text-accent-cyan mt-1.5 flex-shrink-0 text-lg">▹</span>
                 <span>{insight}</span>
               </li>
             ))}
           </ul>
         </div>
 
-        <div className="flex flex-wrap gap-2 sm:gap-3">
+        <div className="flex flex-wrap gap-2.5 sm:gap-3">
           {tech.map((item) => (
             <span
               key={item}
-              className="px-3 sm:px-4 py-1.5 sm:py-2 rounded-full border border-accent-cyan/30 bg-accent-cyan/10 text-accent-cyan text-xs sm:text-sm font-medium font-sans"
+              className="px-4 sm:px-5 py-2 sm:py-2.5 rounded-full border border-accent-cyan/30 bg-accent-cyan/10 text-accent-cyan text-sm sm:text-base font-medium font-sans tracking-wide"
             >
               {item}
             </span>
@@ -1096,10 +1213,10 @@ type TechHighlightProps = {
 
 function TechHighlight({ icon, title, description }: TechHighlightProps) {
   return (
-    <div className="rounded-2xl border border-white/10 bg-white/5 p-5 backdrop-blur-md">
-      <div className="text-3xl mb-3">{icon}</div>
-      <h4 className="text-base sm:text-lg font-semibold text-text-primary mb-2 font-serif">{title}</h4>
-      <p className="text-sm text-text-muted leading-relaxed font-sans">{description}</p>
+    <div className="rounded-2xl border border-white/10 bg-white/5 p-6 sm:p-7 backdrop-blur-md">
+      <div className="text-3xl sm:text-4xl mb-4">{icon}</div>
+      <h4 className="text-lg sm:text-xl md:text-2xl font-semibold text-text-primary mb-3 sm:mb-4 font-serif tracking-tight">{title}</h4>
+      <p className="text-sm sm:text-base text-text-muted leading-relaxed font-sans">{description}</p>
     </div>
   );
 }
