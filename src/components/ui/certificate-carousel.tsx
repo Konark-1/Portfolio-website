@@ -23,85 +23,172 @@ interface CertificateCarouselProps {
 export function CertificateCarousel({ certificates }: CertificateCarouselProps) {
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const [isHovered, setIsHovered] = useState(false);
-  const [isAutoScrolling, setIsAutoScrolling] = useState(true);
+  const [isPaused, setIsPaused] = useState(false);
   const animationRef = useRef<number | null>(null);
+  const pauseTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const isResettingRef = useRef(false);
 
-  // Triple the certificates for smoother infinite scroll
+  // Triple the certificates for seamless infinite scroll
   const extendedCertificates = [...certificates, ...certificates, ...certificates];
 
-  const scroll = useCallback((direction: 'left' | 'right') => {
-    if (scrollContainerRef.current) {
-      const scrollAmount = 344; // card width + gap
-      const currentScroll = scrollContainerRef.current.scrollLeft;
-      const targetScroll = direction === 'left'
-        ? currentScroll - scrollAmount
-        : currentScroll + scrollAmount;
+  const cardWidth = 344; // card width (320) + gap (24)
+  const singleSetWidth = cardWidth * certificates.length;
 
-      scrollContainerRef.current.scrollTo({
-        left: targetScroll,
-        behavior: 'smooth'
+  // Seamlessly reset scroll position when near boundaries - runs on EVERY scroll
+  const checkAndResetBoundaries = useCallback(() => {
+    const scrollContainer = scrollContainerRef.current;
+    if (!scrollContainer || isResettingRef.current) return;
+
+    const currentScroll = scrollContainer.scrollLeft;
+    const maxScroll = scrollContainer.scrollWidth - scrollContainer.clientWidth;
+    
+    // Use a larger threshold - half of single set width for safety
+    const threshold = singleSetWidth * 0.8;
+    
+    // When approaching the right end, jump back
+    if (currentScroll >= maxScroll - threshold) {
+      isResettingRef.current = true;
+      scrollContainer.scrollLeft = currentScroll - singleSetWidth;
+      requestAnimationFrame(() => {
+        isResettingRef.current = false;
       });
-
-      // Pause auto-scroll temporarily on interaction
-      setIsAutoScrolling(false);
-      setTimeout(() => {
-        if (!isHovered) setIsAutoScrolling(true);
-      }, 3000);
     }
-  }, [isHovered]);
+    // When approaching the left end, jump forward
+    else if (currentScroll <= threshold) {
+      isResettingRef.current = true;
+      scrollContainer.scrollLeft = currentScroll + singleSetWidth;
+      requestAnimationFrame(() => {
+        isResettingRef.current = false;
+      });
+    }
+  }, [singleSetWidth]);
 
+  const scroll = useCallback((direction: 'left' | 'right') => {
+    const scrollContainer = scrollContainerRef.current;
+    if (!scrollContainer) return;
+
+    // Pause auto-scroll during manual interaction
+    setIsPaused(true);
+    if (pauseTimeoutRef.current) clearTimeout(pauseTimeoutRef.current);
+
+    const currentScroll = scrollContainer.scrollLeft;
+    const targetScroll = direction === 'left'
+      ? currentScroll - cardWidth
+      : currentScroll + cardWidth;
+
+    scrollContainer.scrollTo({
+      left: targetScroll,
+      behavior: 'smooth'
+    });
+
+    // Resume auto-scroll after delay
+    pauseTimeoutRef.current = setTimeout(() => {
+      if (!isHovered) setIsPaused(false);
+    }, 600);
+  }, [isHovered, cardWidth]);
+
+  // Initialize scroll position to the middle set
   useEffect(() => {
     const scrollContainer = scrollContainerRef.current;
     if (!scrollContainer) return;
 
-    const cardWidth = 344;
-    const totalWidth = cardWidth * certificates.length;
+    // Wait for layout then set initial position
+    const initPosition = () => {
+      if (scrollContainer.scrollWidth > 0) {
+        scrollContainer.scrollLeft = singleSetWidth;
+      }
+    };
+    
+    // Multiple attempts to ensure it works after render
+    requestAnimationFrame(initPosition);
+    setTimeout(initPosition, 100);
+  }, [singleSetWidth]);
 
-    // Speed in pixels per second (e.g., 30px/s is slow and smooth)
+  // Listen to scroll events and check boundaries continuously
+  useEffect(() => {
+    const scrollContainer = scrollContainerRef.current;
+    if (!scrollContainer) return;
+
+    const handleScroll = () => {
+      checkAndResetBoundaries();
+    };
+
+    scrollContainer.addEventListener('scroll', handleScroll, { passive: true });
+
+    return () => {
+      scrollContainer.removeEventListener('scroll', handleScroll);
+    };
+  }, [checkAndResetBoundaries]);
+
+  // Auto-scroll animation
+  useEffect(() => {
+    const scrollContainer = scrollContainerRef.current;
+    if (!scrollContainer) return;
+
     const pixelsPerSecond = 30;
-
     let lastTime = performance.now();
-    let accumulatedScroll = scrollContainer.scrollLeft;
 
     const animate = (currentTime: number) => {
       const deltaTime = currentTime - lastTime;
       lastTime = currentTime;
 
-      // Auto-scroll logic
-      if (isAutoScrolling && !isHovered) {
-        // Calculate how many pixels to move based on time passed
+      if (!isPaused && !isHovered && !isResettingRef.current) {
         const moveAmount = (pixelsPerSecond * deltaTime) / 1000;
-        accumulatedScroll += moveAmount;
-
-        // Boundary checks - seamless loop
-        if (accumulatedScroll >= totalWidth * 2) {
-          accumulatedScroll -= totalWidth;
-        } else if (accumulatedScroll <= 0) {
-          accumulatedScroll += totalWidth;
-        }
-
-        scrollContainer.scrollLeft = accumulatedScroll;
-      } else {
-        // Sync accumulator with actual scroll position when paused/hovered
-        // This ensures no jump when resuming
-        accumulatedScroll = scrollContainer.scrollLeft;
+        scrollContainer.scrollLeft += moveAmount;
       }
 
       animationRef.current = requestAnimationFrame(animate);
     };
-
-    // Initialize scroll position to the middle set if at start
-    if (scrollContainer.scrollLeft === 0) {
-      scrollContainer.scrollLeft = totalWidth;
-      accumulatedScroll = totalWidth;
-    }
 
     animationRef.current = requestAnimationFrame(animate);
 
     return () => {
       if (animationRef.current) cancelAnimationFrame(animationRef.current);
     };
-  }, [isAutoScrolling, isHovered, certificates.length]);
+  }, [isPaused, isHovered]);
+
+  // Handle manual scroll pause/resume
+  useEffect(() => {
+    const scrollContainer = scrollContainerRef.current;
+    if (!scrollContainer) return;
+
+    const handleInteractionStart = () => {
+      setIsPaused(true);
+      if (pauseTimeoutRef.current) clearTimeout(pauseTimeoutRef.current);
+    };
+
+    const handleInteractionEnd = () => {
+      if (pauseTimeoutRef.current) clearTimeout(pauseTimeoutRef.current);
+      
+      pauseTimeoutRef.current = setTimeout(() => {
+        if (!isHovered) setIsPaused(false);
+      }, 1000);
+    };
+
+    const handleWheel = () => {
+      handleInteractionStart();
+      handleInteractionEnd();
+    };
+
+    scrollContainer.addEventListener('wheel', handleWheel, { passive: true });
+    scrollContainer.addEventListener('touchstart', handleInteractionStart, { passive: true });
+    scrollContainer.addEventListener('touchend', handleInteractionEnd, { passive: true });
+
+    return () => {
+      scrollContainer.removeEventListener('wheel', handleWheel);
+      scrollContainer.removeEventListener('touchstart', handleInteractionStart);
+      scrollContainer.removeEventListener('touchend', handleInteractionEnd);
+      if (pauseTimeoutRef.current) clearTimeout(pauseTimeoutRef.current);
+    };
+  }, [isHovered]);
+
+  // Cleanup on unmount
+  useEffect(() => {
+    return () => {
+      if (pauseTimeoutRef.current) clearTimeout(pauseTimeoutRef.current);
+      if (animationRef.current) cancelAnimationFrame(animationRef.current);
+    };
+  }, []);
 
   return (
     <div
@@ -109,11 +196,7 @@ export function CertificateCarousel({ certificates }: CertificateCarouselProps) 
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => {
         setIsHovered(false);
-        setIsAutoScrolling(true);
-      }}
-      onTouchStart={() => setIsAutoScrolling(false)}
-      onTouchEnd={() => {
-        setTimeout(() => setIsAutoScrolling(true), 3000);
+        setIsPaused(false);
       }}
     >
       {/* Navigation Buttons */}
@@ -159,14 +242,13 @@ export function CertificateCarousel({ certificates }: CertificateCarouselProps) 
       <div className="absolute left-0 top-0 bottom-0 w-12 sm:w-24 bg-gradient-to-r from-gray-900 via-gray-900/60 to-transparent z-10 pointer-events-none" />
       <div className="absolute right-0 top-0 bottom-0 w-12 sm:w-24 bg-gradient-to-l from-gray-900 via-gray-900/60 to-transparent z-10 pointer-events-none" />
 
-      {/* Scrolling container - Increased padding to clear gradients */}
+      {/* Scrolling container */}
       <div
         ref={scrollContainerRef}
         className="flex overflow-x-auto gap-6 px-12 sm:px-24 pb-8 pt-4 scrollbar-hide"
         style={{
           scrollbarWidth: 'none',
           msOverflowStyle: 'none',
-          scrollBehavior: isAutoScrolling ? 'auto' : 'smooth'
         }}
       >
         {extendedCertificates.map((cert, index) => (
