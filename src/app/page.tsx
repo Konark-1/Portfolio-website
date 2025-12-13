@@ -245,7 +245,7 @@ export default function HomePage() {
       icon: FileText,
       label: "Resume",
       value: "Download resume (PDF)",
-      href: "/Resume.pdf",
+      href: "/Konark Resume.pdf",
       download: true,
     },
     {
