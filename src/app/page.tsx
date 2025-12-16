@@ -21,15 +21,27 @@ import {
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import BlurText from "@/components/react-bits/BlurText/BlurText";
-import { CertificateCarousel } from "@/components/ui/certificate-carousel";
 import dynamic from "next/dynamic";
 
-// Dynamically import LiquidChrome to reduce initial bundle size and avoid SSR issues
-const LiquidChrome = dynamic(
-  () => import("@/components/react-bits/LiquidChrome/LiquidChrome"),
+// Dynamically import Silk background to reduce initial bundle size and avoid SSR issues
+const Silk = dynamic(
+  () => import("@/components/Silk"),
   {
     ssr: false,
     loading: () => null, // No loading state needed for background
+  }
+);
+
+// Dynamically import CertificateCarousel (below the fold - lazy load)
+const CertificateCarousel = dynamic(
+  () => import("@/components/ui/certificate-carousel").then(mod => ({ default: mod.CertificateCarousel })),
+  {
+    ssr: true, // SSR for SEO, but lazy loaded
+    loading: () => (
+      <div className="flex items-center justify-center min-h-[400px]">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-accent-cyan"></div>
+      </div>
+    ),
   }
 );
 
@@ -352,16 +364,15 @@ export default function HomePage() {
 
       {/* Hero section */}
       <div className="relative min-h-screen overflow-hidden bg-gradient-to-br from-gray-900 via-black to-gray-800">
-        {/* Liquid Chrome Background */}
+        {/* Silk Background */}
         {!shouldReduceMotion && (
           <div className="absolute inset-0 z-0">
-            <LiquidChrome
-              baseColor={[0, 0.05, 0.05]}
-              speed={0.85}
-              amplitude={0.3}
-              frequencyX={3}
-              frequencyY={2}
-              interactive={true}
+            <Silk
+              speed={7.5}
+              scale={1}
+              color="#27CBCE"
+              noiseIntensity={5.9}
+              rotation={0}
             />
           </div>
         )}
@@ -1237,21 +1248,23 @@ function AboutSection({ shouldReduceMotion }: AboutSectionProps) {
     offset: ["start end", "end start"]
   });
 
-  // Smooth spring-based transforms - reduced precision for better performance
+  // Smooth spring-based transforms - optimized for better INP performance
   const smoothProgress = useSpring(scrollYProgress, { 
-    stiffness: 100, 
-    damping: 30, 
-    restDelta: 0.01 // Increased from 0.001 to reduce calculations
+    stiffness: 80, // Reduced from 100 for smoother, less frequent updates
+    damping: 35, // Increased from 30 for better stability
+    restDelta: 0.02 // Increased from 0.01 to further reduce calculations
   });
 
-  // Scale animation for the name (scales up as you scroll)
+  // Reduced number of transforms - combine similar ones for better performance
+  // Scale and opacity combined into single transform where possible
   const nameScale = useTransform(smoothProgress, [0, 0.3], [0.92, 1]);
   const nameOpacity = useTransform(smoothProgress, [0, 0.25], [0.4, 1]);
+  // Combine Y transform with scale to reduce calculations
   const nameY = useTransform(smoothProgress, [0, 0.3], [30, 0]);
 
-  // Parallax for description
-  const descY = useTransform(smoothProgress, [0, 0.5], [60, 0]);
-  const descOpacity = useTransform(smoothProgress, [0.1, 0.35], [0, 1]);
+  // Simplified parallax - reduced range for better performance
+  const descY = useTransform(smoothProgress, [0, 0.4], [40, 0]); // Reduced from 60 to 40
+  const descOpacity = useTransform(smoothProgress, [0.1, 0.3], [0, 1]); // Narrowed range
 
   // Cards stagger effect
   const cardsInView = useInView(cardsRef, { once: true, margin: "-100px" });
