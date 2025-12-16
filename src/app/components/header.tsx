@@ -3,7 +3,6 @@
 import { useState, useEffect, useCallback, memo, useRef } from 'react';
 import Link from 'next/link';
 import { LiquidGlassGroup, LiquidGlassItem } from "@/components/ui/liquid-glass-group";
-import GlassSurface from "@/components/react-bits/GlassSurface/GlassSurface";
 import { Menu, X } from 'lucide-react';
 import { detectDeviceCapabilities, shouldDisableHeavyAnimations } from "@/lib/performance";
 
@@ -21,18 +20,18 @@ function Header() {
     let rafId: number | null = null;
     let lastScrollUpdate = 0;
     const scrollThrottle = 16; // ~60fps but batched with RAF
-    
+
     const handleScroll = () => {
       const now = performance.now();
       if (now - lastScrollUpdate < scrollThrottle) {
         return;
       }
       lastScrollUpdate = now;
-      
+
       if (rafId) {
         return; // Already queued
       }
-      
+
       rafId = requestAnimationFrame(() => {
         const currentScrollY = window.scrollY;
         const scrolledPastHero = currentScrollY > 50;
@@ -250,35 +249,36 @@ function Header() {
         }`}>
         <div className={`mx-auto transition-all duration-300 ease-in-out ${isScrolled ? 'w-4/5 md:w-4/5' : 'w-full'
           }`}>
-          <div className="relative">
-            <GlassSurface
-              width="114%"
-              height={52}
-              borderRadius={45}
-              backgroundOpacity={0.1}
-              saturation={1}
-              borderWidth={0.07}
-              brightness={50}
-              opacity={0.93}
-              blur={11}
-              displace={0.5}
-              distortionScale={-180}
-              redOffset={0}
-              greenOffset={10}
-              blueOffset={20}
-              className="absolute left-1/2 transform -translate-x-1/2"
+          <div className="relative h-[52px]">
+            {/* Lightweight CSS-only glass header */}
+            <div
+              className="absolute left-1/2 transform -translate-x-1/2 flex items-center justify-center overflow-hidden"
+              style={{
+                width: '114%',
+                height: '52px',
+                borderRadius: '45px',
+                background: 'rgba(255, 255, 255, 0.1)',
+                backdropFilter: 'blur(12px) saturate(1.2)',
+                WebkitBackdropFilter: 'blur(12px) saturate(1.2)',
+                border: '1px solid rgba(255, 255, 255, 0.15)',
+                boxShadow: `
+                  inset 0 1px 0 0 rgba(255, 255, 255, 0.15),
+                  inset 0 -1px 0 0 rgba(255, 255, 255, 0.05),
+                  0 4px 24px -4px rgba(0, 0, 0, 0.15)
+                `,
+              }}
             >
               <div className="flex items-center justify-between w-full h-full px-4">
                 <HeaderContent />
               </div>
-            </GlassSurface>
+            </div>
           </div>
         </div>
       </div>
 
       {/* Backdrop overlay - no blur */}
       {isMobileMenuOpen && (
-        <div 
+        <div
           className="fixed inset-0 bg-black/20 z-40 md:hidden"
           onClick={() => setIsMobileMenuOpen(false)}
         />
@@ -290,7 +290,7 @@ function Header() {
         className={`md:hidden absolute top-full left-0 right-0 z-50 ${isMobileMenuOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'
           }`}
       >
-        <div 
+        <div
           className="relative px-4 py-6"
           style={{
             transform: isMobileMenuOpen ? 'translate3d(0, 0, 0)' : 'translate3d(0, -16px, 0)',
@@ -303,7 +303,7 @@ function Header() {
             // Default to safe values (no blur) if device caps not detected yet
             if (!deviceCaps) {
               return (
-                <div 
+                <div
                   className="w-full rounded-[20px] px-4 py-6 space-y-4 text-center relative overflow-hidden"
                   style={{
                     background: isMobileMenuOpen ? 'rgba(0, 0, 0, 0.5)' : 'rgba(0, 0, 0, 0)',
@@ -340,15 +340,15 @@ function Header() {
                 </div>
               );
             }
-            
+
             const shouldDisableBlur = deviceCaps.isLowEndDevice || !deviceCaps.hasGPU || !deviceCaps.supportsWebGL;
             const isLowEnd = deviceCaps.isLowEndDevice;
             const isMobile = deviceCaps.isMobile;
-            
+
             // Determine blur amount: 0px (disabled), 8px (low-end), 12px (mobile), 16px (high-end)
             let blurAmount = 16;
             let saturation = 180;
-            
+
             if (shouldDisableBlur) {
               blurAmount = 0;
               saturation = 100;
@@ -359,12 +359,12 @@ function Header() {
               blurAmount = 12;
               saturation = 160;
             }
-            
+
             const blurValue = isMobileMenuOpen ? `blur(${blurAmount}px) saturate(${saturation}%)` : 'blur(0px) saturate(100%)';
             const bgOpacity = blurAmount === 0 ? (isMobileMenuOpen ? 0.5 : 0) : (isMobileMenuOpen ? 0.3 : 0);
-            
+
             return (
-              <div 
+              <div
                 className="w-full rounded-[20px] px-4 py-6 space-y-4 text-center relative overflow-hidden"
                 style={{
                   background: `rgba(0, 0, 0, ${bgOpacity})`,
@@ -372,7 +372,7 @@ function Header() {
                   WebkitBackdropFilter: blurValue,
                   border: isMobileMenuOpen ? '1px solid rgba(255, 255, 255, 0.1)' : '1px solid rgba(255, 255, 255, 0)',
                   boxShadow: isMobileMenuOpen ? '0 8px 32px 0 rgba(0, 0, 0, 0.37)' : '0 0px 0px 0 rgba(0, 0, 0, 0)',
-                  transition: blurAmount > 0 
+                  transition: blurAmount > 0
                     ? 'backdrop-filter 300ms cubic-bezier(0.4, 0, 0.2, 1), -webkit-backdrop-filter 300ms cubic-bezier(0.4, 0, 0.2, 1), background-color 300ms cubic-bezier(0.4, 0, 0.2, 1), border-color 300ms cubic-bezier(0.4, 0, 0.2, 1), box-shadow 300ms cubic-bezier(0.4, 0, 0.2, 1)'
                     : 'background-color 300ms cubic-bezier(0.4, 0, 0.2, 1), border-color 300ms cubic-bezier(0.4, 0, 0.2, 1), box-shadow 300ms cubic-bezier(0.4, 0, 0.2, 1)',
                   willChange: blurAmount > 0 ? 'backdrop-filter, background-color' : 'background-color',
