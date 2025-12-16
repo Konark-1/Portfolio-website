@@ -50,17 +50,20 @@ body {
   margin: 0;
   padding: 0;
   overflow-x: hidden;
-  -ms-overflow-style: none; /* IE & Edge */
+  -ms-overflow-style: none;
+  /* IE & Edge */
 }
 
 html {
   overflow-x: hidden;
   scroll-behavior: smooth;
-  scrollbar-width: none; /* Firefox */
+  scrollbar-width: none;
+  /* Firefox */
 }
 
 /* Performance optimizations for low-end devices */
 @media (prefers-reduced-motion: reduce) {
+
   *,
   *::before,
   *::after {
@@ -89,7 +92,8 @@ html {
 [data-smooth-cursor] {
   will-change: transform;
   contain: strict;
-  transform: translateZ(0); /* Force GPU acceleration */
+  transform: translateZ(0);
+  /* Force GPU acceleration */
 }
 
 /* Reduce backdrop-filter usage on low-end devices */
@@ -102,7 +106,8 @@ html {
 
 html::-webkit-scrollbar,
 body::-webkit-scrollbar {
-  display: none; /* Chrome, Safari, Opera */
+  display: none;
+  /* Chrome, Safari, Opera */
 }
 
 * {
@@ -116,9 +121,12 @@ body::-webkit-scrollbar {
 
 /* Animation for the pulsing effect */
 @keyframes pulse {
-  0%, 100% {
+
+  0%,
+  100% {
     opacity: 1;
   }
+
   50% {
     opacity: 0.5;
   }
@@ -126,7 +134,9 @@ body::-webkit-scrollbar {
 
 /* Animation for the ping effect */
 @keyframes ping {
-  75%, 100% {
+
+  75%,
+  100% {
     transform: scale(2);
     opacity: 0;
   }
@@ -227,6 +237,7 @@ body::-webkit-scrollbar {
   from {
     background-position: 0% 0%;
   }
+
   to {
     background-position: 0% -1000%;
   }
@@ -235,9 +246,9 @@ body::-webkit-scrollbar {
 /* Our implementation using the stock keyframes */
 .liquid-animated .liquid-bg {
   background: radial-gradient(1200px 600px at 10% 10%, rgba(0, 200, 255, 0.35), transparent 40%),
-              radial-gradient(1000px 500px at 80% 30%, rgba(180, 0, 255, 0.25), transparent 45%),
-              radial-gradient(1000px 500px at 20% 80%, rgba(255, 150, 0, 0.18), transparent 50%),
-              radial-gradient(1400px 700px at 60% 80%, rgba(255, 255, 255, 0.08), transparent 55%);
+    radial-gradient(1000px 500px at 80% 30%, rgba(180, 0, 255, 0.25), transparent 45%),
+    radial-gradient(1000px 500px at 20% 80%, rgba(255, 150, 0, 0.18), transparent 50%),
+    radial-gradient(1400px 700px at 60% 80%, rgba(255, 255, 255, 0.08), transparent 55%);
   width: 200%;
   height: 200%;
   background-size: 100% 1000%;
@@ -248,22 +259,22 @@ body::-webkit-scrollbar {
 .zoom-on-hover {
   transition: transform 220ms ease-out;
   will-change: transform;
-  transform: translateZ(0); /* Force hardware acceleration */
+  transform: translateZ(0);
+  /* Force hardware acceleration */
 }
+
 .zoom-on-hover:hover {
   transform: scale(1.12) translateZ(0);
 }
 
 /* Metallic Text Effect */
 .metallic-text {
-  background: linear-gradient(
-    135deg,
-    #c0c0c0 0%,
-    #ffffff 25%,
-    #e8e8e8 50%,
-    #ffffff 75%,
-    #c0c0c0 100%
-  );
+  background: linear-gradient(135deg,
+      #c0c0c0 0%,
+      #ffffff 25%,
+      #e8e8e8 50%,
+      #ffffff 75%,
+      #c0c0c0 100%);
   background-size: 200% 200%;
   background-clip: text;
   -webkit-background-clip: text;
@@ -276,9 +287,12 @@ body::-webkit-scrollbar {
 }
 
 @keyframes metallic-shine {
-  0%, 100% {
+
+  0%,
+  100% {
     background-position: 0% 50%;
   }
+
   50% {
     background-position: 100% 50%;
   }
@@ -286,17 +300,15 @@ body::-webkit-scrollbar {
 
 /* Enhanced Metallic Text with Chrome Effect */
 .chrome-text {
-  background: linear-gradient(
-    135deg,
-    #b8b8b8 0%,
-    #ffffff 15%,
-    #d4d4d4 30%,
-    #ffffff 45%,
-    #e8e8e8 60%,
-    #ffffff 75%,
-    #c0c0c0 90%,
-    #ffffff 100%
-  );
+  background: linear-gradient(135deg,
+      #b8b8b8 0%,
+      #ffffff 15%,
+      #d4d4d4 30%,
+      #ffffff 45%,
+      #e8e8e8 60%,
+      #ffffff 75%,
+      #c0c0c0 90%,
+      #ffffff 100%);
   background-size: 300% 300%;
   background-clip: text;
   -webkit-background-clip: text;
@@ -306,15 +318,20 @@ body::-webkit-scrollbar {
 }
 
 @keyframes chrome-shine {
-  0%, 100% {
+
+  0%,
+  100% {
     background-position: 0% 0%;
   }
+
   25% {
     background-position: 100% 0%;
   }
+
   50% {
     background-position: 100% 100%;
   }
+
   75% {
     background-position: 0% 100%;
   }
@@ -325,6 +342,7 @@ body::-webkit-scrollbar {
   0% {
     transform: translateX(-100%);
   }
+
   100% {
     transform: translateX(100%);
   }
@@ -337,20 +355,18 @@ body::-webkit-scrollbar {
 /* Authentic Metallic Paint Effect for Header Name */
 .metallic-paint-text {
   position: relative;
-  background: linear-gradient(
-    110deg,
-    #2a2a2a 0%,
-    #4a4a4a 10%,
-    #6a6a6a 20%,
-    #8a8a8a 30%,
-    #b0b0b0 40%,
-    #d0d0d0 50%,
-    #b0b0b0 60%,
-    #8a8a8a 70%,
-    #6a6a6a 80%,
-    #4a4a4a 90%,
-    #2a2a2a 100%
-  );
+  background: linear-gradient(110deg,
+      #2a2a2a 0%,
+      #4a4a4a 10%,
+      #6a6a6a 20%,
+      #8a8a8a 30%,
+      #b0b0b0 40%,
+      #d0d0d0 50%,
+      #b0b0b0 60%,
+      #8a8a8a 70%,
+      #6a6a6a 80%,
+      #4a4a4a 90%,
+      #2a2a2a 100%);
   /* Pattern Scale: 2 - Controls the size of the gradient pattern */
   background-size: 200% 100%;
   background-clip: text;
@@ -379,18 +395,16 @@ body::-webkit-scrollbar {
   right: 0;
   bottom: 0;
   /* Liquid: 0.29 - Subtle liquid metal flow effect */
-  background: linear-gradient(
-    90deg,
-    transparent 0%,
-    transparent 30%,
-    rgba(220, 220, 220, 0.1) 40%,
-    rgba(255, 255, 255, 0.15) 45%,
-    rgba(255, 255, 255, 0.29) 50%,
-    rgba(255, 255, 255, 0.15) 55%,
-    rgba(220, 220, 220, 0.1) 60%,
-    transparent 70%,
-    transparent 100%
-  );
+  background: linear-gradient(90deg,
+      transparent 0%,
+      transparent 30%,
+      rgba(220, 220, 220, 0.1) 40%,
+      rgba(255, 255, 255, 0.15) 45%,
+      rgba(255, 255, 255, 0.29) 50%,
+      rgba(255, 255, 255, 0.15) 55%,
+      rgba(220, 220, 220, 0.1) 60%,
+      transparent 70%,
+      transparent 100%);
   /* Speed: 0.3 - Liquid flow animation speed (converted to 3.33s duration) */
   animation: liquid-flow 3.33s ease-in-out infinite;
   pointer-events: none;
@@ -401,16 +415,20 @@ body::-webkit-scrollbar {
 }
 
 @keyframes metallic-paint-flow {
-  0%, 100% {
+
+  0%,
+  100% {
     background-position: 0% 50%;
     /* Pattern Blur: 0.011 - Subtle blur effect only */
     filter: blur(0.011px);
   }
+
   33% {
     /* Pattern Scale: 2 - Creates the flowing pattern movement */
     background-position: 100% 0%;
     filter: blur(0.011px);
   }
+
   66% {
     background-position: 0% 100%;
     filter: blur(0.011px);
@@ -422,17 +440,21 @@ body::-webkit-scrollbar {
     transform: translateX(-100%);
     opacity: 0;
   }
+
   25% {
     opacity: 0.05;
   }
+
   50% {
     transform: translateX(0%);
     /* Liquid: 0.29 - Subtle liquid flow visibility */
     opacity: 0.15;
   }
+
   75% {
     opacity: 0.05;
   }
+
   100% {
     transform: translateX(100%);
     opacity: 0;
@@ -609,8 +631,11 @@ body::-webkit-scrollbar {
 
 /* Mobile-specific optimizations */
 @media (max-width: 640px) {
+
   /* Improve touch targets */
-  button, a, [role="button"] {
+  button,
+  a,
+  [role="button"] {
     min-height: 44px;
     min-width: 44px;
   }
@@ -713,22 +738,35 @@ body::-webkit-scrollbar {
   --radius-xl: 1.5rem;
 
   /* Spacing scale (8px rhythm) */
-  --space-1: 0.5rem;   /* 8px */
-  --space-2: 1rem;     /* 16px */
-  --space-3: 1.5rem;   /* 24px */
-  --space-4: 2rem;     /* 32px */
-  --space-5: 3rem;     /* 48px */
-  --space-6: 4rem;     /* 64px */
-  --space-7: 6rem;     /* 96px */
-  --space-8: 8rem;     /* 128px */
+  --space-1: 0.5rem;
+  /* 8px */
+  --space-2: 1rem;
+  /* 16px */
+  --space-3: 1.5rem;
+  /* 24px */
+  --space-4: 2rem;
+  /* 32px */
+  --space-5: 3rem;
+  /* 48px */
+  --space-6: 4rem;
+  /* 64px */
+  --space-7: 6rem;
+  /* 96px */
+  --space-8: 8rem;
+  /* 128px */
 
   /* Typography scale */
-  --heading-1: 3.5rem;  /* 56px */
-  --heading-2: 2.25rem; /* 36px */
-  --heading-3: 1.5rem;  /* 24px */
-  --body: 1rem;         /* 16px */
+  --heading-1: 3.5rem;
+  /* 56px */
+  --heading-2: 2.25rem;
+  /* 36px */
+  --heading-3: 1.5rem;
+  /* 24px */
+  --body: 1rem;
+  /* 16px */
   --body-line-height: 1.6;
-  --small-text: 0.875rem; /* 14px */
+  --small-text: 0.875rem;
+  /* 14px */
   --tracking-tight: -0.02em;
 }
 
@@ -751,6 +789,7 @@ body::-webkit-scrollbar {
   * {
     @apply border-border outline-ring/50;
   }
+
   body {
     @apply bg-background text-foreground;
     font-family: var(--font-sans);
@@ -761,6 +800,7 @@ body::-webkit-scrollbar {
     font-feature-settings: "liga", "kern";
     text-rendering: optimizeLegibility;
   }
+
   h1,
   .heading-1 {
     font-family: var(--font-serif);
@@ -769,6 +809,7 @@ body::-webkit-scrollbar {
     letter-spacing: var(--tracking-tight);
     font-weight: 700;
   }
+
   h2,
   .heading-2 {
     font-family: var(--font-serif);
@@ -777,6 +818,7 @@ body::-webkit-scrollbar {
     letter-spacing: -0.005em;
     font-weight: 600;
   }
+
   h3,
   .heading-3 {
     font-family: var(--font-heading);
@@ -784,16 +826,19 @@ body::-webkit-scrollbar {
     line-height: 1.3;
     font-weight: 500;
   }
+
   p {
     font-size: var(--body);
     line-height: var(--body-line-height);
     color: var(--text-muted);
   }
+
   small,
   .text-small {
     font-size: var(--small-text);
     line-height: 1.45;
   }
+
   ::selection {
     background: var(--accent-cyan);
     color: #051026;
@@ -811,6 +856,7 @@ body::-webkit-scrollbar {
   0% {
     transform: translateX(0);
   }
+
   100% {
     transform: translateX(var(--scroll-distance, -1032px));
   }
@@ -819,5 +865,155 @@ body::-webkit-scrollbar {
 .certificate-scroll {
   animation: certificate-scroll var(--scroll-duration, 60s) linear infinite;
   will-change: transform;
-  transform: translateZ(0); /* GPU acceleration */
+  transform: translateZ(0);
+  /* GPU acceleration */
+}
+
+/* Sticky Dashboard Section Styles */
+.sticky-dashboard-container {
+  position: relative;
+}
+
+.tabs_height {
+  position: relative;
+}
+
+.tabs_sticky-wrapper {
+  height: 100vh;
+  position: sticky;
+  top: 0;
+  display: flex;
+  align-items: center;
+  padding: 2rem 0;
+}
+
+.tabs_component {
+  width: 100%;
+  height: 90vh;
+  display: grid;
+  grid-template-columns: 0.4fr 1fr;
+  gap: 2rem;
+}
+
+@media (max-width: 1024px) {
+  .tabs_component {
+    grid-template-columns: 1fr;
+    height: auto;
+    gap: 1.5rem;
+  }
+
+  .tabs_sticky-wrapper {
+    height: auto;
+    padding: 1rem 0;
+  }
+}
+
+.tabs_left {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  background-color: rgba(66, 66, 66, 0.3);
+  border-radius: 1.25rem;
+  padding: 1.5rem;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(8px);
+  overflow: hidden;
+}
+
+.tabs_left-top {
+  position: relative;
+  flex: 1;
+  overflow: hidden;
+}
+
+.tabs_let-content {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  padding: 0.5rem 0;
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 0.4s ease-out, transform 0.4s ease-out;
+  pointer-events: none;
+  overflow-y: auto;
+}
+
+.tabs_let-content.is-active {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+
+.tabs_line {
+  width: 100%;
+  height: 1px;
+  background: linear-gradient(to right, rgba(100, 255, 218, 0.3), transparent);
+  margin: 0.75rem 0;
+}
+
+.tabs_left-bottom {
+  padding-top: 1rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.tabs_right {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  border-radius: 1.25rem;
+  overflow: hidden;
+}
+
+@media (max-width: 1024px) {
+  .tabs_right {
+    aspect-ratio: 16/9;
+    height: auto;
+    min-height: 400px;
+  }
+}
+
+.tabs_video {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 0.4s ease-out, transform 0.4s ease-out;
+  pointer-events: none;
+}
+
+.tabs_video.is-active {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+
+/* Hide scrollbar in description area */
+.tabs_let-content::-webkit-scrollbar {
+  display: none;
+}
+
+.tabs_let-content {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* GSAP Stacked Cards Styles */
+.c-card {
+  position: relative;
+  transform-origin: center top;
+  will-change: transform, opacity;
+}
+
+.c-card:last-child {
+  margin-bottom: 0;
+}
+
+/* Ensure proper stacking during GSAP animations */
+.c-card[style*="position: fixed"] {
+  transform-style: preserve-3d;
+  backface-visibility: hidden;
 }

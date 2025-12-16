@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect, useDeferredValue, useTransition, useCallback } from "react";
-import GlassSurface from "@/components/react-bits/GlassSurface/GlassSurface";
+import GlassButton from "@/components/ui/GlassButton";
 import { motion, useReducedMotion, useScroll, useTransform, useSpring, useInView } from "framer-motion";
 import { Card, CardContent } from "@/components/ui/card";
 import {
@@ -32,9 +32,9 @@ const Silk = dynamic(
   }
 );
 
-// Dynamically import CertificateCarousel (below the fold - lazy load)
-const CertificateCarousel = dynamic(
-  () => import("@/components/ui/certificate-carousel").then(mod => ({ default: mod.CertificateCarousel })),
+// Dynamically import StackedCardCertificates (below the fold - lazy load)
+const StackedCardCertificates = dynamic(
+  () => import("@/components/ui/stacked-card-certificates").then(mod => ({ default: mod.StackedCardCertificates })),
   {
     ssr: true, // SSR for SEO, but lazy loaded
     loading: () => (
@@ -59,10 +59,10 @@ export default function HomePage() {
   const [formErrors, setFormErrors] = useState<{ name?: string; email?: string; message?: string }>({});
   const [isMounted, setIsMounted] = useState(false);
   const [isPending, startTransition] = useTransition();
-  
+
   // Use deferred value for form data to reduce input lag
   const deferredFormData = useDeferredValue(formData);
-  
+
   // Debounce timer ref for error clearing
   const errorClearTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
@@ -74,15 +74,15 @@ export default function HomePage() {
   const handleInputChange = useCallback((e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { id, value } = e.target;
     const fieldName = id.replace("contact-", "") as keyof typeof formErrors;
-    
+
     // Update form data immediately for responsive UI
     setFormData((prev) => ({ ...prev, [fieldName]: value }));
-    
+
     // Debounce error clearing to reduce state updates
     if (errorClearTimeoutRef.current) {
       clearTimeout(errorClearTimeoutRef.current);
     }
-    
+
     if (formErrors[fieldName]) {
       errorClearTimeoutRef.current = setTimeout(() => {
         startTransition(() => {
@@ -203,7 +203,7 @@ export default function HomePage() {
 
   const experienceTimeline = [
     {
-      title: "Certified Data Analyst Trainee",
+      title: "Certified Data Analyst",
       company: "Ducat, Noida",
       duration: "Jul 2024 – Nov 2025",
       summary:
@@ -227,7 +227,7 @@ export default function HomePage() {
       skillTags: ["Data Integrity", "SLA Management", "Healthcare Ops"],
     },
     {
-      title: "Marketing & Sales Trainee",
+      title: "Marketing & Sales",
       company: "IFortis Corporate",
       duration: "May 2021 – Jul 2021",
       summary:
@@ -362,127 +362,110 @@ export default function HomePage() {
     <main className="relative min-h-screen bg-gradient-to-br from-gray-900 via-black to-gray-800">
       {/* Connection warming handled via preconnect/dns-prefetch in layout */}
 
-      {/* Hero section */}
-      <div className="relative min-h-screen overflow-hidden bg-gradient-to-br from-gray-900 via-black to-gray-800">
-        {/* Silk Background */}
-        {!shouldReduceMotion && (
-          <div className="absolute inset-0 z-0">
-            <Silk
-              speed={7.5}
-              scale={1}
-              color="#27CBCE"
-              noiseIntensity={5.9}
-              rotation={0}
-            />
-          </div>
-        )}
-
-        {/* Subtle gradient overlay for text readability (lighter) */}
-        <div className="absolute inset-0 z-[1] bg-gradient-to-b from-transparent via-transparent to-gray-900/20 pointer-events-none" />
-
-        {/* Content container with proper spacing from header */}
-        <div className="relative z-10 flex flex-col items-center justify-center min-h-[85vh] pt-20 sm:pt-24 lg:pt-28 px-4 sm:px-6">
-          {/* Main heading */}
-          <div className="text-center max-w-6xl mx-auto space-y-6">
-            <h1 className="font-serif text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-bold tracking-tight leading-[1.1] text-white">
-              Data Analyst & Business Intelligence Specialist
-            </h1>
-            <p className="max-w-3xl mx-auto text-base sm:text-lg md:text-xl leading-relaxed text-white/80 font-sans">
-              I find the signal in the noise. Transforming complex data into actionable business intelligence.
-            </p>
-          </div>
-
-          {/* Action buttons */}
-          <div className="mt-12 sm:mt-16 flex flex-col sm:flex-row justify-center items-center gap-4 w-full max-w-lg mx-auto">
-            <div
-              className="cursor-pointer hover:scale-105 transition-all duration-300 hover:shadow-lg pointer-events-auto group w-[85%] sm:w-auto"
-              onClick={(e) => {
-                e.preventDefault();
-                const element = document.getElementById('about');
-                if (element) {
-                  const headerHeight = 115;
-                  const elementPosition = element.offsetTop - headerHeight;
-                  // Use requestAnimationFrame for smoother scroll
-                  requestAnimationFrame(() => {
-                    window.scrollTo({
-                      top: elementPosition,
-                      behavior: 'smooth'
-                    });
-                  });
-                }
-              }}
-            >
-              <GlassSurface
-                width="100%"
-                height={55}
-                borderRadius={50}
-                backgroundOpacity={0.1}
-                saturation={1}
-                borderWidth={0.07}
-                brightness={50}
-                opacity={0.93}
-                blur={11}
-                displace={0.5}
-                distortionScale={-180}
-                redOffset={0}
-                greenOffset={10}
-                blueOffset={20}
-                disableShadow
-              >
-                <button className="px-6 sm:px-8 py-3 text-text-primary font-semibold w-full h-full text-sm sm:text-base tracking-wide flex items-center justify-center gap-2 font-sans">
-                  Get Started
-                </button>
-              </GlassSurface>
+      {/* Sticky Full-Page Slides Container - Hero slides under About */}
+      <div className="relative" style={{ height: '200vh' }}>
+        {/* Hero section - First Sticky Slide */}
+        <div className="sticky top-0 h-screen overflow-hidden bg-gradient-to-br from-gray-900 via-black to-gray-800 z-0">
+          {/* Silk Background */}
+          {!shouldReduceMotion && (
+            <div className="absolute inset-0 z-0">
+              <Silk
+                speed={7.5}
+                scale={1}
+                color="#27CBCE"
+                noiseIntensity={5.9}
+                rotation={0}
+              />
             </div>
-            <div
-              className="w-[85%] sm:w-auto cursor-pointer hover:scale-105 transition-all duration-300 hover:shadow-lg pointer-events-auto group"
-              onClick={(e) => {
-                e.preventDefault();
-                const element = document.getElementById('projects');
-                if (element) {
-                  const headerHeight = 115;
-                  const elementPosition = element.offsetTop - headerHeight;
-                  // Use requestAnimationFrame for smoother scroll
-                  requestAnimationFrame(() => {
-                    window.scrollTo({
-                      top: elementPosition,
-                      behavior: 'smooth'
+          )}
+
+          {/* Subtle gradient overlay for text readability (lighter) */}
+          <div className="absolute inset-0 z-[1] bg-gradient-to-b from-transparent via-transparent to-gray-900/20 pointer-events-none" />
+
+          {/* Content container with proper spacing from header */}
+          <div className="relative z-10 flex flex-col items-center justify-center min-h-[85vh] pt-20 sm:pt-24 lg:pt-28 px-4 sm:px-6">
+            {/* Main heading */}
+            <div className="text-center max-w-6xl mx-auto space-y-6">
+              <h1 className="font-serif text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-bold tracking-tight leading-[1.1] text-white">
+                Data Analyst & Business Intelligence Specialist
+              </h1>
+              <p className="max-w-3xl mx-auto text-base sm:text-lg md:text-xl leading-relaxed text-white/80 font-sans">
+                I find the signal in the noise. Transforming complex data into actionable business intelligence.
+              </p>
+            </div>
+
+            {/* Action buttons */}
+            <div className="mt-12 sm:mt-16 flex flex-col sm:flex-row justify-center items-center gap-4 w-full max-w-lg mx-auto">
+              <div
+                className="cursor-pointer hover:scale-105 transition-all duration-300 hover:shadow-lg pointer-events-auto group w-[85%] sm:w-auto"
+                onClick={(e) => {
+                  e.preventDefault();
+                  const element = document.getElementById('about');
+                  if (element) {
+                    const headerHeight = 115;
+                    const elementPosition = element.offsetTop - headerHeight;
+                    // Use requestAnimationFrame for smoother scroll
+                    requestAnimationFrame(() => {
+                      window.scrollTo({
+                        top: elementPosition,
+                        behavior: 'smooth'
+                      });
                     });
-                  });
-                } else {
-                  // Fallback: navigate if section not found
-                  window.location.href = '/portfolio';
-                }
-              }}
-            >
-              <GlassSurface
-                width="100%"
-                height={55}
-                borderRadius={50}
-                backgroundOpacity={0.1}
-                saturation={1}
-                borderWidth={0.07}
-                brightness={50}
-                opacity={0.93}
-                blur={11}
-                displace={0.5}
-                distortionScale={-180}
-                redOffset={0}
-                greenOffset={10}
-                blueOffset={20}
-                disableShadow
+                  }
+                }}
               >
-                <span className="px-6 sm:px-8 py-3 text-text-primary font-medium w-full h-full text-sm sm:text-base tracking-wide flex items-center justify-center gap-2 font-sans">
-                  MY PORTFOLIO
-                </span>
-              </GlassSurface>
+                <GlassButton
+                  width="100%"
+                  height={55}
+                  borderRadius={50}
+                  backgroundOpacity={0.1}
+                  blur={12}
+                >
+                  <button className="px-6 sm:px-8 py-3 text-text-primary font-semibold w-full h-full text-sm sm:text-base tracking-wide flex items-center justify-center gap-2 font-sans">
+                    Get Started
+                  </button>
+                </GlassButton>
+              </div>
+              <div
+                className="w-[85%] sm:w-auto cursor-pointer hover:scale-105 transition-all duration-300 hover:shadow-lg pointer-events-auto group"
+                onClick={(e) => {
+                  e.preventDefault();
+                  const element = document.getElementById('projects');
+                  if (element) {
+                    const headerHeight = 115;
+                    const elementPosition = element.offsetTop - headerHeight;
+                    // Use requestAnimationFrame for smoother scroll
+                    requestAnimationFrame(() => {
+                      window.scrollTo({
+                        top: elementPosition,
+                        behavior: 'smooth'
+                      });
+                    });
+                  } else {
+                    // Fallback: navigate if section not found
+                    window.location.href = '/portfolio';
+                  }
+                }}
+              >
+                <GlassButton
+                  width="100%"
+                  height={55}
+                  borderRadius={50}
+                  backgroundOpacity={0.1}
+                  blur={12}
+                >
+                  <span className="px-6 sm:px-8 py-3 text-text-primary font-medium w-full h-full text-sm sm:text-base tracking-wide flex items-center justify-center gap-2 font-sans">
+                    MY PORTFOLIO
+                  </span>
+                </GlassButton>
+              </div>
             </div>
           </div>
         </div>
-      </div>
 
-      {/* About Section - Dynamic Scroll Animations */}
-      <AboutSection shouldReduceMotion={shouldReduceMotion} />
+        {/* About Section - Second Sticky Slide (Covers Hero) */}
+        <AboutSection shouldReduceMotion={shouldReduceMotion} />
+      </div>
 
       {/* Skills / Technical Expertise Section */}
       <section id="skills" className="relative z-10 bg-slate-950 text-foreground border-t border-border">
@@ -609,7 +592,7 @@ export default function HomePage() {
 
       {/* Projects Section - Premium minimalist redesign */}
       <section id="projects" className="relative py-24 sm:py-32 lg:py-40 px-4 sm:px-6 overflow-hidden border-t border-border">
-        <div className={`absolute inset-0 bg-[radial-gradient(circle_at_top,#22d3ee1a,transparent_45%)] ${shouldReduceMotion ? 'blur-xl' : 'blur-3xl'} pointer-events-none`} />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,#22d3ee1a,transparent_45%)] blur-3xl pointer-events-none" />
         <div className="absolute inset-0 bg-gradient-to-b from-transparent via-background/80 to-background pointer-events-none" />
 
         <div className="max-w-7xl mx-auto relative z-10 space-y-20">
@@ -642,117 +625,83 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Certificates Section */}
-      <section id="certificates" className="relative z-10 bg-gradient-to-b from-gray-900 via-black to-gray-900 text-white py-24 sm:py-32 lg:py-40 overflow-hidden">
-        {/* Background effects */}
-        <div className="absolute inset-0 pointer-events-none">
-          <div className="absolute top-0 left-1/4 h-[500px] w-[500px] -translate-x-1/2 rounded-full bg-cyan-500/10 blur-[120px]" />
-          <div className="absolute bottom-0 right-1/4 h-[400px] w-[400px] rounded-full bg-blue-500/10 blur-[100px]" />
-        </div>
-
-        {/* Section Header */}
-        <div className="relative z-10 mb-16">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6 }}
-            className="text-center max-w-7xl mx-auto px-4 sm:px-6 lg:px-8"
-          >
-            <BlurText
-              className="text-xs tracking-[0.4em] uppercase text-text-muted mb-4 font-sans"
-              delay={0}
-            >
-              Credentials & Achievements
-            </BlurText>
-            <h2 className="font-serif text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold bg-gradient-to-r from-cyan-400 via-blue-400 to-purple-400 bg-clip-text text-transparent mb-6 tracking-tight leading-tight">
-              Professional Certificates
-            </h2>
-            <p className="max-w-3xl mx-auto text-base sm:text-lg text-text-muted leading-relaxed font-sans">
-              Validated expertise in data analytics, business intelligence, and advanced Power BI techniques through industry-recognized certifications.
-            </p>
-          </motion.div>
-        </div>
-
-        {/* Certificate Carousel */}
-        <CertificateCarousel
-          certificates={[
-            {
-              title: "Data Analyst Professional",
-              description: "Professional certification validating core data analysis skills and methodologies.",
-              filePath: "/Certificates/Data Analyst-Certificate Data Analyst.pdf",
-              imagePath: "/Certificates/Data Analyst-Certificate Data Analyst-1.png",
-              issuer: "OneRoadMap",
-              date: "2024",
-              skills: ["Data Analysis", "SQL", "Python", "Visualization"],
-            },
-            {
-              title: "Professional Training Certificate",
-              description: "Comprehensive training program in data analytics and business intelligence tools.",
-              filePath: "/Certificates/Konark Parihar ducat certificate.pdf",
-              imagePath: "/Certificates/Konark Parihar ducat certificate.png",
-              issuer: "DUCAT",
-              date: "2024",
-              skills: ["Data Analytics", "BI Tools", "Business Intelligence"],
-            },
-            {
-              title: "Excel Specialist",
-              description: "Advanced proficiency in Microsoft Excel for complex data management and analysis.",
-              filePath: "/Certificates/Excel certificate.pdf",
-              imagePath: "/Certificates/Excel certificate-1.png",
-              issuer: "OneRoadMap",
-              date: "2024",
-              skills: ["Advanced Excel", "Data Management", "Pivot Tables"],
-            },
-            {
-              title: "Create Visual Calculation",
-              description: "Advanced Power BI visual calculations and DAX formulations for dynamic reporting.",
-              filePath: "/Certificates/Create Visual Calculation.pdf",
-              imagePath: "/Certificates/Create Visual Calculation.png",
-              issuer: "Microsoft",
-              date: "2024",
-              skills: ["Power BI", "DAX", "Visual Calculations"],
-            },
-            {
-              title: "Python for Data Science",
-              description: "Certification in Python programming for data analysis, manipulation, and visualization.",
-              filePath: "/Certificates/Python.pdf",
-              imagePath: "/Certificates/Python.png",
-              issuer: "OneRoadMap",
-              date: "2024",
-              skills: ["Python", "Pandas", "NumPy", "Data Visualization"],
-            },
-            {
-              title: "DAX Time Intelligence",
-              description: "Mastering time-based calculations and analysis using DAX functions in Power BI.",
-              filePath: "/Certificates/Dax time Intelligence.pdf",
-              imagePath: "/Certificates/Dax time Intelligence.png",
-              issuer: "Microsoft",
-              date: "2024",
-              skills: ["Power BI", "DAX", "Time Intelligence"],
-            },
-            {
-              title: "SQL Advanced",
-              description: "Advanced SQL query writing, database management, and performance optimization.",
-              filePath: "/Certificates/sql certificate.pdf",
-              imagePath: "/Certificates/sql certificate-1.png",
-              issuer: "OneRoadMap",
-              date: "2024",
-              skills: ["SQL", "Database Management", "Query Optimization"],
-            },
-            {
-              title: "End to End Analytics",
-              description: "Complete data analytics workflow from data extraction to visualization and insights.",
-              filePath: "/Certificates/end to end analytics.pdf",
-              imagePath: "/Certificates/end to end analytics.png",
-              issuer: "Microsoft",
-              date: "2024",
-              skills: ["Data Workflow", "ETL", "Visualization", "Insights"],
-            },
-          ]}
-        />
-
-      </section>
+      {/* Certificates Section - GSAP Stacked Cards */}
+      <StackedCardCertificates
+        certificates={[
+          {
+            title: "Professional Training Certificate",
+            description: "Comprehensive training program in data analytics and business intelligence tools.",
+            filePath: "/Certificates/Konark Parihar ducat certificate.pdf",
+            imagePath: "/Certificates/Konark Parihar ducat certificate.webp",
+            issuer: "DUCAT",
+            date: "2025",
+            skills: ["Data Analytics", "BI Tools", "Business Intelligence"],
+          },
+          {
+            title: "Data Analyst Professional",
+            description: "Professional certification validating core data analysis skills and methodologies.",
+            filePath: "/Certificates/Data Analyst-Certificate Data Analyst.pdf",
+            imagePath: "/Certificates/Data Analyst-Certificate Data Analyst.webp",
+            issuer: "OneRoadMap",
+            date: "2025",
+            skills: ["Data Analysis", "SQL", "Python", "Visualization"],
+          },
+          {
+            title: "Excel Specialist",
+            description: "Advanced proficiency in Microsoft Excel for complex data management and analysis.",
+            filePath: "/Certificates/Excel certificate.pdf",
+            imagePath: "/Certificates/Excel certificate.webp",
+            issuer: "OneRoadMap",
+            date: "2025",
+            skills: ["Advanced Excel", "Data Management", "Pivot Tables"],
+          },
+          {
+            title: "Create Visual Calculation",
+            description: "Advanced Power BI visual calculations and DAX formulations for dynamic reporting.",
+            filePath: "/Certificates/Create Visual Calculation.pdf",
+            imagePath: "/Certificates/Create Visual Calculation.webp",
+            issuer: "Microsoft",
+            date: "2025",
+            skills: ["Power BI", "DAX", "Visual Calculations"],
+          },
+          {
+            title: "Python for Data Science",
+            description: "Certification in Python programming for data analysis, manipulation, and visualization.",
+            filePath: "/Certificates/Python.pdf",
+            imagePath: "/Certificates/Python.webp",
+            issuer: "OneRoadMap",
+            date: "2025",
+            skills: ["Python", "Pandas", "NumPy", "Data Visualization"],
+          },
+          {
+            title: "DAX Time Intelligence",
+            description: "Mastering time-based calculations and analysis using DAX functions in Power BI.",
+            filePath: "/Certificates/Dax time Intelligence.pdf",
+            imagePath: "/Certificates/Dax time Intelligence.webp",
+            issuer: "Microsoft",
+            date: "2025",
+            skills: ["Power BI", "DAX", "Time Intelligence"],
+          },
+          {
+            title: "SQL Advanced",
+            description: "Advanced SQL query writing, database management, and performance optimization.",
+            filePath: "/Certificates/sql certificate.pdf",
+            imagePath: "/Certificates/sql certificate.webp",
+            issuer: "OneRoadMap",
+            date: "2025",
+            skills: ["SQL", "Database Management", "Query Optimization"],
+          },
+          {
+            title: "End to End Analytics",
+            description: "Complete data analytics workflow from data extraction to visualization and insights.",
+            filePath: "/Certificates/end to end analytics.pdf",
+            imagePath: "/Certificates/end to end analytics.webp",
+            issuer: "Microsoft",
+            date: "2025",
+            skills: ["Data Workflow", "ETL", "Visualization", "Insights"],
+          },
+        ]}
+      />
 
       {/* Contact Section */}
       <section id="contact" className="relative z-10 bg-slate-950 text-foreground border-t border-border">
@@ -1249,7 +1198,7 @@ function AboutSection({ shouldReduceMotion }: AboutSectionProps) {
   });
 
   // Smooth spring-based transforms - optimized for better INP performance
-  const smoothProgress = useSpring(scrollYProgress, { 
+  const smoothProgress = useSpring(scrollYProgress, {
     stiffness: 80, // Reduced from 100 for smoother, less frequent updates
     damping: 35, // Increased from 30 for better stability
     restDelta: 0.02 // Increased from 0.01 to further reduce calculations
@@ -1296,10 +1245,10 @@ function AboutSection({ shouldReduceMotion }: AboutSectionProps) {
     <section
       ref={sectionRef}
       id="about"
-      className="sticky top-0 z-0 min-h-screen flex items-center justify-center px-4 sm:px-6 lg:px-8 py-20 sm:py-28 lg:py-32 overflow-hidden"
+      className="sticky top-0 z-10 h-screen flex items-center justify-center px-4 sm:px-6 lg:px-8 py-20 sm:py-28 lg:py-32 overflow-hidden bg-[#0A192F]"
     >
-      {/* Gradient transition from hero */}
-      <div className="absolute inset-0 bg-gradient-to-b from-[#0A192F]/0 via-[#0A192F]/60 to-[#0A192F]" />
+      {/* Solid background to cover hero section */}
+      <div className="absolute inset-0 bg-[#0A192F]" />
 
       {/* Subtle ambient glow - monochromatic */}
       <div className="pointer-events-none absolute inset-0">
