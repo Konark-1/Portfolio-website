@@ -52,23 +52,26 @@ export function StackedCardCertificates({ certificates }: StackedCardCertificate
 
             // Iterate over each card
             cards.forEach((card, index) => {
+                const isLastCard = index === lastCardIndex;
                 // Last card doesn't scale down
-                const targetScale = index === lastCardIndex ? 1 : 0.85 + (0.15 * (index / lastCardIndex));
+                const targetScale = isLastCard ? 1 : 0.85 + (0.15 * (index / lastCardIndex));
 
                 const scaleDown = gsap.to(card, {
                     scale: targetScale,
-                    opacity: index === lastCardIndex ? 1 : 0.6,
+                    opacity: isLastCard ? 1 : 0.6,
                     ease: "none",
                 });
 
                 ScrollTrigger.create({
                     trigger: card,
-                    start: "top 20px", // Account for header
-                    end: () => lastCardST.start,
+                    start: "center center", // Center the cards in viewport
+                    // Last card stays pinned 80% longer for overlay effect with next section
+                    end: isLastCard ? "+=80vh" : () => lastCardST.start,
                     pin: true,
-                    pinSpacing: false,
+                    pinSpacing: isLastCard, // Only last card creates pin spacing for overlay effect
+                    anticipatePin: 1, // Smooth pin transition to prevent flickering
                     scrub: 0.5,
-                    animation: scaleDown,
+                    animation: isLastCard ? undefined : scaleDown, // Last card doesn't animate
                     toggleActions: "restart none none reverse",
                 });
             });
@@ -116,13 +119,13 @@ export function StackedCardCertificates({ certificates }: StackedCardCertificate
             </div>
 
             {/* Stacked Cards Container */}
-            <div ref={cardsContainerRef} className="relative z-10 px-4 sm:px-6 lg:px-8">
+            <div ref={cardsContainerRef} className="relative z-10 px-4 sm:px-6 lg:px-8 pb-8">
                 <div className="max-w-4xl mx-auto flex flex-col items-center">
                     {certificates.map((cert, index) => (
                         <div
                             key={`${cert.title}-${index}`}
                             ref={(el) => { cardRefs.current[index] = el; }}
-                            className="c-card mb-8 w-full max-w-[90vw] sm:max-w-none"
+                            className={`c-card w-full max-w-[90vw] sm:max-w-none ${index === certificates.length - 1 ? '' : 'mb-8'}`}
                             style={{ zIndex: index + 1 }}
                         >
                             <CertificateStackedCard certificate={cert} index={index} />
@@ -130,9 +133,6 @@ export function StackedCardCertificates({ certificates }: StackedCardCertificate
                     ))}
                 </div>
             </div>
-
-            {/* Spacer for scroll space after last card */}
-            <div className="spacer" style={{ height: "5vh" }} />
         </section>
     );
 }
