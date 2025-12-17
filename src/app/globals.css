@@ -713,22 +713,49 @@ body::-webkit-scrollbar {
   --font-heading: var(--font-serif, "Playfair Display", "Georgia", serif);
   --font-mono: var(--font-geist-mono);
 
-  /* Brand palette */
-  --background: #0A192F;
-  --surface: #0D2241;
-  --surface-elevated: #132A52;
+  /* Enhanced Premium Dark + Turquoise Theme */
+  /* Base Background Colors */
+  --background: #0A0E1A;
+  --background-hero: #0F1419;
+  --background-about: #0A0E1A;
+  --background-skills: #0F1419;
+  --background-experience: #0A0E1A;
+  --background-projects: #0A0E1A;
+  --background-contact: #0F1419;
+  
+  /* Surface Colors with Turquoise Tint */
+  --surface: rgba(15, 20, 25, 0.8);
+  --surface-elevated: rgba(20, 27, 38, 0.9);
+  --surface-glow: rgba(39, 203, 206, 0.08);
+  
+  /* Text Colors */
   --foreground: #E6F1FF;
   --text-primary: #E6F1FF;
   --text-muted: #8892B0;
   --text-subtle: rgba(230, 241, 255, 0.65);
-  --accent-cyan: #64FFDA;
+  
+  /* Turquoise Accent System */
+  --accent-turquoise: #27CBCE;
+  --accent-cyan: #27CBCE;  /* Primary turquoise (matches hero) */
+  --accent-cyan-secondary: #20B2AA;
   --accent-bright: #00D9FF;
+  --accent-glow: #64FFDA;
+  
+  /* Highlight */
   --highlight: #FFA726;
-  --border-color: rgba(255, 255, 255, 0.08);
-  --card: rgba(255, 255, 255, 0.04);
+  
+  /* Border System with Turquoise Tint */
+  --border-color: rgba(39, 203, 206, 0.12);
+  --border-hover: rgba(39, 203, 206, 0.25);
+  --border-glow: rgba(39, 203, 206, 0.4);
+  
+  /* Card Colors */
+  --card: rgba(39, 203, 206, 0.05);
   --card-foreground: #F4FBFF;
-  --overlay-soft: rgba(10, 25, 47, 0.65);
-  --overlay-strong: rgba(6, 15, 30, 0.9);
+  
+  /* Overlays */
+  --overlay-soft: rgba(10, 14, 26, 0.65);
+  --overlay-strong: rgba(5, 8, 16, 0.9);
 
   /* Radii */
   --radius: 0.9rem;
@@ -771,18 +798,27 @@ body::-webkit-scrollbar {
 }
 
 .dark {
-  --background: #050B16;
-  --surface: #0C1A32;
-  --surface-elevated: #101F3A;
+  --background: #050810;
+  --background-hero: #0A0E1A;
+  --background-about: #050810;
+  --background-skills: #0A0E1A;
+  --background-experience: #050810;
+  --background-projects: #050810;
+  --background-contact: #0A0E1A;
+  --surface: rgba(10, 14, 26, 0.8);
+  --surface-elevated: rgba(15, 20, 30, 0.9);
+  --surface-glow: rgba(39, 203, 206, 0.1);
   --foreground: #E6F1FF;
   --text-primary: #F4FBFF;
   --text-muted: #93A1C3;
   --text-subtle: rgba(244, 251, 255, 0.65);
-  --border-color: rgba(255, 255, 255, 0.07);
-  --card: rgba(255, 255, 255, 0.04);
+  --border-color: rgba(39, 203, 206, 0.1);
+  --border-hover: rgba(39, 203, 206, 0.2);
+  --border-glow: rgba(39, 203, 206, 0.35);
+  --card: rgba(39, 203, 206, 0.04);
   --card-foreground: #F4FBFF;
-  --overlay-soft: rgba(5, 11, 22, 0.7);
-  --overlay-strong: rgba(5, 11, 22, 0.92);
+  --overlay-soft: rgba(5, 8, 16, 0.7);
+  --overlay-strong: rgba(5, 8, 16, 0.92);
 }
 
 @layer base {
