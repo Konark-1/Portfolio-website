@@ -66,29 +66,43 @@ export default function AboutSection({ shouldReduceMotion }: AboutSectionProps):
         <section
             ref={sectionRef}
             id="about"
-            className="sticky top-0 z-10 h-screen flex items-center justify-center px-4 sm:px-6 lg:px-8 py-20 sm:py-28 lg:py-32 overflow-hidden"
-            style={{ backgroundColor: 'var(--background-about)' }}
+            className="sticky top-0 z-10 min-h-screen flex items-center justify-center px-4 sm:px-6 lg:px-8 py-24 sm:py-32 lg:py-40"
+            style={{
+                backgroundColor: 'var(--background-about)',
+                willChange: 'transform', // GPU hint for smoother sticky
+                transform: 'translateZ(0)' // Force GPU layer
+            }}
         >
             {/* Solid background to cover hero section */}
             <div className="absolute inset-0" style={{ backgroundColor: 'var(--background-about)' }} />
 
-            {/* Enhanced turquoise ambient glow */}
-            <div className="pointer-events-none absolute inset-0">
+            {/* Top shadow for smooth overlay transition effect */}
+            <div
+                className="absolute top-0 left-0 right-0 h-32 sm:h-24 pointer-events-none z-[1]"
+                style={{
+                    background: 'linear-gradient(to bottom, rgba(0,0,0,0.4) 0%, rgba(0,0,0,0.15) 40%, transparent 100%)',
+                    boxShadow: '0 -20px 60px 20px rgba(0,0,0,0.5)'
+                }}
+            />
+
+            {/* Enhanced turquoise ambient glow - uses CSS containment for performance */}
+            <div className="pointer-events-none absolute inset-0" style={{ contain: 'paint' }}>
                 <motion.div
                     className="absolute top-0 left-1/2 -translate-x-1/2 h-[600px] w-[800px] rounded-full"
                     style={{
                         opacity: smoothProgress,
                         background: 'radial-gradient(circle, rgba(39,203,206,0.15) 0%, transparent 70%)',
-                        filter: 'blur(250px)'
+                        filter: 'blur(200px)', // Slightly reduced blur for better performance
+                        willChange: 'opacity'
                     }}
                 />
             </div>
 
             <div className="max-w-5xl mx-auto w-full relative z-10">
                 {/* Header with Dynamic Scaling */}
-                <div className="text-center mb-20">
+                <div className="text-center mb-12 sm:mb-16 lg:mb-20">
                     <motion.p
-                        className="text-xs tracking-[0.5em] uppercase text-text-muted font-sans mb-6"
+                        className="text-xs tracking-[0.5em] uppercase text-text-muted font-sans mb-4 sm:mb-6"
                         initial={{ opacity: 0, y: 20 }}
                         whileInView={{ opacity: 1, y: 0 }}
                         viewport={{ once: true }}
@@ -100,7 +114,7 @@ export default function AboutSection({ shouldReduceMotion }: AboutSectionProps):
                     {/* Dynamic Scaling Name */}
                     <motion.h1
                         ref={nameRef}
-                        className="font-serif text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-bold text-white leading-[1.1] mb-8 origin-center whitespace-nowrap"
+                        className="font-serif text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-bold text-white leading-[1.1] mb-6 sm:mb-8 origin-center px-2"
                         style={shouldReduceMotion ? {} : {
                             scale: nameScale,
                             opacity: nameOpacity,
@@ -112,7 +126,7 @@ export default function AboutSection({ shouldReduceMotion }: AboutSectionProps):
 
                     {/* Parallax Description */}
                     <motion.p
-                        className="text-lg sm:text-xl text-text-muted font-sans max-w-2xl mx-auto leading-relaxed"
+                        className="text-base sm:text-lg md:text-xl text-text-muted font-sans max-w-2xl mx-auto leading-relaxed px-2"
                         style={shouldReduceMotion ? {} : { y: descY, opacity: descOpacity }}
                     >
                         Data Analyst specializing in{" "}
@@ -124,7 +138,7 @@ export default function AboutSection({ shouldReduceMotion }: AboutSectionProps):
                 </div>
 
                 {/* Key Capabilities - Staggered Slide In */}
-                <div ref={cardsRef} className="mb-20">
+                <div ref={cardsRef} className="mb-12 sm:mb-16 lg:mb-20">
                     <div className="grid grid-cols-1 lg:grid-cols-3 gap-px rounded-2xl overflow-hidden" style={{ backgroundColor: 'rgba(39, 203, 206, 0.08)' }}>
                         {capabilities.map(({ num, title, subtitle, desc }, index) => (
                             <motion.div

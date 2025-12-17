@@ -49,13 +49,15 @@
 body {
   margin: 0;
   padding: 0;
-  overflow-x: hidden;
+  overflow-x: clip;
+  /* Use clip instead of hidden to preserve sticky positioning */
   -ms-overflow-style: none;
   /* IE & Edge */
 }
 
 html {
-  overflow-x: hidden;
+  overflow-x: clip;
+  /* Use clip instead of hidden to preserve sticky positioning */
   scroll-behavior: smooth;
   scrollbar-width: none;
   /* Firefox */
@@ -690,6 +692,40 @@ body::-webkit-scrollbar {
     animation: none !important;
     transition: transform 0.3s ease-out !important;
   }
+
+  /* Ensure About section is fully visible on mobile */
+  #about {
+    min-height: 100vh;
+    height: auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* Better sticky behavior on mobile */
+  .sticky {
+    position: -webkit-sticky;
+    position: sticky;
+  }
+
+  /* Improve section spacing on mobile */
+  section {
+    scroll-margin-top: 80px;
+  }
+
+  /* Hide custom cursor on mobile devices */
+  [data-smooth-cursor],
+  .smooth-cursor,
+  .cursor-custom {
+    display: none !important;
+    pointer-events: none !important;
+    visibility: hidden !important;
+  }
+
+  /* Ensure native cursor behavior on mobile */
+  * {
+    cursor: auto !important;
+  }
 }
 
 /* Tablet optimizations */
@@ -722,37 +758,38 @@ body::-webkit-scrollbar {
   --background-experience: #0A0E1A;
   --background-projects: #0A0E1A;
   --background-contact: #0F1419;
-  
+
   /* Surface Colors with Turquoise Tint */
   --surface: rgba(15, 20, 25, 0.8);
   --surface-elevated: rgba(20, 27, 38, 0.9);
   --surface-glow: rgba(39, 203, 206, 0.08);
-  
+
   /* Text Colors */
   --foreground: #E6F1FF;
   --text-primary: #E6F1FF;
   --text-muted: #8892B0;
   --text-subtle: rgba(230, 241, 255, 0.65);
-  
+
   /* Turquoise Accent System */
   --accent-turquoise: #27CBCE;
-  --accent-cyan: #27CBCE;  /* Primary turquoise (matches hero) */
+  --accent-cyan: #27CBCE;
+  /* Primary turquoise (matches hero) */
   --accent-cyan-secondary: #20B2AA;
   --accent-bright: #00D9FF;
   --accent-glow: #64FFDA;
-  
+
   /* Highlight */
   --highlight: #FFA726;
-  
+
   /* Border System with Turquoise Tint */
   --border-color: rgba(39, 203, 206, 0.12);
   --border-hover: rgba(39, 203, 206, 0.25);
   --border-glow: rgba(39, 203, 206, 0.4);
-  
+
   /* Card Colors */
   --card: rgba(39, 203, 206, 0.05);
   --card-foreground: #F4FBFF;
-  
+
   /* Overlays */
   --overlay-soft: rgba(10, 14, 26, 0.65);
   --overlay-strong: rgba(5, 8, 16, 0.9);
