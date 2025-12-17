@@ -63,7 +63,7 @@ export function StackedCardCertificates({ certificates }: StackedCardCertificate
 
                 ScrollTrigger.create({
                     trigger: card,
-                    start: "top 80px", // Account for header
+                    start: "top 20px", // Account for header
                     end: () => lastCardST.start,
                     pin: true,
                     pinSpacing: false,
@@ -92,7 +92,7 @@ export function StackedCardCertificates({ certificates }: StackedCardCertificate
             </div>
 
             {/* Section Header */}
-            <div className="relative z-10 py-24 px-4 sm:px-6 lg:px-8">
+            <div className="relative z-10 py-16 px-4 sm:px-6 lg:px-8">
                 <motion.div
                     initial={{ opacity: 0, y: 20 }}
                     whileInView={{ opacity: 1, y: 0 }}
@@ -117,12 +117,12 @@ export function StackedCardCertificates({ certificates }: StackedCardCertificate
 
             {/* Stacked Cards Container */}
             <div ref={cardsContainerRef} className="relative z-10 px-4 sm:px-6 lg:px-8">
-                <div className="max-w-4xl mx-auto">
+                <div className="max-w-4xl mx-auto flex flex-col items-center">
                     {certificates.map((cert, index) => (
                         <div
                             key={`${cert.title}-${index}`}
                             ref={(el) => { cardRefs.current[index] = el; }}
-                            className="c-card mb-16"
+                            className="c-card mb-8 w-full max-w-[90vw] sm:max-w-none"
                             style={{ zIndex: index + 1 }}
                         >
                             <CertificateStackedCard certificate={cert} index={index} />
@@ -132,7 +132,7 @@ export function StackedCardCertificates({ certificates }: StackedCardCertificate
             </div>
 
             {/* Spacer for scroll space after last card */}
-            <div className="spacer" style={{ height: "50vh" }} />
+            <div className="spacer" style={{ height: "5vh" }} />
         </section>
     );
 }
@@ -163,7 +163,7 @@ function CertificateStackedCard({
 
     return (
         <div
-            className="group cursor-pointer rounded-3xl bg-slate-900/90 border border-white/10 shadow-2xl backdrop-blur-sm hover:border-accent-cyan/40 transition-all duration-300"
+            className="group cursor-pointer rounded-3xl bg-slate-900/95 border border-white/10 shadow-2xl hover:border-accent-cyan/40 transition-all duration-300 will-change-transform"
             onClick={handleClick}
         >
             {/* Certificate Image - 70% of card */}
@@ -190,7 +190,7 @@ function CertificateStackedCard({
                 {/* Issuer Badge */}
                 {certificate.issuer && (
                     <div className="absolute top-4 right-4 z-10">
-                        <div className="px-3 py-1.5 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-white text-sm font-medium font-sans">
+                        <div className="px-3 py-1.5 rounded-full bg-slate-800/90 border border-white/20 text-white text-sm font-medium font-sans">
                             {certificate.issuer}
                         </div>
                     </div>
@@ -198,7 +198,7 @@ function CertificateStackedCard({
 
                 {/* Hover overlay */}
                 <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 flex items-center justify-center transition-all duration-300 opacity-0 group-hover:opacity-100">
-                    <div className="px-5 py-2.5 rounded-full bg-white/20 backdrop-blur-sm border border-white/30 transform scale-90 group-hover:scale-100 transition-transform duration-300">
+                    <div className="px-5 py-2.5 rounded-full bg-slate-700/80 border border-white/30 transform scale-90 group-hover:scale-100 transition-transform duration-300">
                         <div className="flex items-center gap-2 text-white text-sm font-medium font-sans">
                             <ExternalLink className="h-4 w-4" />
                             <span>View Certificate</span>

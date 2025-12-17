@@ -4,6 +4,7 @@ import "./globals.css";
 import Header from "./components/header"; // Import the header
 import Script from "next/script";
 import CursorMount from "./components/CursorMount";
+import { ServiceWorkerRegistration } from "@/components/ServiceWorkerRegistration";
 
 const inter = Inter({ subsets: ["latin"], display: "swap", variable: "--font-sans" });
 const playfair = Playfair_Display({
@@ -31,7 +32,15 @@ export default function RootLayout({
       <head>
         {/* Mobile viewport optimization (allow zoom for accessibility) */}
         <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <meta name="theme-color" content="#000000" />
+        <meta name="theme-color" content="#27CBCE" />
+        
+        {/* PWA Manifest */}
+        <link rel="manifest" href="/manifest.json" />
+        
+        {/* Apple Touch Icons */}
+        <link rel="apple-touch-icon" href="/icon-192.png" />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
 
         {/* Network hints for faster Power BI connect on first paint */}
         <link rel="preconnect" href="https://app.powerbi.com" crossOrigin="anonymous" />
@@ -42,6 +51,7 @@ export default function RootLayout({
         <link rel="dns-prefetch" href="https://wabi-us-east2-redirect.analysis.windows.net" />
       </head>
       <body className={`${inter.variable} ${playfair.variable} ${inter.className} dark`} suppressHydrationWarning>
+        <ServiceWorkerRegistration />
         <Script src="/pbi-resize.js" strategy="afterInteractive" />
         <CursorMount />
         <Header /> {/* Add the header here */}

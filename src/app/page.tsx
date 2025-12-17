@@ -24,6 +24,7 @@ import type { LucideIcon } from "lucide-react";
 import dynamic from "next/dynamic";
 
 // Dynamically import Silk background to reduce initial bundle size and avoid SSR issues
+// Only load when in view to improve initial page load
 const Silk = dynamic(
   () => import("@/components/Silk"),
   {
@@ -33,10 +34,11 @@ const Silk = dynamic(
 );
 
 // Dynamically import StackedCardCertificates (below the fold - lazy load)
+// This is a heavy component with GSAP animations
 const StackedCardCertificates = dynamic(
   () => import("@/components/ui/stacked-card-certificates").then(mod => ({ default: mod.StackedCardCertificates })),
   {
-    ssr: true, // SSR for SEO, but lazy loaded
+    ssr: false, // Client-side only for GSAP compatibility and performance
     loading: () => (
       <div className="flex items-center justify-center min-h-[400px]">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-accent-cyan"></div>
@@ -45,6 +47,7 @@ const StackedCardCertificates = dynamic(
   }
 );
 
+// AboutSection can be SSR'd as it's above the fold
 const AboutSection = dynamic(() => import("@/components/AboutSection"), {
   ssr: true,
 });
@@ -367,9 +370,16 @@ export default function HomePage() {
       {/* Connection warming handled via preconnect/dns-prefetch in layout */}
 
       {/* Sticky Full-Page Slides Container - Hero slides under About */}
-      <div className="relative" style={{ height: '200vh' }}>
+      <div className="relative">
         {/* Hero section - First Sticky Slide */}
-        <div className="sticky top-0 h-screen overflow-hidden z-0" style={{ backgroundColor: 'var(--background-hero)' }}>
+        <div
+          className="sticky top-0 min-h-screen z-0"
+          style={{
+            backgroundColor: 'var(--background-hero)',
+            willChange: 'transform', // GPU hint for smoother sticky
+            transform: 'translateZ(0)' // Force GPU layer
+          }}
+        >
           {/* Silk Background */}
           {!shouldReduceMotion && (
             <div className="absolute inset-0 z-0">
@@ -390,19 +400,19 @@ export default function HomePage() {
           <div className="absolute inset-0 z-[1] bg-[radial-gradient(circle_at_50%_50%,rgba(39,203,206,0.08),transparent_70%)] pointer-events-none" />
 
           {/* Content container with proper spacing from header */}
-          <div className="relative z-10 flex flex-col items-center justify-center min-h-[85vh] pt-20 sm:pt-24 lg:pt-28 px-4 sm:px-6">
+          <div className="relative z-10 flex flex-col items-center justify-center min-h-[85vh] pt-24 sm:pt-28 lg:pt-32 pb-8 px-4 sm:px-6">
             {/* Main heading */}
-            <div className="text-center max-w-6xl mx-auto space-y-6">
-              <h1 className="font-serif text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-bold tracking-tight leading-[1.1] text-white">
+            <div className="text-center max-w-6xl mx-auto space-y-4 sm:space-y-6">
+              <h1 className="font-serif text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl 2xl:text-8xl font-bold tracking-tight leading-[1.1] text-white px-2">
                 Data Analyst & Business Intelligence Specialist
               </h1>
-              <p className="max-w-3xl mx-auto text-base sm:text-lg md:text-xl leading-relaxed text-white/80 font-sans">
+              <p className="max-w-3xl mx-auto text-sm sm:text-base md:text-lg lg:text-xl leading-relaxed text-white/80 font-sans px-2">
                 I find the signal in the noise. Transforming complex data into actionable business intelligence.
               </p>
             </div>
 
             {/* Action buttons */}
-            <div className="mt-12 sm:mt-16 flex flex-col sm:flex-row justify-center items-center gap-4 w-full max-w-lg mx-auto">
+            <div className="mt-8 sm:mt-12 lg:mt-16 flex flex-col sm:flex-row justify-center items-center gap-4 w-full max-w-lg mx-auto px-4">
               <div
                 className="cursor-pointer hover:scale-105 transition-all duration-300 hover:shadow-lg pointer-events-auto group w-[85%] sm:w-auto"
                 onClick={(e) => {
@@ -475,13 +485,13 @@ export default function HomePage() {
       </div>
 
       {/* Skills / Technical Expertise Section */}
-      <section id="skills" className="relative z-10 text-foreground border-t" style={{
+      <section id="skills" className="relative z-20 text-foreground border-t" style={{
         backgroundColor: 'var(--background-skills)',
         borderColor: 'var(--border-color)'
       }}>
         {/* Subtle gradient overlay */}
         <div className="absolute inset-0 bg-gradient-to-br from-[rgba(39,203,206,0.03)] via-transparent to-transparent pointer-events-none" />
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-16 sm:py-20 lg:py-28 space-y-16 relative z-10">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-12 sm:py-16 lg:py-24 space-y-12 sm:space-y-16 relative z-10">
           <motion.div
             className="text-center space-y-4 max-w-3xl mx-auto"
             initial={{ opacity: 0, y: 40 }}
@@ -577,24 +587,24 @@ export default function HomePage() {
       </section>
 
       {/* Experience Section */}
-      <section id="experience" className="relative z-10 text-foreground border-t" style={{
+      <section id="experience" className="relative z-20 text-foreground border-t" style={{
         backgroundColor: 'var(--background-experience)',
         borderColor: 'var(--border-color)'
       }}>
         {/* Subtle turquoise gradient overlay */}
         <div className="absolute inset-0 bg-gradient-to-br from-transparent via-[rgba(39,203,206,0.02)] to-transparent pointer-events-none" />
-        <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 py-16 sm:py-20 lg:py-28 relative z-10">
-          <div className="space-y-4 mb-16 max-w-3xl">
+        <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 py-12 sm:py-16 lg:py-24 relative z-10">
+          <div className="space-y-3 sm:space-y-4 mb-12 sm:mb-16 max-w-3xl">
             <p className="text-xs uppercase tracking-[0.55em] text-text-muted font-sans">Experience</p>
             <h2 className="font-serif text-3xl sm:text-4xl md:text-5xl font-bold text-text-primary tracking-tight leading-tight">
               Hands-on history
             </h2>
-            <p className="text-base sm:text-lg text-text-muted leading-relaxed font-sans">
+            <p className="text-sm sm:text-base md:text-lg text-text-muted leading-relaxed font-sans">
               A chronological overview of my professional journey, highlighting key achievements, responsibilities, and technical expertise gained at each position.
             </p>
           </div>
           {/* Stacked cards container - needs extra bottom padding for sticky effect */}
-          <div className="relative" style={{ paddingBottom: `${(experienceTimeline.length - 1) * 132}px` }}>
+          <div className="relative" style={{ paddingBottom: `${(experienceTimeline.length - 1) * 80}px` }}>
             {experienceTimeline.map((item, index) => (
               <ExperienceEntry
                 key={item.title}
@@ -608,7 +618,7 @@ export default function HomePage() {
       </section>
 
       {/* Projects Section - Premium minimalist redesign */}
-      <section id="projects" className="relative py-24 sm:py-32 lg:py-40 px-4 sm:px-6 overflow-hidden border-t" style={{
+      <section id="projects" className="relative z-20 pt-12 sm:pt-16 lg:pt-24 pb-12 sm:pb-16 lg:pb-20 px-4 sm:px-6 overflow-hidden border-t" style={{
         backgroundColor: 'var(--background-projects)',
         borderColor: 'var(--border-color)'
       }}>
@@ -616,8 +626,8 @@ export default function HomePage() {
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(39,203,206,0.12),transparent_45%)] blur-3xl pointer-events-none" />
         <div className="absolute inset-0 bg-gradient-to-b from-transparent via-[rgba(10,14,26,0.8)] to-[var(--background-projects)] pointer-events-none" />
 
-        <div className="max-w-7xl mx-auto relative z-10 space-y-20">
-          <div className="text-center space-y-8 max-w-7xl mx-auto px-4">
+        <div className="max-w-7xl mx-auto relative z-10 space-y-8">
+          <div className="text-center space-y-6 max-w-7xl mx-auto px-4">
             <h2 className="font-serif text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold bg-gradient-to-r from-[#27CBCE] via-[#20B2AA] to-[#00D9FF] bg-clip-text text-transparent tracking-tight leading-[1.1] mb-4">
               Interactive Analytics
             </h2>
@@ -725,22 +735,22 @@ export default function HomePage() {
       />
 
       {/* Contact Section */}
-      <section id="contact" className="relative z-10 text-foreground border-t" style={{
+      <section id="contact" className="relative z-20 text-foreground border-t" style={{
         backgroundColor: 'var(--background-contact)',
         borderColor: 'var(--border-color)'
       }}>
         {/* Subtle turquoise ambient glow */}
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_50%,rgba(39,203,206,0.06),transparent_60%)] pointer-events-none" />
-        <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 py-16 sm:py-20 lg:py-28 grid gap-12 lg:grid-cols-2 relative z-10">
-          <div className="space-y-6">
+        <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 py-12 sm:py-16 lg:py-24 grid gap-8 sm:gap-12 lg:grid-cols-2 relative z-10">
+          <div className="space-y-4 sm:space-y-6">
             <p className="text-xs uppercase tracking-[0.55em] text-text-muted font-sans">Contact</p>
-            <h2 className="font-serif text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold text-text-primary tracking-tight leading-tight">
+            <h2 className="font-serif text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold text-text-primary tracking-tight leading-tight">
               Let&rsquo;s work together
             </h2>
-            <p className="text-base sm:text-lg md:text-xl text-text-muted leading-relaxed font-sans">
+            <p className="text-sm sm:text-base md:text-lg lg:text-xl text-text-muted leading-relaxed font-sans">
               I&apos;m always open to discussing new opportunities, collaborations, or data analytics projects. Feel free to reach out using the form below or through any of my direct contact channels.
             </p>
-            <p className="text-sm sm:text-base text-text-muted leading-relaxed font-sans">
+            <p className="text-xs sm:text-sm md:text-base text-text-muted leading-relaxed font-sans">
               I typically respond within 24-48 hours. For urgent matters, please use the direct contact channels in the Connect section below.
             </p>
           </div>
@@ -839,13 +849,13 @@ export default function HomePage() {
       }}>
         {/* Subtle gradient overlay */}
         <div className="absolute inset-0 bg-gradient-to-br from-[rgba(39,203,206,0.03)] via-transparent to-transparent pointer-events-none" />
-        <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 py-16 sm:py-20 lg:py-24 space-y-12 relative z-10">
-          <div className="text-center space-y-6 max-w-4xl mx-auto">
+        <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 py-12 sm:py-16 lg:py-20 space-y-8 sm:space-y-12 relative z-10">
+          <div className="text-center space-y-4 sm:space-y-6 max-w-4xl mx-auto">
             <p className="text-xs uppercase tracking-[0.6em] text-text-muted font-sans">Connect to me</p>
-            <h2 className="font-serif text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold text-text-primary tracking-tight leading-tight">
+            <h2 className="font-serif text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold text-text-primary tracking-tight leading-tight">
               Direct lines & quick actions
             </h2>
-            <p className="text-base sm:text-lg md:text-xl text-text-muted leading-relaxed font-sans">
+            <p className="text-sm sm:text-base md:text-lg lg:text-xl text-text-muted leading-relaxed font-sans">
               Quick access to direct contact channels. Choose your preferred method to get in touch—I&apos;m always open to connecting with potential collaborators, employers, or fellow data professionals.
             </p>
           </div>
@@ -974,7 +984,7 @@ function ExperienceEntry({
         duration: 0.6,
         ease: [0.25, 0.46, 0.45, 0.94]
       }}
-      className="sticky mb-8"
+      className="sticky mb-32"
       style={{
         top: `${topOffset}px`,
         zIndex: zIndex,
@@ -1099,7 +1109,9 @@ function DashboardCard({
   gradient,
 }: DashboardCardProps): React.JSX.Element {
   const cardRef = useRef(null);
-  const shouldLoad = useInView(cardRef, { once: true, margin: "200px" });
+  // Lazy load iframes only when they're about to enter viewport
+  // Increased margin to preload slightly before user sees it
+  const shouldLoad = useInView(cardRef, { once: true, margin: "300px" });
 
   return (
     <motion.article
@@ -1148,30 +1160,61 @@ function DashboardCard({
             e.currentTarget.style.borderColor = 'var(--border-color)';
           }}
         >
-          <div className="relative w-full bg-black">
+          <div className="relative w-full" style={{ backgroundColor: 'rgba(10, 14, 26, 0.95)' }}>
             <div className="relative pt-[56.25%] sm:pt-[59.77%] overflow-hidden">
               {shouldLoad ? (
-                <iframe
-                  title={title}
-                  src={embedUrl}
-                  loading="lazy"
-                  className="absolute inset-0 h-full w-full border-0"
-                  style={{
-                    border: 'none',
-                    margin: 0,
-                    padding: 0,
-                    backgroundColor: "#000",
-                    display: 'block'
-                  }}
-                  allowFullScreen
-                  aria-label={description}
-                  referrerPolicy="no-referrer-when-downgrade"
-                  frameBorder="0"
-                  scrolling="no"
-                />
+                <>
+                  {/* Loading placeholder with smooth transition */}
+                  <div
+                    className="absolute inset-0 flex items-center justify-center transition-opacity duration-500"
+                    style={{
+                      backgroundColor: 'rgba(10, 14, 26, 0.95)',
+                      opacity: 1,
+                      pointerEvents: 'none'
+                    }}
+                  >
+                    <div className="flex flex-col items-center gap-3">
+                      <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-accent-cyan"></div>
+                      <div className="text-text-muted text-sm font-sans">Loading interactive dashboard...</div>
+                    </div>
+                  </div>
+                  <iframe
+                    title={title}
+                    src={embedUrl}
+                    loading="lazy"
+                    className="absolute inset-0 h-full w-full border-0"
+                    style={{
+                      border: 'none',
+                      margin: 0,
+                      padding: 0,
+                      backgroundColor: "transparent",
+                      display: 'block'
+                    }}
+                    allowFullScreen
+                    aria-label={description}
+                    referrerPolicy="no-referrer-when-downgrade"
+                    frameBorder="0"
+                    scrolling="no"
+                    onLoad={(e) => {
+                      // Hide loading state when iframe loads
+                      const loadingDiv = e.currentTarget.previousElementSibling as HTMLElement;
+                      if (loadingDiv) {
+                        setTimeout(() => {
+                          loadingDiv.style.opacity = '0';
+                          setTimeout(() => {
+                            loadingDiv.style.display = 'none';
+                          }, 500);
+                        }, 300);
+                      }
+                    }}
+                  />
+                </>
               ) : (
-                <div className="absolute inset-0 flex items-center justify-center bg-black">
-                  <div className="text-text-muted text-sm font-sans">Loading dashboard...</div>
+                <div className="absolute inset-0 flex items-center justify-center" style={{ backgroundColor: 'rgba(10, 14, 26, 0.95)' }}>
+                  <div className="flex flex-col items-center gap-3">
+                    <div className="animate-pulse rounded-full h-10 w-10 bg-accent-cyan/20"></div>
+                    <div className="text-text-muted text-sm font-sans">Preparing dashboard...</div>
+                  </div>
                 </div>
               )}
             </div>

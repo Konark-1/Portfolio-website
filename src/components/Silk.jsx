@@ -68,8 +68,9 @@ void main() {
 }
 `;
 
-const SilkPlane = forwardRef(function SilkPlane({ uniforms }, ref) {
+const SilkPlane = forwardRef(function SilkPlane({ uniforms, isInViewport }, ref) {
   const { viewport } = useThree();
+  const lastUpdateRef = useRef(0);
 
   useLayoutEffect(() => {
     if (ref.current) {
@@ -77,16 +78,34 @@ const SilkPlane = forwardRef(function SilkPlane({ uniforms }, ref) {
     }
   }, [ref, viewport]);
 
-  useFrame((_, delta) => {
+  useFrame((state, delta) => {
+    // Skip updates when not in viewport - keeps frameloop running but saves GPU
+    if (!isInViewport.current) return;
+    
+    // Throttle updates to reduce CPU usage - update every ~16ms (60fps max)
+    const now = state.clock.elapsedTime;
+    if (now - lastUpdateRef.current < 0.016) return;
+    
+    lastUpdateRef.current = now;
+    
     if (ref.current && ref.current.material && ref.current.material.uniforms) {
-      ref.current.material.uniforms.uTime.value += 0.1 * delta;
+      // Smooth delta clamping to prevent jumps when tab becomes visible
+      const clampedDelta = Math.min(delta, 0.1);
+      ref.current.material.uniforms.uTime.value += 0.1 * clampedDelta;
     }
   });
 
   return (
-    <mesh ref={ref}>
+    <mesh ref={ref} frustumCulled={true}>
       <planeGeometry args={[1, 1, 1, 1]} />
-      <shaderMaterial uniforms={uniforms} vertexShader={vertexShader} fragmentShader={fragmentShader} />
+      <shaderMaterial 
+        uniforms={uniforms} 
+        vertexShader={vertexShader} 
+        fragmentShader={fragmentShader}
+        transparent={false}
+        depthWrite={false}
+        depthTest={false}
+      />
     </mesh>
   );
 });
@@ -95,8 +114,9 @@ SilkPlane.displayName = 'SilkPlane';
 const Silk = ({ speed = 5, scale = 1, color = '#7B7481', noiseIntensity = 1.5, rotation = 0 }) => {
   const meshRef = useRef();
   const canvasRef = useRef();
-  const [frameloop, setFrameloop] = useState('always');
-  const frameloopRef = useRef('always');
+  const containerRef = useRef();
+  const isInViewportRef = useRef(true); // Assume in viewport initially (hero section)
+  const isDocumentVisibleRef = useRef(!document.hidden);
 
   const uniforms = useMemo(
     () => ({
@@ -110,103 +130,70 @@ const Silk = ({ speed = 5, scale = 1, color = '#7B7481', noiseIntensity = 1.5, r
     [speed, scale, noiseIntensity, color, rotation]
   );
 
-  // Handle visibility changes - only pause when truly hidden, always resume when visible
+  // Handle visibility and viewport intersection - optimized for performance
   useEffect(() => {
-    const resume = () => {
-      if (frameloopRef.current !== 'always') {
-        frameloopRef.current = 'always';
-        setFrameloop('always');
-      }
-    };
-
-    const pause = () => {
-      if (frameloopRef.current !== 'demand') {
-        frameloopRef.current = 'demand';
-        setFrameloop('demand');
-      }
-    };
-
     const handleVisibilityChange = () => {
-      if (document.hidden) {
-        pause();
-      } else {
-        resume();
-      }
+      isDocumentVisibleRef.current = !document.hidden;
     };
 
-    const handleFocus = () => {
-      if (!document.hidden) {
-        resume();
-      }
+    // Intersection Observer to detect when component is in viewport
+    let observer = null;
+    
+    const setupObserver = () => {
+      if (!containerRef.current) return;
+      
+      observer = new IntersectionObserver(
+        (entries) => {
+          const entry = entries[0];
+          isInViewportRef.current = entry.isIntersecting;
+        },
+        {
+          threshold: [0, 0.1], // Trigger at 0% and 10% visibility
+          rootMargin: '100px' // Larger margin for earlier detection
+        }
+      );
+
+      observer.observe(containerRef.current);
     };
 
-    const handlePageshow = () => {
-      // Handle back/forward cache restoration
-      if (!document.hidden) {
-        resume();
-      }
-    };
-
-    // Set initial state
-    if (document.hidden) {
-      pause();
-    } else {
-      resume();
-    }
+    // Setup observer immediately
+    setupObserver();
 
     // Add event listeners
     document.addEventListener('visibilitychange', handleVisibilityChange);
-    window.addEventListener('focus', handleFocus);
-    window.addEventListener('pageshow', handlePageshow);
-    
-    // Safety check: ensure it's always running when visible
-    // This catches any edge cases where events don't fire
-    const safetyInterval = setInterval(() => {
-      if (!document.hidden && frameloopRef.current !== 'always') {
-        resume();
-      }
-    }, 1000);
 
     return () => {
       document.removeEventListener('visibilitychange', handleVisibilityChange);
-      window.removeEventListener('focus', handleFocus);
-      window.removeEventListener('pageshow', handlePageshow);
-      clearInterval(safetyInterval);
+      if (observer) {
+        observer.disconnect();
+      }
     };
   }, []);
 
   return (
-    <Canvas 
-      ref={canvasRef}
-      dpr={[1, 2]} 
-      frameloop={frameloop}
-      gl={{
-        preserveDrawingBuffer: false,
-        powerPreference: 'high-performance',
-        antialias: true,
-        alpha: false,
-        // Handle context loss gracefully
-        onContextLost: (event) => {
-          event.preventDefault();
-          console.warn('WebGL context lost in Silk component');
-        },
-        onContextRestored: () => {
-          console.info('WebGL context restored in Silk component');
-          // Force resume when context is restored
-          if (!document.hidden) {
-            frameloopRef.current = 'always';
-            setFrameloop('always');
-          }
-        },
-      }}
-      style={{ 
-        width: '100%',
-        height: '100%',
-        backgroundColor: 'transparent',
-      }}
-    >
-      <SilkPlane ref={meshRef} uniforms={uniforms} />
-    </Canvas>
+    <div ref={containerRef} style={{ width: '100%', height: '100%' }}>
+      <Canvas 
+        ref={canvasRef}
+        dpr={[1, 2]} 
+        frameloop="always"
+        gl={{
+          preserveDrawingBuffer: false,
+          powerPreference: 'high-performance',
+          antialias: true,
+          alpha: false,
+          // Disable stencil and depth buffers for better performance when not needed
+          stencil: false,
+          depth: false,
+        }}
+        style={{ 
+          width: '100%',
+          height: '100%',
+          backgroundColor: 'transparent',
+        }}
+      >
+        <SilkPlane ref={meshRef} uniforms={uniforms} isInViewport={isInViewportRef} />
+      </Canvas>
+    </div>
   );
 };
 
