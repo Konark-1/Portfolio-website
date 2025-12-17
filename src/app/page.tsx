@@ -603,7 +603,7 @@ export default function HomePage() {
               A chronological overview of my professional journey, highlighting key achievements, responsibilities, and technical expertise gained at each position.
             </p>
           </div>
-          {/* Stacked cards container - needs extra bottom padding for sticky effect */}
+          {/* Stacked cards container - uses CSS sticky */}
           <div className="relative" style={{ paddingBottom: `${(experienceTimeline.length - 1) * 80}px` }}>
             {experienceTimeline.map((item, index) => (
               <ExperienceEntry
@@ -617,8 +617,8 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Projects Section - Premium minimalist redesign */}
-      <section id="projects" className="relative z-20 pt-12 sm:pt-16 lg:pt-24 pb-12 sm:pb-16 lg:pb-20 px-4 sm:px-6 overflow-hidden border-t" style={{
+      {/* Projects Section - overlays Experience section with negative margin */}
+      <section id="projects" className="relative z-30 pt-12 sm:pt-16 lg:pt-24 pb-12 sm:pb-16 lg:pb-20 px-4 sm:px-6 overflow-hidden border-t -mt-[60vh]" style={{
         backgroundColor: 'var(--background-projects)',
         borderColor: 'var(--border-color)'
       }}>
