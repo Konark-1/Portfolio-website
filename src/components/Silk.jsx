@@ -1,5 +1,5 @@
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
-import { forwardRef, useRef, useMemo, useLayoutEffect } from 'react';
+import { forwardRef, useRef, useMemo, useLayoutEffect, useEffect, useState } from 'react';
 import { Color } from 'three';
 
 const hexToNormalizedRGB = hex => {
@@ -78,7 +78,9 @@ const SilkPlane = forwardRef(function SilkPlane({ uniforms }, ref) {
   }, [ref, viewport]);
 
   useFrame((_, delta) => {
-    ref.current.material.uniforms.uTime.value += 0.1 * delta;
+    if (ref.current && ref.current.material && ref.current.material.uniforms) {
+      ref.current.material.uniforms.uTime.value += 0.1 * delta;
+    }
   });
 
   return (
@@ -92,6 +94,9 @@ SilkPlane.displayName = 'SilkPlane';
 
 const Silk = ({ speed = 5, scale = 1, color = '#7B7481', noiseIntensity = 1.5, rotation = 0 }) => {
   const meshRef = useRef();
+  const canvasRef = useRef();
+  const [frameloop, setFrameloop] = useState('always');
+  const frameloopRef = useRef('always');
 
   const uniforms = useMemo(
     () => ({
@@ -105,8 +110,101 @@ const Silk = ({ speed = 5, scale = 1, color = '#7B7481', noiseIntensity = 1.5, r
     [speed, scale, noiseIntensity, color, rotation]
   );
 
+  // Handle visibility changes - only pause when truly hidden, always resume when visible
+  useEffect(() => {
+    const resume = () => {
+      if (frameloopRef.current !== 'always') {
+        frameloopRef.current = 'always';
+        setFrameloop('always');
+      }
+    };
+
+    const pause = () => {
+      if (frameloopRef.current !== 'demand') {
+        frameloopRef.current = 'demand';
+        setFrameloop('demand');
+      }
+    };
+
+    const handleVisibilityChange = () => {
+      if (document.hidden) {
+        pause();
+      } else {
+        resume();
+      }
+    };
+
+    const handleFocus = () => {
+      if (!document.hidden) {
+        resume();
+      }
+    };
+
+    const handlePageshow = () => {
+      // Handle back/forward cache restoration
+      if (!document.hidden) {
+        resume();
+      }
+    };
+
+    // Set initial state
+    if (document.hidden) {
+      pause();
+    } else {
+      resume();
+    }
+
+    // Add event listeners
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    window.addEventListener('focus', handleFocus);
+    window.addEventListener('pageshow', handlePageshow);
+    
+    // Safety check: ensure it's always running when visible
+    // This catches any edge cases where events don't fire
+    const safetyInterval = setInterval(() => {
+      if (!document.hidden && frameloopRef.current !== 'always') {
+        resume();
+      }
+    }, 1000);
+
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+      window.removeEventListener('focus', handleFocus);
+      window.removeEventListener('pageshow', handlePageshow);
+      clearInterval(safetyInterval);
+    };
+  }, []);
+
   return (
-    <Canvas dpr={[1, 2]} frameloop="always">
+    <Canvas 
+      ref={canvasRef}
+      dpr={[1, 2]} 
+      frameloop={frameloop}
+      gl={{
+        preserveDrawingBuffer: false,
+        powerPreference: 'high-performance',
+        antialias: true,
+        alpha: false,
+        // Handle context loss gracefully
+        onContextLost: (event) => {
+          event.preventDefault();
+          console.warn('WebGL context lost in Silk component');
+        },
+        onContextRestored: () => {
+          console.info('WebGL context restored in Silk component');
+          // Force resume when context is restored
+          if (!document.hidden) {
+            frameloopRef.current = 'always';
+            setFrameloop('always');
+          }
+        },
+      }}
+      style={{ 
+        width: '100%',
+        height: '100%',
+        backgroundColor: 'transparent',
+      }}
+    >
       <SilkPlane ref={meshRef} uniforms={uniforms} />
     </Canvas>
   );

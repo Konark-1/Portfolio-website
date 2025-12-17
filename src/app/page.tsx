@@ -20,7 +20,7 @@ import {
   Star,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
-import BlurText from "@/components/react-bits/BlurText/BlurText";
+
 import dynamic from "next/dynamic";
 
 // Dynamically import Silk background to reduce initial bundle size and avoid SSR issues
@@ -44,6 +44,10 @@ const StackedCardCertificates = dynamic(
     ),
   }
 );
+
+const AboutSection = dynamic(() => import("@/components/AboutSection"), {
+  ssr: true,
+});
 
 export default function HomePage() {
   // Respect reduced motion preference
@@ -359,13 +363,13 @@ export default function HomePage() {
 
 
   return (
-    <main className="relative min-h-screen bg-gradient-to-br from-gray-900 via-black to-gray-800">
+    <main className="relative min-h-screen" style={{ backgroundColor: 'var(--background)' }}>
       {/* Connection warming handled via preconnect/dns-prefetch in layout */}
 
       {/* Sticky Full-Page Slides Container - Hero slides under About */}
       <div className="relative" style={{ height: '200vh' }}>
         {/* Hero section - First Sticky Slide */}
-        <div className="sticky top-0 h-screen overflow-hidden bg-gradient-to-br from-gray-900 via-black to-gray-800 z-0">
+        <div className="sticky top-0 h-screen overflow-hidden z-0" style={{ backgroundColor: 'var(--background-hero)' }}>
           {/* Silk Background */}
           {!shouldReduceMotion && (
             <div className="absolute inset-0 z-0">
@@ -379,8 +383,11 @@ export default function HomePage() {
             </div>
           )}
 
-          {/* Subtle gradient overlay for text readability (lighter) */}
-          <div className="absolute inset-0 z-[1] bg-gradient-to-b from-transparent via-transparent to-gray-900/20 pointer-events-none" />
+          {/* Enhanced gradient overlay with turquoise tint */}
+          <div className="absolute inset-0 z-[1] bg-gradient-to-b from-transparent via-transparent to-[rgba(10,14,26,0.4)] pointer-events-none" />
+
+          {/* Subtle turquoise ambient glow */}
+          <div className="absolute inset-0 z-[1] bg-[radial-gradient(circle_at_50%_50%,rgba(39,203,206,0.08),transparent_70%)] pointer-events-none" />
 
           {/* Content container with proper spacing from header */}
           <div className="relative z-10 flex flex-col items-center justify-center min-h-[85vh] pt-20 sm:pt-24 lg:pt-28 px-4 sm:px-6">
@@ -468,8 +475,13 @@ export default function HomePage() {
       </div>
 
       {/* Skills / Technical Expertise Section */}
-      <section id="skills" className="relative z-10 bg-slate-950 text-foreground border-t border-border">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-16 sm:py-20 lg:py-28 space-y-16">
+      <section id="skills" className="relative z-10 text-foreground border-t" style={{
+        backgroundColor: 'var(--background-skills)',
+        borderColor: 'var(--border-color)'
+      }}>
+        {/* Subtle gradient overlay */}
+        <div className="absolute inset-0 bg-gradient-to-br from-[rgba(39,203,206,0.03)] via-transparent to-transparent pointer-events-none" />
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-16 sm:py-20 lg:py-28 space-y-16 relative z-10">
           <motion.div
             className="text-center space-y-4 max-w-3xl mx-auto"
             initial={{ opacity: 0, y: 40 }}
@@ -524,7 +536,7 @@ export default function HomePage() {
             }}
             whileHover={{
               scale: 1.02,
-              borderColor: "rgba(6, 182, 212, 0.6)",
+              borderColor: "rgba(39, 203, 206, 0.5)",
               transition: { duration: 0.3 }
             }}
           >
@@ -565,8 +577,13 @@ export default function HomePage() {
       </section>
 
       {/* Experience Section */}
-      <section id="experience" className="relative z-10 bg-background text-foreground border-t border-border">
-        <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 py-16 sm:py-20 lg:py-28">
+      <section id="experience" className="relative z-10 text-foreground border-t" style={{
+        backgroundColor: 'var(--background-experience)',
+        borderColor: 'var(--border-color)'
+      }}>
+        {/* Subtle turquoise gradient overlay */}
+        <div className="absolute inset-0 bg-gradient-to-br from-transparent via-[rgba(39,203,206,0.02)] to-transparent pointer-events-none" />
+        <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 py-16 sm:py-20 lg:py-28 relative z-10">
           <div className="space-y-4 mb-16 max-w-3xl">
             <p className="text-xs uppercase tracking-[0.55em] text-text-muted font-sans">Experience</p>
             <h2 className="font-serif text-3xl sm:text-4xl md:text-5xl font-bold text-text-primary tracking-tight leading-tight">
@@ -591,13 +608,17 @@ export default function HomePage() {
       </section>
 
       {/* Projects Section - Premium minimalist redesign */}
-      <section id="projects" className="relative py-24 sm:py-32 lg:py-40 px-4 sm:px-6 overflow-hidden border-t border-border">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,#22d3ee1a,transparent_45%)] blur-3xl pointer-events-none" />
-        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-background/80 to-background pointer-events-none" />
+      <section id="projects" className="relative py-24 sm:py-32 lg:py-40 px-4 sm:px-6 overflow-hidden border-t" style={{
+        backgroundColor: 'var(--background-projects)',
+        borderColor: 'var(--border-color)'
+      }}>
+        {/* Enhanced turquoise radial gradient */}
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(39,203,206,0.12),transparent_45%)] blur-3xl pointer-events-none" />
+        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-[rgba(10,14,26,0.8)] to-[var(--background-projects)] pointer-events-none" />
 
         <div className="max-w-7xl mx-auto relative z-10 space-y-20">
           <div className="text-center space-y-8 max-w-7xl mx-auto px-4">
-            <h2 className="font-serif text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold bg-gradient-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent tracking-tight leading-[1.1] mb-4">
+            <h2 className="font-serif text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold bg-gradient-to-r from-[#27CBCE] via-[#20B2AA] to-[#00D9FF] bg-clip-text text-transparent tracking-tight leading-[1.1] mb-4">
               Interactive Analytics
             </h2>
             <p className="text-base sm:text-lg md:text-xl lg:text-2xl text-text-muted leading-relaxed font-sans max-w-5xl mx-auto">
@@ -704,8 +725,13 @@ export default function HomePage() {
       />
 
       {/* Contact Section */}
-      <section id="contact" className="relative z-10 bg-slate-950 text-foreground border-t border-border">
-        <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 py-16 sm:py-20 lg:py-28 grid gap-12 lg:grid-cols-2">
+      <section id="contact" className="relative z-10 text-foreground border-t" style={{
+        backgroundColor: 'var(--background-contact)',
+        borderColor: 'var(--border-color)'
+      }}>
+        {/* Subtle turquoise ambient glow */}
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_50%,rgba(39,203,206,0.06),transparent_60%)] pointer-events-none" />
+        <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 py-16 sm:py-20 lg:py-28 grid gap-12 lg:grid-cols-2 relative z-10">
           <div className="space-y-6">
             <p className="text-xs uppercase tracking-[0.55em] text-text-muted font-sans">Contact</p>
             <h2 className="font-serif text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold text-text-primary tracking-tight leading-tight">
@@ -807,8 +833,13 @@ export default function HomePage() {
       </section>
 
       {/* Connect Section */}
-      <section id="connect" className="relative z-10 bg-background text-foreground border-t border-border">
-        <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 py-16 sm:py-20 lg:py-24 space-y-12">
+      <section id="connect" className="relative z-10 text-foreground border-t" style={{
+        backgroundColor: 'var(--background)',
+        borderColor: 'var(--border-color)'
+      }}>
+        {/* Subtle gradient overlay */}
+        <div className="absolute inset-0 bg-gradient-to-br from-[rgba(39,203,206,0.03)] via-transparent to-transparent pointer-events-none" />
+        <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 py-16 sm:py-20 lg:py-24 space-y-12 relative z-10">
           <div className="text-center space-y-6 max-w-4xl mx-auto">
             <p className="text-xs uppercase tracking-[0.6em] text-text-muted font-sans">Connect to me</p>
             <h2 className="font-serif text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold text-text-primary tracking-tight leading-tight">
@@ -836,7 +867,7 @@ type SkillCardProps = {
   description: string;
 };
 
-function SkillCard({ icon: Icon, title, level, description }: SkillCardProps) {
+function SkillCard({ icon: Icon, title, level, description }: SkillCardProps): React.JSX.Element {
   return (
     <motion.div
       initial={{ opacity: 0, y: 30, scale: 0.95 }}
@@ -923,7 +954,7 @@ function ExperienceEntry({
   achievements,
   skillTags,
   index,
-}: ExperienceEntryProps) {
+}: ExperienceEntryProps): React.JSX.Element {
   // Format index as 01, 02, 03
   const formattedIndex = String(index + 1).padStart(2, '0');
 
@@ -951,9 +982,10 @@ function ExperienceEntry({
     >
       {/* Card container with solid background to cover previous card */}
       <div
-        className="rounded-3xl border border-border bg-background p-6 sm:p-8 transition-all duration-500 hover:border-accent-cyan/30"
+        className="rounded-3xl border border-border p-6 sm:p-8 transition-all duration-500 hover:border-accent-cyan/30"
         style={{
-          boxShadow: `0 -20px 50px -10px rgba(0,0,0,0.9), 0 0 0 1px rgba(255,255,255,0.05)`,
+          backgroundColor: 'var(--background-experience)',
+          boxShadow: `0 -20px 50px -10px rgba(0,0,0,0.9), 0 0 0 1px rgba(39,203,206,0.08)`,
         }}
       >
         {/* Numbered prefix - validgraphs.com style */}
@@ -1010,9 +1042,12 @@ type ContactChannelProps = {
   download?: boolean;
 };
 
-function ContactChannelCard({ icon: Icon, label, value, href, download }: ContactChannelProps) {
+function ContactChannelCard({ icon: Icon, label, value, href, download }: ContactChannelProps): React.JSX.Element {
   const content = (
-    <div className="flex items-center justify-between rounded-3xl border border-white/5 bg-white/5 px-5 py-4 shadow-glass-soft">
+    <div className="flex items-center justify-between rounded-3xl border px-5 py-4 shadow-glass-soft transition-all duration-300 hover:scale-[1.02]" style={{
+      borderColor: 'var(--border-color)',
+      backgroundColor: 'var(--card)',
+    }}>
       <div>
         <p className="text-xs uppercase tracking-[0.4em] text-text-muted font-sans">{label}</p>
         <p className="mt-1 text-sm font-semibold text-text-primary font-sans">{value}</p>
@@ -1062,7 +1097,7 @@ function DashboardCard({
   metrics,
   insights,
   gradient,
-}: DashboardCardProps) {
+}: DashboardCardProps): React.JSX.Element {
   const cardRef = useRef(null);
   const shouldLoad = useInView(cardRef, { once: true, margin: "200px" });
 
@@ -1073,13 +1108,21 @@ function DashboardCard({
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true }}
       transition={{ duration: 0.5 }}
-      className={`group relative rounded-3xl border border-white/10 overflow-hidden bg-gradient-to-br from-gray-900/70 to-gray-900/40 backdrop-blur-xl`}
+      className={`group relative rounded-3xl border overflow-hidden backdrop-blur-xl`}
+      style={{
+        borderColor: 'var(--border-color)',
+        background: 'linear-gradient(135deg, rgba(10, 14, 26, 0.7) 0%, rgba(15, 20, 25, 0.4) 100%)',
+      }}
     >
       <div className={`absolute inset-0 bg-gradient-to-br ${gradient} opacity-0 group-hover:opacity-100 transition-opacity duration-700`} />
       <div className="relative z-10 p-8 sm:p-10 lg:p-12 space-y-8 sm:space-y-10">
         <div className="space-y-4 sm:space-y-5">
           {featured && (
-            <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-cyan-500/10 border border-cyan-500/30 text-cyan-300 text-xs sm:text-sm font-semibold mb-2 font-sans tracking-wide">
+            <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full border text-xs sm:text-sm font-semibold mb-2 font-sans tracking-wide" style={{
+              backgroundColor: 'rgba(39, 203, 206, 0.1)',
+              borderColor: 'rgba(39, 203, 206, 0.3)',
+              color: 'rgba(39, 203, 206, 0.9)'
+            }}>
               <Star className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
               Featured Project
             </span>
@@ -1094,7 +1137,16 @@ function DashboardCard({
         <div
           role="region"
           aria-label={`${title} - Interactive Power BI Dashboard`}
-          className="rounded-2xl overflow-hidden border-2 border-white/10 group-hover:border-accent-cyan/40 transition-colors"
+          className="rounded-2xl overflow-hidden border-2 transition-colors"
+          style={{
+            borderColor: 'var(--border-color)',
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.borderColor = 'rgba(39, 203, 206, 0.4)';
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.borderColor = 'var(--border-color)';
+          }}
         >
           <div className="relative w-full bg-black">
             <div className="relative pt-[56.25%] sm:pt-[59.77%] overflow-hidden">
@@ -1126,7 +1178,10 @@ function DashboardCard({
           </div>
         </div>
 
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6 p-6 sm:p-8 rounded-2xl bg-white/5 border border-white/10">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6 p-6 sm:p-8 rounded-2xl border" style={{
+          backgroundColor: 'rgba(39, 203, 206, 0.05)',
+          borderColor: 'var(--border-color)',
+        }}>
           {metrics.map(({ label, value }) => (
             <div key={label} className="text-center space-y-2">
               <p className="text-2xl sm:text-3xl md:text-4xl font-bold text-accent-cyan font-serif leading-tight">{value}</p>
@@ -1171,9 +1226,12 @@ type TechHighlightProps = {
   description: string;
 };
 
-function TechHighlight({ icon, title, description }: TechHighlightProps) {
+function TechHighlight({ icon, title, description }: TechHighlightProps): React.JSX.Element {
   return (
-    <div className="rounded-2xl border border-white/10 bg-white/5 p-6 sm:p-7 backdrop-blur-md">
+    <div className="rounded-2xl border p-6 sm:p-7 backdrop-blur-md" style={{
+      borderColor: 'var(--border-color)',
+      backgroundColor: 'rgba(39, 203, 206, 0.05)',
+    }}>
       <div className="text-3xl sm:text-4xl mb-4">{icon}</div>
       <h4 className="text-lg sm:text-xl md:text-2xl font-semibold text-text-primary mb-3 sm:mb-4 font-serif tracking-tight">{title}</h4>
       <p className="text-sm sm:text-base text-text-muted leading-relaxed font-sans">{description}</p>
@@ -1181,197 +1239,4 @@ function TechHighlight({ icon, title, description }: TechHighlightProps) {
   );
 }
 
-// About Section with Dynamic Scroll Animations
-type AboutSectionProps = {
-  shouldReduceMotion: boolean | null;
-};
 
-function AboutSection({ shouldReduceMotion }: AboutSectionProps) {
-  const sectionRef = useRef<HTMLElement>(null);
-  const nameRef = useRef<HTMLHeadingElement>(null);
-  const cardsRef = useRef<HTMLDivElement>(null);
-
-  // Scroll progress for the section - optimized for better INP
-  const { scrollYProgress } = useScroll({
-    target: sectionRef,
-    offset: ["start end", "end start"]
-  });
-
-  // Smooth spring-based transforms - optimized for better INP performance
-  const smoothProgress = useSpring(scrollYProgress, {
-    stiffness: 80, // Reduced from 100 for smoother, less frequent updates
-    damping: 35, // Increased from 30 for better stability
-    restDelta: 0.02 // Increased from 0.01 to further reduce calculations
-  });
-
-  // Reduced number of transforms - combine similar ones for better performance
-  // Scale and opacity combined into single transform where possible
-  const nameScale = useTransform(smoothProgress, [0, 0.3], [0.92, 1]);
-  const nameOpacity = useTransform(smoothProgress, [0, 0.25], [0.4, 1]);
-  // Combine Y transform with scale to reduce calculations
-  const nameY = useTransform(smoothProgress, [0, 0.3], [30, 0]);
-
-  // Simplified parallax - reduced range for better performance
-  const descY = useTransform(smoothProgress, [0, 0.4], [40, 0]); // Reduced from 60 to 40
-  const descOpacity = useTransform(smoothProgress, [0.1, 0.3], [0, 1]); // Narrowed range
-
-  // Cards stagger effect
-  const cardsInView = useInView(cardsRef, { once: true, margin: "-100px" });
-
-  const capabilities = [
-    {
-      num: "01",
-      title: "Dynamic",
-      subtitle: "Stakeholder Views",
-      desc: "Multi-user dashboards tailored for different decision-makers"
-    },
-    {
-      num: "02",
-      title: "Automated",
-      subtitle: "Intelligence",
-      desc: "AI-driven workflows that accelerate insight delivery"
-    },
-    {
-      num: "03",
-      title: "Targeted",
-      subtitle: "Decision Support",
-      desc: "Focused analytics that drive actionable outcomes"
-    },
-  ];
-
-  const skills = ["Power BI", "SQL", "DAX", "Python", "Excel", "VBA", "AI Workflow", "Healthcare Analytics"];
-
-  return (
-    <section
-      ref={sectionRef}
-      id="about"
-      className="sticky top-0 z-10 h-screen flex items-center justify-center px-4 sm:px-6 lg:px-8 py-20 sm:py-28 lg:py-32 overflow-hidden bg-[#0A192F]"
-    >
-      {/* Solid background to cover hero section */}
-      <div className="absolute inset-0 bg-[#0A192F]" />
-
-      {/* Subtle ambient glow - monochromatic */}
-      <div className="pointer-events-none absolute inset-0">
-        <motion.div
-          className="absolute top-0 left-1/2 -translate-x-1/2 h-[600px] w-[800px] rounded-full bg-cyan-500/10 blur-[250px]"
-          style={{ opacity: smoothProgress }}
-        />
-      </div>
-
-      <div className="max-w-5xl mx-auto w-full relative z-10">
-        {/* Header with Dynamic Scaling */}
-        <div className="text-center mb-20">
-          <motion.p
-            className="text-xs tracking-[0.5em] uppercase text-text-muted font-sans mb-6"
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6 }}
-          >
-            About
-          </motion.p>
-
-          {/* Dynamic Scaling Name */}
-          <motion.h1
-            ref={nameRef}
-            className="font-serif text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-bold text-white leading-[1.1] mb-8 origin-center whitespace-nowrap"
-            style={shouldReduceMotion ? {} : {
-              scale: nameScale,
-              opacity: nameOpacity,
-              y: nameY
-            }}
-          >
-            KONARK PARIHAR
-          </motion.h1>
-
-          {/* Parallax Description */}
-          <motion.p
-            className="text-lg sm:text-xl text-text-muted font-sans max-w-2xl mx-auto leading-relaxed"
-            style={shouldReduceMotion ? {} : { y: descY, opacity: descOpacity }}
-          >
-            Data Analyst specializing in{" "}
-            <span className="text-accent-cyan">Power BI</span>,{" "}
-            <span className="text-accent-cyan">SQL</span>, and{" "}
-            <span className="text-accent-cyan">AI-powered workflows</span> —
-            transforming complex data into strategic business decisions.
-          </motion.p>
-        </div>
-
-        {/* Key Capabilities - Staggered Slide In */}
-        <div ref={cardsRef} className="mb-20">
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-px bg-white/5 rounded-2xl overflow-hidden">
-            {capabilities.map(({ num, title, subtitle, desc }, index) => (
-              <motion.div
-                key={num}
-                className="bg-[#0A192F] p-8 sm:p-10 group hover:bg-white/[0.02] transition-colors duration-500"
-                initial={{ opacity: 0, x: index === 0 ? -60 : index === 2 ? 60 : 0, y: index === 1 ? 40 : 0 }}
-                animate={cardsInView ? { opacity: 1, x: 0, y: 0 } : {}}
-                transition={{
-                  duration: 0.7,
-                  delay: index * 0.15,
-                  ease: [0.25, 0.46, 0.45, 0.94]
-                }}
-              >
-                <span className="text-xs text-text-muted/50 font-mono tracking-wider">{num}</span>
-                <motion.h3
-                  className="text-2xl sm:text-3xl font-bold text-white font-serif mt-4 mb-1 group-hover:text-accent-cyan transition-colors duration-300"
-                  whileHover={{ scale: 1.02 }}
-                  transition={{ type: "spring", stiffness: 300, damping: 20 }}
-                >
-                  {title}
-                </motion.h3>
-                <p className="text-xs uppercase tracking-[0.2em] text-accent-cyan/70 font-sans mb-4">
-                  {subtitle}
-                </p>
-                <p className="text-sm text-text-muted leading-relaxed font-sans">
-                  {desc}
-                </p>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-
-        {/* Skills - Cascading Fade In */}
-        <div className="overflow-hidden">
-          <motion.div
-            className="flex items-center justify-center gap-4 mb-8"
-            initial={{ opacity: 0 }}
-            whileInView={{ opacity: 1 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.5 }}
-          >
-            <div className="h-px flex-1 max-w-[100px] bg-gradient-to-r from-transparent to-white/10" />
-            <p className="text-xs tracking-[0.4em] uppercase text-text-muted font-sans">Technical Stack</p>
-            <div className="h-px flex-1 max-w-[100px] bg-gradient-to-l from-transparent to-white/10" />
-          </motion.div>
-
-          <div className="flex flex-wrap justify-center gap-3">
-            {skills.map((skill, index) => (
-              <motion.span
-                key={skill}
-                className="px-4 py-2 text-sm text-text-muted border border-white/10 rounded-full 
-                           hover:text-white hover:border-white/30
-                           transition-all duration-300 cursor-default font-sans"
-                initial={{ opacity: 0, y: 20, scale: 0.9 }}
-                whileInView={{ opacity: 1, y: 0, scale: 1 }}
-                viewport={{ once: true }}
-                transition={{
-                  duration: 0.4,
-                  delay: 0.05 * index,
-                  ease: "easeOut"
-                }}
-                whileHover={{
-                  scale: 1.08,
-                  boxShadow: "0 0 20px rgba(100,255,218,0.2)",
-                  borderColor: "rgba(100,255,218,0.5)"
-                }}
-              >
-                {skill}
-              </motion.span>
-            ))}
-          </div>
-        </div>
-      </div>
-    </section>
-  );
-}
