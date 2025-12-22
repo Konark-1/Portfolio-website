@@ -9,6 +9,7 @@ import {
   Brain,
   Code2,
   Database,
+  Download,
   FileText,
   Globe,
   Layers,
@@ -370,10 +371,11 @@ export default function HomePage() {
       {/* Connection warming handled via preconnect/dns-prefetch in layout */}
 
       {/* Sticky Full-Page Slides Container - Hero slides under About */}
-      <div className="relative">
+      <div className="relative" suppressHydrationWarning>
         {/* Hero section - First Sticky Slide */}
         <div
           className="sticky top-0 min-h-screen z-0"
+          suppressHydrationWarning
           style={{
             backgroundColor: 'var(--background-hero)',
             willChange: 'transform', // GPU hint for smoother sticky
@@ -400,51 +402,39 @@ export default function HomePage() {
           <div className="absolute inset-0 z-[1] bg-[radial-gradient(circle_at_50%_50%,rgba(39,203,206,0.08),transparent_70%)] pointer-events-none" />
 
           {/* Content container with proper spacing from header */}
-          <div className="relative z-10 flex flex-col items-center justify-center min-h-[85vh] pt-24 sm:pt-28 lg:pt-32 pb-8 px-4 sm:px-6">
+          <div className="relative z-10 flex flex-col items-center justify-center min-h-[85vh] pt-24 sm:pt-28 lg:pt-32 pb-8 px-4 sm:px-6" suppressHydrationWarning>
             {/* Main heading */}
-            <div className="text-center max-w-6xl mx-auto space-y-4 sm:space-y-6">
-              <h1 className="font-serif text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl 2xl:text-8xl font-bold tracking-tight leading-[1.1] text-white px-2">
+            <div className="text-center max-w-6xl mx-auto space-y-4 sm:space-y-6" suppressHydrationWarning>
+              <h1 className="font-serif text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl 2xl:text-8xl font-bold tracking-tight leading-[1.1] text-white px-2" suppressHydrationWarning>
                 Data Analyst & Business Intelligence Specialist
               </h1>
-              <p className="max-w-3xl mx-auto text-sm sm:text-base md:text-lg lg:text-xl leading-relaxed text-white/80 font-sans px-2">
+              <p className="max-w-3xl mx-auto text-sm sm:text-base md:text-lg lg:text-xl leading-relaxed text-white/80 font-sans px-2" suppressHydrationWarning>
                 I find the signal in the noise. Transforming complex data into actionable business intelligence.
               </p>
             </div>
 
             {/* Action buttons */}
-            <div className="mt-8 sm:mt-12 lg:mt-16 flex flex-col sm:flex-row justify-center items-center gap-4 w-full max-w-lg mx-auto px-4">
-              <div
-                className="cursor-pointer hover:scale-105 transition-all duration-300 hover:shadow-lg pointer-events-auto group w-[85%] sm:w-auto"
-                onClick={(e) => {
-                  e.preventDefault();
-                  const element = document.getElementById('about');
-                  if (element) {
-                    const headerHeight = 115;
-                    const elementPosition = element.offsetTop - headerHeight;
-                    // Use requestAnimationFrame for smoother scroll
-                    requestAnimationFrame(() => {
-                      window.scrollTo({
-                        top: elementPosition,
-                        behavior: 'smooth'
-                      });
-                    });
-                  }
-                }}
+            <div className="mt-8 sm:mt-12 lg:mt-16 flex flex-col sm:flex-row justify-center items-center gap-4 w-full max-w-xl mx-auto px-4" suppressHydrationWarning>
+              <a
+                href="/Konark Resume.pdf"
+                download
+                className="cursor-pointer hover:scale-105 transition-all duration-300 hover:shadow-lg pointer-events-auto group"
               >
                 <GlassButton
-                  width="100%"
+                  width={220}
                   height={55}
                   borderRadius={50}
                   backgroundOpacity={0.1}
                   blur={12}
                 >
-                  <button className="px-6 sm:px-8 py-3 text-text-primary font-semibold w-full h-full text-sm sm:text-base tracking-wide flex items-center justify-center gap-2 font-sans">
-                    Get Started
-                  </button>
+                  <span className="px-6 py-3 text-text-primary font-semibold w-full h-full text-sm sm:text-base tracking-wide flex items-center justify-center gap-2 font-sans uppercase">
+                    <Download className="h-4 w-4 sm:h-5 sm:w-5" />
+                    Resume
+                  </span>
                 </GlassButton>
-              </div>
+              </a>
               <div
-                className="w-[85%] sm:w-auto cursor-pointer hover:scale-105 transition-all duration-300 hover:shadow-lg pointer-events-auto group"
+                className="cursor-pointer hover:scale-105 transition-all duration-300 hover:shadow-lg pointer-events-auto group"
                 onClick={(e) => {
                   e.preventDefault();
                   const element = document.getElementById('projects');
@@ -465,14 +455,14 @@ export default function HomePage() {
                 }}
               >
                 <GlassButton
-                  width="100%"
+                  width={220}
                   height={55}
                   borderRadius={50}
                   backgroundOpacity={0.1}
                   blur={12}
                 >
-                  <span className="px-6 sm:px-8 py-3 text-text-primary font-medium w-full h-full text-sm sm:text-base tracking-wide flex items-center justify-center gap-2 font-sans">
-                    MY PORTFOLIO
+                  <span className="px-6 py-3 text-text-primary font-semibold w-full h-full text-sm sm:text-base tracking-wide flex items-center justify-center gap-2 font-sans uppercase">
+                    My Portfolio
                   </span>
                 </GlassButton>
               </div>
