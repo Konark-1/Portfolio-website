@@ -618,7 +618,7 @@ export default function HomePage() {
       </section>
 
       {/* Projects Section - overlays Experience section with negative margin */}
-      <section id="projects" className="relative z-30 pt-12 sm:pt-16 lg:pt-24 pb-12 sm:pb-16 lg:pb-20 px-4 sm:px-6 overflow-hidden border-t -mt-[60vh]" style={{
+      <section id="projects" className="relative z-30 pt-12 sm:pt-16 lg:pt-24 pb-12 sm:pb-16 lg:pb-20 px-4 sm:px-6 overflow-hidden border-t -mt-[40vh]" style={{
         backgroundColor: 'var(--background-projects)',
         borderColor: 'var(--border-color)'
       }}>

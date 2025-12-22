@@ -86,12 +86,20 @@ export function StackedCardCertificates({ certificates }: StackedCardCertificate
         <section
             ref={sectionRef}
             id="certificates"
-            className="relative bg-gradient-to-b from-gray-900 via-black to-gray-900 text-white overflow-hidden"
+            className="relative text-white overflow-hidden border-t"
+            style={{
+                backgroundColor: 'var(--background-experience)',
+                borderColor: 'var(--border-color)'
+            }}
         >
-            {/* Background effects */}
+            {/* Enhanced Background - Mobile-safe decorations (no heavy blur) */}
             <div className="absolute inset-0 pointer-events-none">
-                <div className="absolute top-0 left-1/4 h-[500px] w-[500px] -translate-x-1/2 rounded-full bg-cyan-500/10 blur-[120px]" />
-                <div className="absolute bottom-0 right-1/4 h-[400px] w-[400px] rounded-full bg-blue-500/10 blur-[100px]" />
+                {/* Top gradient fade from previous section */}
+                <div className="absolute top-0 left-0 right-0 h-24 bg-gradient-to-b from-[rgba(39,203,206,0.06)] to-transparent" />
+                {/* Subtle ambient glow */}
+                <div className="absolute top-1/4 left-1/2 -translate-x-1/2 h-[400px] w-[80%] bg-[radial-gradient(ellipse_at_center,rgba(39,203,206,0.05),transparent_70%)]" />
+                {/* Bottom fade to contact section */}
+                <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-[var(--background-contact)] to-transparent" />
             </div>
 
             {/* Section Header */}
@@ -126,7 +134,10 @@ export function StackedCardCertificates({ certificates }: StackedCardCertificate
                             key={`${cert.title}-${index}`}
                             ref={(el) => { cardRefs.current[index] = el; }}
                             className={`c-card w-full max-w-[90vw] sm:max-w-none ${index === certificates.length - 1 ? '' : 'mb-8'}`}
-                            style={{ zIndex: index + 1 }}
+                            style={{
+                                zIndex: index + 1,
+                                backgroundColor: 'var(--background-experience)',
+                            }}
                         >
                             <CertificateStackedCard certificate={cert} index={index} />
                         </div>
@@ -163,11 +174,17 @@ function CertificateStackedCard({
 
     return (
         <div
-            className="group cursor-pointer rounded-3xl bg-slate-900/95 border border-white/10 shadow-2xl hover:border-accent-cyan/40 transition-all duration-300 will-change-transform"
+            className="group cursor-pointer rounded-3xl border shadow-2xl transition-all duration-300 will-change-transform"
+            style={{
+                backgroundColor: 'var(--surface-elevated)',
+                borderColor: 'var(--border-color)',
+            }}
+            onMouseEnter={(e) => e.currentTarget.style.borderColor = 'var(--border-glow)'}
+            onMouseLeave={(e) => e.currentTarget.style.borderColor = 'var(--border-color)'}
             onClick={handleClick}
         >
             {/* Certificate Image - 70% of card */}
-            <div className="relative w-full aspect-[16/9] overflow-hidden rounded-t-3xl bg-gradient-to-br from-gray-800 to-gray-900">
+            <div className="relative w-full aspect-[16/9] overflow-hidden rounded-t-3xl" style={{ backgroundColor: 'var(--background)' }}>
                 {showImage ? (
                     <Image
                         src={certificate.imagePath!}
@@ -190,7 +207,7 @@ function CertificateStackedCard({
                 {/* Issuer Badge */}
                 {certificate.issuer && (
                     <div className="absolute top-4 right-4 z-10">
-                        <div className="px-3 py-1.5 rounded-full bg-slate-800/90 border border-white/20 text-white text-sm font-medium font-sans">
+                        <div className="px-3 py-1.5 rounded-full border text-sm font-medium font-sans" style={{ backgroundColor: 'var(--surface)', borderColor: 'var(--border-color)', color: 'var(--text-primary)' }}>
                             {certificate.issuer}
                         </div>
                     </div>
@@ -198,8 +215,8 @@ function CertificateStackedCard({
 
                 {/* Hover overlay */}
                 <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 flex items-center justify-center transition-all duration-300 opacity-0 group-hover:opacity-100">
-                    <div className="px-5 py-2.5 rounded-full bg-slate-700/80 border border-white/30 transform scale-90 group-hover:scale-100 transition-transform duration-300">
-                        <div className="flex items-center gap-2 text-white text-sm font-medium font-sans">
+                    <div className="px-5 py-2.5 rounded-full border transform scale-90 group-hover:scale-100 transition-transform duration-300" style={{ backgroundColor: 'rgba(39, 203, 206, 0.15)', borderColor: 'var(--accent-cyan)' }}>
+                        <div className="flex items-center gap-2 text-sm font-medium font-sans" style={{ color: 'var(--accent-cyan)' }}>
                             <ExternalLink className="h-4 w-4" />
                             <span>View Certificate</span>
                         </div>
@@ -208,7 +225,7 @@ function CertificateStackedCard({
             </div>
 
             {/* Content - 20-30% of card */}
-            <div className="p-6 space-y-4 bg-gradient-to-t from-slate-950 to-slate-900/80">
+            <div className="p-6 space-y-4 rounded-b-3xl" style={{ background: 'linear-gradient(to top, var(--background), var(--surface-elevated))' }}>
                 {/* Title */}
                 <div className="flex items-start gap-3">
                     <div className="flex-shrink-0 p-2.5 rounded-xl bg-gradient-to-br from-accent-cyan/20 to-blue-500/20 border border-accent-cyan/30">
@@ -233,7 +250,7 @@ function CertificateStackedCard({
 
                 {/* Skills Tags */}
                 {certificate.skills && certificate.skills.length > 0 && (
-                    <div className="pt-4 border-t border-white/5">
+                    <div className="pt-4 border-t" style={{ borderColor: 'var(--border-color)' }}>
                         <div className="flex flex-wrap gap-2">
                             {certificate.skills.map((skill) => (
                                 <span
