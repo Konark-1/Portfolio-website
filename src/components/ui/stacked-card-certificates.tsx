@@ -44,35 +44,34 @@ export function StackedCardCertificates({ certificates }: StackedCardCertificate
 
             if (cards.length < 2) return;
 
-            // Create ScrollTrigger for the last card to establish the end point
-            const lastCardST = ScrollTrigger.create({
-                trigger: cards[lastCardIndex],
-                start: "center center",
-            });
+            const lastCard = cards[lastCardIndex];
 
-            // Iterate over each card
+            // Iterate over each card (except last - it doesn't get pinned)
             cards.forEach((card, index) => {
-                const isLastCard = index === lastCardIndex;
-                // Last card doesn't scale down
-                const targetScale = isLastCard ? 1 : 0.85 + (0.15 * (index / lastCardIndex));
+                // Skip last card - it scrolls naturally, other cards stack on it
+                if (index === lastCardIndex) return;
+
+                // Scale down as cards stack
+                const targetScale = 0.85 + (0.15 * (index / lastCardIndex));
 
                 const scaleDown = gsap.to(card, {
                     scale: targetScale,
-                    opacity: isLastCard ? 1 : 0.6,
+                    opacity: 0.6,
                     ease: "none",
                 });
 
                 ScrollTrigger.create({
                     trigger: card,
-                    start: "center center", // Center the cards in viewport
-                    // Last card stays pinned 80% longer for overlay effect with next section
-                    end: isLastCard ? "+=80vh" : () => lastCardST.start,
+                    start: "center center",
+                    // End when the last card's center reaches viewport center
+                    // Calculate the distance from this card to the last card
+                    endTrigger: lastCard,
+                    end: "center center",
                     pin: true,
-                    pinSpacing: isLastCard, // Only last card creates pin spacing for overlay effect
-                    anticipatePin: 1, // Smooth pin transition to prevent flickering
+                    pinSpacing: false,
+                    anticipatePin: 1,
                     scrub: 0.5,
-                    animation: isLastCard ? undefined : scaleDown, // Last card doesn't animate
-                    toggleActions: "restart none none reverse",
+                    animation: scaleDown,
                 });
             });
         }, sectionRef);
