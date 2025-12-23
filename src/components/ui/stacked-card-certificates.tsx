@@ -38,6 +38,20 @@ export function StackedCardCertificates({ certificates }: StackedCardCertificate
         // Re-register in case context was lost
         gsap.registerPlugin(ScrollTrigger);
 
+        // CRITICAL: Prevent iOS Safari viewport resize from causing ScrollTrigger recalculation
+        ScrollTrigger.config({ ignoreMobileResize: true });
+
+        // Detect mobile devices - DISABLE GSAP pinning completely on mobile to prevent crashes
+        const isMobile = window.matchMedia("(max-width: 768px)").matches;
+        const isLowPowerDevice = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+        // On mobile, skip all GSAP animations to prevent crash
+        // Cards will display as a simple scrollable list instead
+        if (isMobile || isLowPowerDevice) {
+            console.log("[Certificates] Mobile detected - GSAP pinning disabled for stability");
+            return;
+        }
+
         const ctx = gsap.context(() => {
             const cards = cardRefs.current.filter(Boolean) as HTMLDivElement[];
             const lastCardIndex = cards.length - 1;
@@ -46,7 +60,7 @@ export function StackedCardCertificates({ certificates }: StackedCardCertificate
 
             const lastCard = cards[lastCardIndex];
 
-            // Iterate over each card (except last - it doesn't get pinned)
+            // Desktop only: Iterate over each card (except last - it doesn't get pinned)
             cards.forEach((card, index) => {
                 // Skip last card - it scrolls naturally, other cards stack on it
                 if (index === lastCardIndex) return;
@@ -63,8 +77,6 @@ export function StackedCardCertificates({ certificates }: StackedCardCertificate
                 ScrollTrigger.create({
                     trigger: card,
                     start: "center center",
-                    // End when the last card's center reaches viewport center
-                    // Calculate the distance from this card to the last card
                     endTrigger: lastCard,
                     end: "center center",
                     pin: true,
@@ -76,7 +88,13 @@ export function StackedCardCertificates({ certificates }: StackedCardCertificate
             });
         }, sectionRef);
 
+        // Delayed refresh for first load stability
+        const refreshTimeout = setTimeout(() => {
+            ScrollTrigger.refresh();
+        }, 200);
+
         return () => {
+            clearTimeout(refreshTimeout);
             ctx.revert();
         };
     }, [certificates.length]);
@@ -192,7 +210,8 @@ function CertificateStackedCard({
                         sizes="(max-width: 768px) 100vw, 800px"
                         className="object-contain p-6 transition-transform duration-500 group-hover:scale-105"
                         onError={() => setImageError(true)}
-                        priority={index < 2}
+                        priority={index < 4}
+                        loading={index < 4 ? undefined : "lazy"}
                     />
                 ) : (
                     <div className="w-full h-full flex items-center justify-center p-6">

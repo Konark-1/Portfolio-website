@@ -58,9 +58,17 @@ body {
 html {
   overflow-x: clip;
   /* Use clip instead of hidden to preserve sticky positioning */
-  scroll-behavior: smooth;
+  /* IMPORTANT: scroll-behavior: smooth conflicts with GSAP ScrollTrigger on mobile */
+  /* Smooth scroll is now applied only on desktop devices with fine pointer (mouse) */
   scrollbar-width: none;
   /* Firefox */
+}
+
+/* Enable smooth scroll only on desktop devices - prevents GSAP ScrollTrigger conflicts on mobile */
+@media (min-width: 768px) and (pointer: fine) {
+  html {
+    scroll-behavior: smooth;
+  }
 }
 
 /* Performance optimizations for low-end devices */
