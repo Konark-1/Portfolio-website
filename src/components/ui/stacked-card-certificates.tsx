@@ -1,6 +1,6 @@
 "use client";
 
-import { useLayoutEffect, useRef, useState } from "react";
+import { useLayoutEffect, useRef, useState, useEffect } from "react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import Image from "next/image";
@@ -31,9 +31,16 @@ export function StackedCardCertificates({ certificates }: StackedCardCertificate
     const sectionRef = useRef<HTMLElement>(null);
     const cardsContainerRef = useRef<HTMLDivElement>(null);
     const cardRefs = useRef<(HTMLDivElement | null)[]>([]);
+    const [isMounted, setIsMounted] = useState(false);
+
+    // Ensure component mounts before checking window-based conditions
+    useEffect(() => {
+        setIsMounted(true);
+    }, []);
 
     useLayoutEffect(() => {
-        if (typeof window === "undefined") return;
+        // Skip during SSR and before mount to prevent hydration mismatch
+        if (!isMounted) return;
 
         // Re-register in case context was lost
         gsap.registerPlugin(ScrollTrigger);
@@ -97,7 +104,7 @@ export function StackedCardCertificates({ certificates }: StackedCardCertificate
             clearTimeout(refreshTimeout);
             ctx.revert();
         };
-    }, [certificates.length]);
+    }, [certificates.length, isMounted]);
 
     return (
         <section
