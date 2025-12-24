@@ -371,108 +371,135 @@ export default function HomePage() {
       {/* Connection warming handled via preconnect/dns-prefetch in layout */}
 
       {/* Sticky Full-Page Slides Container - Hero slides under About */}
-      <div className="relative" suppressHydrationWarning>
-        {/* Hero section - First Sticky Slide */}
-        <div
-          className="sticky top-0 min-h-screen z-0"
-          suppressHydrationWarning
-          style={{
-            backgroundColor: 'var(--background-hero)',
-            willChange: 'transform', // GPU hint for smoother sticky
-            transform: 'translateZ(0)' // Force GPU layer
-          }}
-        >
-          {/* Silk Background */}
-          {!shouldReduceMotion && (
-            <div className="absolute inset-0 z-0">
-              <Silk
-                speed={7.5}
-                scale={1}
-                color="#27CBCE"
-                noiseIntensity={5.9}
-                rotation={0}
-              />
-            </div>
-          )}
+      {/* Client-only rendering to prevent hydration mismatches from browser extensions */}
+      {isMounted ? (
+        <div className="relative" suppressHydrationWarning>
+          {/* Hero section - First Sticky Slide */}
+          <div
+            className="sticky top-0 min-h-screen z-0"
+            suppressHydrationWarning
+            style={{
+              backgroundColor: 'var(--background-hero)',
+              willChange: 'transform', // GPU hint for smoother sticky
+              transform: 'translateZ(0)' // Force GPU layer
+            }}
+          >
+            {/* Silk Background */}
+            {!shouldReduceMotion && (
+              <div className="absolute inset-0 z-0">
+                <Silk
+                  speed={7.5}
+                  scale={1}
+                  color="#27CBCE"
+                  noiseIntensity={5.9}
+                  rotation={0}
+                />
+              </div>
+            )}
 
-          {/* Enhanced gradient overlay with turquoise tint */}
-          <div className="absolute inset-0 z-[1] bg-gradient-to-b from-transparent via-transparent to-[rgba(10,14,26,0.4)] pointer-events-none" />
+            {/* Enhanced gradient overlay with turquoise tint */}
+            <div className="absolute inset-0 z-[1] bg-gradient-to-b from-transparent via-transparent to-[rgba(10,14,26,0.4)] pointer-events-none" />
 
-          {/* Subtle turquoise ambient glow */}
-          <div className="absolute inset-0 z-[1] bg-[radial-gradient(circle_at_50%_50%,rgba(39,203,206,0.08),transparent_70%)] pointer-events-none" />
+            {/* Subtle turquoise ambient glow */}
+            <div className="absolute inset-0 z-[1] bg-[radial-gradient(circle_at_50%_50%,rgba(39,203,206,0.08),transparent_70%)] pointer-events-none" />
 
-          {/* Content container with proper spacing from header */}
-          <div className="relative z-10 flex flex-col items-center justify-center min-h-[85vh] pt-24 sm:pt-28 lg:pt-32 pb-8 px-4 sm:px-6" suppressHydrationWarning>
-            {/* Main heading */}
-            <div className="text-center max-w-6xl mx-auto space-y-4 sm:space-y-6" suppressHydrationWarning>
-              <h1 className="font-serif text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl 2xl:text-8xl font-bold tracking-tight leading-[1.1] text-white px-2" suppressHydrationWarning>
-                Data Analyst & Business Intelligence Specialist
-              </h1>
-              <p className="max-w-3xl mx-auto text-sm sm:text-base md:text-lg lg:text-xl leading-relaxed text-white/80 font-sans px-2" suppressHydrationWarning>
-                I find the signal in the noise. Transforming complex data into actionable business intelligence.
-              </p>
-            </div>
+            {/* Content container with proper spacing from header */}
+            <div className="relative z-10 flex flex-col items-center justify-center min-h-[85vh] pt-24 sm:pt-28 lg:pt-32 pb-8 px-4 sm:px-6" suppressHydrationWarning>
+              {/* Main heading */}
+              <div className="text-center max-w-6xl mx-auto space-y-4 sm:space-y-6" suppressHydrationWarning>
+                <h1 className="font-serif text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl 2xl:text-8xl font-bold tracking-tight leading-[1.1] text-white px-2" suppressHydrationWarning>
+                  Data Analyst & Business Intelligence Specialist
+                </h1>
+                <p className="max-w-3xl mx-auto text-sm sm:text-base md:text-lg lg:text-xl leading-relaxed text-white/80 font-sans px-2" suppressHydrationWarning>
+                  I find the signal in the noise. Transforming complex data into actionable business intelligence.
+                </p>
+              </div>
 
-            {/* Action buttons */}
-            <div className="mt-8 sm:mt-12 lg:mt-16 flex flex-col sm:flex-row justify-center items-center gap-4 w-full max-w-xl mx-auto px-4" suppressHydrationWarning>
-              <a
-                href="/Konark Resume.pdf"
-                download
-                className="cursor-pointer hover:scale-105 transition-all duration-300 hover:shadow-lg pointer-events-auto group"
-              >
-                <GlassButton
-                  width={220}
-                  height={55}
-                  borderRadius={50}
-                  backgroundOpacity={0.1}
-                  blur={12}
+              {/* Action buttons */}
+              <div className="mt-8 sm:mt-12 lg:mt-16 flex flex-col sm:flex-row justify-center items-center gap-4 w-full max-w-xl mx-auto px-4" suppressHydrationWarning>
+                <a
+                  href="/Konark Resume.pdf"
+                  download
+                  className="cursor-pointer hover:scale-105 transition-all duration-300 hover:shadow-lg pointer-events-auto group"
                 >
-                  <span className="px-6 py-3 text-text-primary font-semibold w-full h-full text-sm sm:text-base tracking-wide flex items-center justify-center gap-2 font-sans uppercase">
-                    <Download className="h-4 w-4 sm:h-5 sm:w-5" />
-                    Resume
-                  </span>
-                </GlassButton>
-              </a>
-              <div
-                className="cursor-pointer hover:scale-105 transition-all duration-300 hover:shadow-lg pointer-events-auto group"
-                onClick={(e) => {
-                  e.preventDefault();
-                  const element = document.getElementById('projects');
-                  if (element) {
-                    const headerHeight = 115;
-                    const elementPosition = element.offsetTop - headerHeight;
-                    // Use requestAnimationFrame for smoother scroll
-                    requestAnimationFrame(() => {
-                      window.scrollTo({
-                        top: elementPosition,
-                        behavior: 'smooth'
+                  <GlassButton
+                    width={220}
+                    height={55}
+                    borderRadius={50}
+                    backgroundOpacity={0.1}
+                    blur={12}
+                  >
+                    <span className="px-6 py-3 text-text-primary font-semibold w-full h-full text-sm sm:text-base tracking-wide flex items-center justify-center gap-2 font-sans uppercase">
+                      <Download className="h-4 w-4 sm:h-5 sm:w-5" />
+                      Resume
+                    </span>
+                  </GlassButton>
+                </a>
+                <div
+                  className="cursor-pointer hover:scale-105 transition-all duration-300 hover:shadow-lg pointer-events-auto group"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    const element = document.getElementById('projects');
+                    if (element) {
+                      const headerHeight = 115;
+                      const elementPosition = element.offsetTop - headerHeight;
+                      // Use requestAnimationFrame for smoother scroll
+                      requestAnimationFrame(() => {
+                        window.scrollTo({
+                          top: elementPosition,
+                          behavior: 'smooth'
+                        });
                       });
-                    });
-                  } else {
-                    // Fallback: navigate if section not found
-                    window.location.href = '/portfolio';
-                  }
-                }}
-              >
-                <GlassButton
-                  width={220}
-                  height={55}
-                  borderRadius={50}
-                  backgroundOpacity={0.1}
-                  blur={12}
+                    } else {
+                      // Fallback: navigate if section not found
+                      window.location.href = '/portfolio';
+                    }
+                  }}
                 >
-                  <span className="px-6 py-3 text-text-primary font-semibold w-full h-full text-sm sm:text-base tracking-wide flex items-center justify-center gap-2 font-sans uppercase">
-                    My Portfolio
-                  </span>
-                </GlassButton>
+                  <GlassButton
+                    width={220}
+                    height={55}
+                    borderRadius={50}
+                    backgroundOpacity={0.1}
+                    blur={12}
+                  >
+                    <span className="px-6 py-3 text-text-primary font-semibold w-full h-full text-sm sm:text-base tracking-wide flex items-center justify-center gap-2 font-sans uppercase">
+                      My Portfolio
+                    </span>
+                  </GlassButton>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* About Section - Second Sticky Slide (Covers Hero) */}
+          <AboutSection shouldReduceMotion={shouldReduceMotion} />
+        </div>
+      ) : (
+        /* SSR Placeholder - matches client structure to minimize layout shift */
+        <div className="relative">
+          <div
+            className="sticky top-0 min-h-screen z-0"
+            style={{ backgroundColor: 'var(--background-hero)' }}
+          >
+            <div className="relative z-10 flex flex-col items-center justify-center min-h-[85vh] pt-24 sm:pt-28 lg:pt-32 pb-8 px-4 sm:px-6">
+              <div className="text-center max-w-6xl mx-auto space-y-4 sm:space-y-6">
+                <h1 className="font-serif text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl 2xl:text-8xl font-bold tracking-tight leading-[1.1] text-white px-2">
+                  Data Analyst & Business Intelligence Specialist
+                </h1>
+                <p className="max-w-3xl mx-auto text-sm sm:text-base md:text-lg lg:text-xl leading-relaxed text-white/80 font-sans px-2">
+                  I find the signal in the noise. Transforming complex data into actionable business intelligence.
+                </p>
+              </div>
+              <div className="mt-8 sm:mt-12 lg:mt-16 flex flex-col sm:flex-row justify-center items-center gap-4 w-full max-w-xl mx-auto px-4">
+                {/* Placeholder buttons with same dimensions */}
+                <div className="w-[220px] h-[55px] rounded-[50px] bg-white/10 backdrop-blur-sm border border-white/15" />
+                <div className="w-[220px] h-[55px] rounded-[50px] bg-white/10 backdrop-blur-sm border border-white/15" />
               </div>
             </div>
           </div>
         </div>
-
-        {/* About Section - Second Sticky Slide (Covers Hero) */}
-        <AboutSection shouldReduceMotion={shouldReduceMotion} />
-      </div>
+      )}
 
       {/* Skills / Technical Expertise Section */}
       <section id="skills" className="relative z-20 text-foreground border-t" style={{
@@ -1139,7 +1166,7 @@ function DashboardCard({
         <div
           role="region"
           aria-label={`${title} - Interactive Power BI Dashboard`}
-          className="rounded-2xl overflow-hidden border-2 transition-colors"
+          className="rounded-2xl overflow-hidden border-2 transition-colors relative group/dashboard"
           style={{
             borderColor: 'var(--border-color)',
           }}
@@ -1150,6 +1177,67 @@ function DashboardCard({
             e.currentTarget.style.borderColor = 'var(--border-color)';
           }}
         >
+          {/* Full Screen Button Overlay - Enhanced for mobile visibility */}
+          <button
+            onClick={(e) => {
+              const container = e.currentTarget.parentElement;
+              if (container) {
+                // Check for fullscreen API support (not available on iOS Safari for iframes)
+                const fullscreenSupported = document.fullscreenEnabled ||
+                  (document as any).webkitFullscreenEnabled;
+
+                if (fullscreenSupported) {
+                  if (document.fullscreenElement || (document as any).webkitFullscreenElement) {
+                    if (document.exitFullscreen) {
+                      document.exitFullscreen();
+                    } else if ((document as any).webkitExitFullscreen) {
+                      (document as any).webkitExitFullscreen();
+                    }
+                  } else {
+                    const requestFS = container.requestFullscreen ||
+                      (container as any).webkitRequestFullscreen;
+                    if (requestFS) {
+                      requestFS.call(container).catch((err: any) => {
+                        // Fallback: open dashboard URL directly
+                        window.open(embedUrl, '_blank');
+                      });
+                    }
+                  }
+                } else {
+                  // iOS Safari fallback: open dashboard in new tab for better mobile experience
+                  window.open(embedUrl, '_blank');
+                }
+              }
+            }}
+            className="absolute top-2 right-2 sm:top-3 sm:right-3 z-20 flex items-center gap-1.5 sm:gap-2 px-3 py-2 sm:px-4 sm:py-2.5 rounded-xl border backdrop-blur-md transition-all duration-300 hover:scale-105 active:scale-95 touch-manipulation"
+            style={{
+              backgroundColor: 'rgba(10, 14, 26, 0.95)',
+              borderColor: 'rgba(39, 203, 206, 0.6)',
+              color: 'rgba(39, 203, 206, 1)',
+              boxShadow: '0 2px 12px rgba(39, 203, 206, 0.25)',
+            }}
+            aria-label="View dashboard in full screen"
+            title="View in Full Screen (opens in new tab on mobile)"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="18"
+              height="18"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2.5"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              className="sm:w-5 sm:h-5"
+            >
+              <path d="M8 3H5a2 2 0 0 0-2 2v3" />
+              <path d="M21 8V5a2 2 0 0 0-2-2h-3" />
+              <path d="M3 16v3a2 2 0 0 0 2 2h3" />
+              <path d="M16 21h3a2 2 0 0 0 2-2v-3" />
+            </svg>
+            <span className="text-xs sm:text-sm font-semibold font-sans tracking-wide">Full Screen</span>
+          </button>
           <div className="relative w-full" style={{ backgroundColor: 'rgba(10, 14, 26, 0.95)' }}>
             <div className="relative pt-[56.25%] sm:pt-[59.77%] overflow-hidden">
               {shouldLoad ? (

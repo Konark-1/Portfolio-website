@@ -68,7 +68,7 @@ void main() {
 }
 `;
 
-const SilkPlane = forwardRef(function SilkPlane({ uniforms, isInViewport }, ref) {
+const SilkPlane = forwardRef(function SilkPlane({ uniforms, isInViewport, isDocumentVisible }, ref) {
   const { viewport } = useThree();
   const lastUpdateRef = useRef(0);
 
@@ -79,15 +79,16 @@ const SilkPlane = forwardRef(function SilkPlane({ uniforms, isInViewport }, ref)
   }, [ref, viewport]);
 
   useFrame((state, delta) => {
-    // Skip updates when not in viewport - keeps frameloop running but saves GPU
-    if (!isInViewport.current) return;
-    
+    // Skip updates when not in viewport OR document is hidden (tab in background)
+    // This saves significant GPU resources especially on mobile
+    if (!isInViewport.current || !isDocumentVisible.current) return;
+
     // Throttle updates to reduce CPU usage - update every ~16ms (60fps max)
     const now = state.clock.elapsedTime;
     if (now - lastUpdateRef.current < 0.016) return;
-    
+
     lastUpdateRef.current = now;
-    
+
     if (ref.current && ref.current.material && ref.current.material.uniforms) {
       // Smooth delta clamping to prevent jumps when tab becomes visible
       const clampedDelta = Math.min(delta, 0.1);
@@ -98,9 +99,9 @@ const SilkPlane = forwardRef(function SilkPlane({ uniforms, isInViewport }, ref)
   return (
     <mesh ref={ref} frustumCulled={true}>
       <planeGeometry args={[1, 1, 1, 1]} />
-      <shaderMaterial 
-        uniforms={uniforms} 
-        vertexShader={vertexShader} 
+      <shaderMaterial
+        uniforms={uniforms}
+        vertexShader={vertexShader}
         fragmentShader={fragmentShader}
         transparent={false}
         depthWrite={false}
@@ -138,10 +139,10 @@ const Silk = ({ speed = 5, scale = 1, color = '#7B7481', noiseIntensity = 1.5, r
 
     // Intersection Observer to detect when component is in viewport
     let observer = null;
-    
+
     const setupObserver = () => {
       if (!containerRef.current) return;
-      
+
       observer = new IntersectionObserver(
         (entries) => {
           const entry = entries[0];
@@ -172,9 +173,9 @@ const Silk = ({ speed = 5, scale = 1, color = '#7B7481', noiseIntensity = 1.5, r
 
   return (
     <div ref={containerRef} style={{ width: '100%', height: '100%' }}>
-      <Canvas 
+      <Canvas
         ref={canvasRef}
-        dpr={[1, 2]} 
+        dpr={[1, 2]}
         frameloop="always"
         gl={{
           preserveDrawingBuffer: false,
@@ -185,13 +186,13 @@ const Silk = ({ speed = 5, scale = 1, color = '#7B7481', noiseIntensity = 1.5, r
           stencil: false,
           depth: false,
         }}
-        style={{ 
+        style={{
           width: '100%',
           height: '100%',
           backgroundColor: 'transparent',
         }}
       >
-        <SilkPlane ref={meshRef} uniforms={uniforms} isInViewport={isInViewportRef} />
+        <SilkPlane ref={meshRef} uniforms={uniforms} isInViewport={isInViewportRef} isDocumentVisible={isDocumentVisibleRef} />
       </Canvas>
     </div>
   );
