@@ -54,9 +54,9 @@ export function detectDeviceCapabilities(): DeviceCapabilities {
         const renderer = gl.getParameter(debugInfo.UNMASKED_RENDERER_WEBGL);
         // Check if GPU is software-rendered (indicates no hardware GPU)
         if (typeof renderer === 'string') {
-          hasGPU = !renderer.toLowerCase().includes('software') && 
-                   !renderer.toLowerCase().includes('llvmpipe') &&
-                   !renderer.toLowerCase().includes('mesa');
+          hasGPU = !renderer.toLowerCase().includes('software') &&
+            !renderer.toLowerCase().includes('llvmpipe') &&
+            !renderer.toLowerCase().includes('mesa');
         } else {
           hasGPU = true;
         }
@@ -78,19 +78,29 @@ export function detectDeviceCapabilities(): DeviceCapabilities {
     memoryInfo.hardwareConcurrency = navigator.hardwareConcurrency;
   }
 
-  // Determine if low-end device
-  const isLowEndDevice = 
-    isMobile ||
+  // Detect iOS Safari specifically - it has stricter GPU memory limits even on powerful devices
+  const isIOSSafari = /iPad|iPhone|iPod/.test(navigator.userAgent) &&
+    /WebKit/.test(navigator.userAgent) &&
+    !/CriOS/.test(navigator.userAgent); // Not Chrome on iOS
+
+  // Determine if ACTUALLY low-end device based on hardware capabilities
+  // IMPORTANT: Being mobile does NOT automatically mean low-end
+  // iPhone 13 (4GB RAM, 6 cores, A15 GPU) should NOT be classified as low-end
+  const isActuallyLowEnd =
     !hasGPU ||
     (memoryInfo.deviceMemory !== undefined && memoryInfo.deviceMemory < 4) ||
     (memoryInfo.hardwareConcurrency !== undefined && memoryInfo.hardwareConcurrency < 4);
 
+  // For backwards compatibility, expose combined low-end OR iOS Safari limits
+  // This is used for features that are specifically problematic on iOS Safari (like WebGL)
+  const isLowEndDevice = isActuallyLowEnd;
+
   // Estimate FPS based on device capabilities
   let estimatedFPS = 60;
-  if (isLowEndDevice) {
+  if (isActuallyLowEnd) {
     estimatedFPS = hasGPU ? 30 : 15;
   } else if (isMobile) {
-    estimatedFPS = 30;
+    estimatedFPS = 45; // Mobile devices with good specs can handle 45fps
   }
 
   cachedCapabilities = {
@@ -100,17 +110,21 @@ export function detectDeviceCapabilities(): DeviceCapabilities {
     supportsWebGL,
     estimatedFPS,
     memoryInfo,
-  };
+    // Additional properties for more granular control
+    isIOSSafari,
+    isActuallyLowEnd,
+  } as DeviceCapabilities;
 
   return cachedCapabilities;
 }
 
 /**
  * Check if heavy animations should be disabled
+ * Now only returns true for ACTUALLY low-end devices, not all mobile
  */
 export function shouldDisableHeavyAnimations(): boolean {
   const caps = detectDeviceCapabilities();
-  return caps.isLowEndDevice || !caps.hasGPU || !caps.supportsWebGL;
+  return (caps as any).isActuallyLowEnd || !caps.hasGPU || !caps.supportsWebGL;
 }
 
 /**
