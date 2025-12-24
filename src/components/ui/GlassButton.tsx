@@ -17,7 +17,7 @@ export interface GlassButtonProps {
 /**
  * Lightweight CSS-only glass surface component.
  * Replaces the heavy SVG-filter-based GlassSurface for better performance.
- * Uses CSS backdrop-filter for glassmorphism effect.
+ * Uses CSS backdrop-filter for glassmorphism effect on all devices.
  */
 const GlassButton: React.FC<GlassButtonProps> = ({
     children,

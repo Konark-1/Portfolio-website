@@ -2,9 +2,9 @@
 
 import { useState, useEffect, useCallback, memo, useRef } from 'react';
 import Link from 'next/link';
-import { LiquidGlassGroup, LiquidGlassItem } from "@/components/ui/liquid-glass-group";
+import GlassButton from "@/components/ui/GlassButton";
 import { Menu, X } from 'lucide-react';
-import { detectDeviceCapabilities, shouldDisableHeavyAnimations } from "@/lib/performance";
+import { detectDeviceCapabilities } from "@/lib/performance";
 
 function Header() {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -191,12 +191,41 @@ function Header() {
         </Link>
       </div>
       <div className="hidden md:block">
-        <LiquidGlassGroup className="ring-1 ring-border">
-          <LiquidGlassItem onClick={scrollToTop}>Home</LiquidGlassItem>
-          <LiquidGlassItem onClick={() => scrollToSection('about')}>About</LiquidGlassItem>
-          <LiquidGlassItem onClick={scrollToPortfolio}>Portfolio</LiquidGlassItem>
-          <LiquidGlassItem onClick={() => scrollToSection('certificates')}>Certificates</LiquidGlassItem>
-        </LiquidGlassGroup>
+        <GlassButton
+          width="auto"
+          height={44}
+          borderRadius={50}
+          backgroundOpacity={0.08}
+          blur={12}
+          className="ring-1 ring-border px-1"
+        >
+          <div className="flex items-center gap-0.5">
+            <button
+              onClick={scrollToTop}
+              className="relative z-10 rounded-full px-3 py-1.5 text-base font-medium text-white/80 hover:text-white transition-colors duration-200 hover:scale-105"
+            >
+              Home
+            </button>
+            <button
+              onClick={() => scrollToSection('about')}
+              className="relative z-10 rounded-full px-3 py-1.5 text-base font-medium text-white/80 hover:text-white transition-colors duration-200 hover:scale-105"
+            >
+              About
+            </button>
+            <button
+              onClick={scrollToPortfolio}
+              className="relative z-10 rounded-full px-3 py-1.5 text-base font-medium text-white/80 hover:text-white transition-colors duration-200 hover:scale-105"
+            >
+              Portfolio
+            </button>
+            <button
+              onClick={() => scrollToSection('certificates')}
+              className="relative z-10 rounded-full px-3 py-1.5 text-base font-medium text-white/80 hover:text-white transition-colors duration-200 hover:scale-105"
+            >
+              Certificates
+            </button>
+          </div>
+        </GlassButton>
       </div>
       {/* Mobile menu button */}
       <div className="md:hidden">

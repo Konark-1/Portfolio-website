@@ -299,6 +299,7 @@ export default function HomePage() {
         "Comprehensive environmental intelligence: 15+ metrics including air quality (PM10, PM2.5, O3), visibility, humidity, wind speed, and UV index",
       ],
       gradient: "from-teal-500/20 via-cyan-500/10 to-cyan-400/0",
+      previewImage: "/images/dashboard-previews/Adaptive Weather Visuals.webp",
     },
     {
       title: "Macro & Micro Level Analysis",
@@ -321,6 +322,7 @@ export default function HomePage() {
         "Multi-variate correlation analysis: Advanced scatter plots and combo charts correlate Profit, Sales, and Quantity to uncover hidden patterns",
       ],
       gradient: "from-blue-500/20 via-indigo-500/10 to-indigo-400/0",
+      previewImage: "/images/dashboard-previews/Macro & Micro Level Analysis.webp",
     },
     {
       title: "Distribution & Trend Analysis",
@@ -344,6 +346,7 @@ export default function HomePage() {
         "State-level profitability mapping: Geographic bubble visualization pinpoints high-performing regions for strategic expansion",
       ],
       gradient: "from-purple-500/20 via-pink-500/10 to-pink-400/0",
+      previewImage: "/images/dashboard-previews/Distribution & Trend Analysis.webp",
     },
   ];
 
@@ -1108,6 +1111,7 @@ type DashboardCardProps = {
   subtitle: string;
   description: string;
   embedUrl: string;
+  previewImage: string;
   tech: string[];
   metrics: { label: string; value: string }[];
   insights: string[];
@@ -1120,12 +1124,28 @@ function DashboardCard({
   subtitle,
   description,
   embedUrl,
+  previewImage,
   tech,
   metrics,
   insights,
   gradient,
 }: DashboardCardProps): React.JSX.Element {
   const cardRef = useRef(null);
+  const [isMounted, setIsMounted] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
+
+  // Detect mobile only after mount to avoid hydration mismatch
+  // Server renders desktop view (iframe placeholder), client detects mobile after hydration
+  useEffect(() => {
+    setIsMounted(true);
+    const checkMobile = () => {
+      const mobile = window.matchMedia('(max-width: 768px)').matches ||
+        window.matchMedia('(pointer: coarse)').matches;
+      setIsMobile(mobile);
+    };
+    checkMobile();
+  }, []);
+
   // Lazy load iframes only when they're about to enter viewport
   // Increased margin to preload slightly before user sees it
   const shouldLoad = useInView(cardRef, { once: true, margin: "300px" });
@@ -1209,7 +1229,7 @@ function DashboardCard({
                 }
               }
             }}
-            className="absolute top-2 right-2 sm:top-3 sm:right-3 z-20 flex items-center gap-1.5 sm:gap-2 px-3 py-2 sm:px-4 sm:py-2.5 rounded-xl border backdrop-blur-md transition-all duration-300 hover:scale-105 active:scale-95 touch-manipulation"
+            className="hidden sm:flex absolute top-2 right-2 sm:top-3 sm:right-3 z-20 items-center gap-1.5 sm:gap-2 px-3 py-2 sm:px-4 sm:py-2.5 rounded-xl border backdrop-blur-md transition-all duration-300 hover:scale-105 active:scale-95 touch-manipulation"
             style={{
               backgroundColor: 'rgba(10, 14, 26, 0.95)',
               borderColor: 'rgba(39, 203, 206, 0.6)',
@@ -1240,7 +1260,56 @@ function DashboardCard({
           </button>
           <div className="relative w-full" style={{ backgroundColor: 'rgba(10, 14, 26, 0.95)' }}>
             <div className="relative pt-[56.25%] sm:pt-[59.77%] overflow-hidden">
-              {shouldLoad ? (
+              {isMounted && isMobile ? (
+                /* Mobile: Show preview image with centered fullscreen button */
+                <div className="absolute inset-0">
+                  {/* Preview Image */}
+                  <img
+                    src={previewImage}
+                    alt={`${title} dashboard preview`}
+                    className="absolute inset-0 w-full h-full object-cover object-top"
+                    loading="lazy"
+                  />
+                  {/* Dark overlay for better button visibility */}
+                  <div className="absolute inset-0 bg-black/30" />
+                  {/* Centered Fullscreen Button */}
+                  <button
+                    onClick={() => window.open(embedUrl, '_blank')}
+                    className="absolute inset-0 flex flex-col items-center justify-center gap-3 transition-all duration-300 active:scale-95 touch-manipulation"
+                    aria-label="View dashboard in full screen"
+                  >
+                    <div
+                      className="flex items-center gap-2 px-6 py-3 rounded-xl border backdrop-blur-md"
+                      style={{
+                        backgroundColor: 'rgba(10, 14, 26, 0.9)',
+                        borderColor: 'rgba(39, 203, 206, 0.6)',
+                        color: 'rgba(39, 203, 206, 1)',
+                        boxShadow: '0 4px 20px rgba(39, 203, 206, 0.3)',
+                      }}
+                    >
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="20"
+                        height="20"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2.5"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      >
+                        <path d="M8 3H5a2 2 0 0 0-2 2v3" />
+                        <path d="M21 8V5a2 2 0 0 0-2-2h-3" />
+                        <path d="M3 16v3a2 2 0 0 0 2 2h3" />
+                        <path d="M16 21h3a2 2 0 0 0 2-2v-3" />
+                      </svg>
+                      <span className="text-sm font-semibold font-sans tracking-wide">View Full Screen</span>
+                    </div>
+                    <span className="text-xs text-white/70 font-sans">Tap to open interactive dashboard</span>
+                  </button>
+                </div>
+              ) : shouldLoad ? (
+                /* Desktop: Show iframe */
                 <>
                   {/* Loading placeholder with smooth transition */}
                   <div

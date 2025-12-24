@@ -241,30 +241,6 @@ body::-webkit-scrollbar {
   color: rgba(255, 255, 255, 0.8);
 }
 
-/* Liquid glass animated background utility for groups */
-/* Stock index.css essentials for the liquid-glass component */
-@keyframes moveBackground {
-  from {
-    background-position: 0% 0%;
-  }
-
-  to {
-    background-position: 0% -1000%;
-  }
-}
-
-/* Our implementation using the stock keyframes */
-.liquid-animated .liquid-bg {
-  background: radial-gradient(1200px 600px at 10% 10%, rgba(0, 200, 255, 0.35), transparent 40%),
-    radial-gradient(1000px 500px at 80% 30%, rgba(180, 0, 255, 0.25), transparent 45%),
-    radial-gradient(1000px 500px at 20% 80%, rgba(255, 150, 0, 0.18), transparent 50%),
-    radial-gradient(1400px 700px at 60% 80%, rgba(255, 255, 255, 0.08), transparent 55%);
-  width: 200%;
-  height: 200%;
-  background-size: 100% 1000%;
-  animation: moveBackground 24s linear infinite;
-}
-
 /* Subtle zoom utility for header items */
 .zoom-on-hover {
   transition: transform 220ms ease-out;
