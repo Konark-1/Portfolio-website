@@ -15,19 +15,19 @@ const playfair = Playfair_Display({
 });
 
 export const metadata: Metadata = {
-  title: "Konark - Data Analyst Portfolio",
-  description: "Portfolio of Konark, a skilled data analyst.",
+  title: "Konark Parihar - Data Analyst & AI Innovator",
+  description: "Multi-disciplinary technologist & AI innovator. Built full-stack portfolio with interactive dashboards and analytics. Leveraging Generative AI for 3x faster insights.",
   openGraph: {
-    title: "Konark - Data Analyst Portfolio",
-    description: "Portfolio of Konark, a skilled data analyst.",
+    title: "Konark Parihar - Data Analyst & AI Innovator",
+    description: "Multi-disciplinary technologist & AI innovator. Built full-stack portfolio with interactive dashboards and analytics. Leveraging Generative AI for 3x faster insights.",
     url: "https://konarkparihar.vercel.app",
-    siteName: "Konark Portfolio",
+    siteName: "Konark Parihar Portfolio",
     images: [
       {
-        url: "/og-thumbnail.webp",
+        url: "https://konarkparihar.vercel.app/og-thumbnail.webp",
         width: 1200,
         height: 630,
-        alt: "Konark - Data Analyst Portfolio",
+        alt: "Konark Parihar - Data Analyst & AI Innovator",
       },
     ],
     locale: "en_US",
@@ -35,9 +35,9 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Konark - Data Analyst Portfolio",
-    description: "Portfolio of Konark, a skilled data analyst.",
-    images: ["/og-thumbnail.webp"],
+    title: "Konark Parihar - Data Analyst & AI Innovator",
+    description: "Multi-disciplinary technologist & AI innovator. Built full-stack portfolio with interactive dashboards and analytics. Leveraging Generative AI for 3x faster insights.",
+    images: ["https://konarkparihar.vercel.app/og-thumbnail.webp"],
   },
 };
 
@@ -55,10 +55,10 @@ export default function RootLayout({
         {/* Mobile viewport optimization (allow zoom for accessibility) */}
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <meta name="theme-color" content="#27CBCE" />
-        
+
         {/* PWA Manifest */}
         <link rel="manifest" href="/manifest.json" />
-        
+
         {/* Apple Touch Icons */}
         <link rel="apple-touch-icon" href="/icon-192.png" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
