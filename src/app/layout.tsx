@@ -17,6 +17,28 @@ const playfair = Playfair_Display({
 export const metadata: Metadata = {
   title: "Konark - Data Analyst Portfolio",
   description: "Portfolio of Konark, a skilled data analyst.",
+  openGraph: {
+    title: "Konark - Data Analyst Portfolio",
+    description: "Portfolio of Konark, a skilled data analyst.",
+    url: "https://konarkparihar.vercel.app",
+    siteName: "Konark Portfolio",
+    images: [
+      {
+        url: "/og-thumbnail.webp",
+        width: 1200,
+        height: 630,
+        alt: "Konark - Data Analyst Portfolio",
+      },
+    ],
+    locale: "en_US",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Konark - Data Analyst Portfolio",
+    description: "Portfolio of Konark, a skilled data analyst.",
+    images: ["/og-thumbnail.webp"],
+  },
 };
 
 import { SpeedInsights } from "@vercel/speed-insights/next";
