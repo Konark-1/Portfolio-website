@@ -1,17 +1,10 @@
 "use client";
 
-import { useLayoutEffect, useRef, useState, useEffect } from "react";
-import { gsap } from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { useState, useRef, useCallback, useEffect } from "react";
 import Image from "next/image";
-import { Award, ExternalLink } from "lucide-react";
-import { motion } from "framer-motion";
-import BlurText from "@/components/react-bits/BlurText/BlurText";
-
-// Register GSAP plugins
-if (typeof window !== "undefined") {
-    gsap.registerPlugin(ScrollTrigger);
-}
+import { Award, ExternalLink, ChevronLeft, ChevronRight } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+import { MagneticButton } from "./magnetic-button";
 
 interface Certificate {
     title: string;
@@ -28,167 +21,216 @@ interface StackedCardCertificatesProps {
 }
 
 export function StackedCardCertificates({ certificates }: StackedCardCertificatesProps) {
-    const sectionRef = useRef<HTMLElement>(null);
-    const cardsContainerRef = useRef<HTMLDivElement>(null);
-    const cardRefs = useRef<(HTMLDivElement | null)[]>([]);
-    const [isMounted, setIsMounted] = useState(false);
+    const [activeIndex, setActiveIndex] = useState(0);
+    const [direction, setDirection] = useState(0); // -1 for left, 1 for right
+    const [isHovered, setIsHovered] = useState(false);
+    const [isInView, setIsInView] = useState(false);
+    const containerRef = useRef<HTMLDivElement>(null);
 
-    // Ensure component mounts before checking window-based conditions
+    // Visibility detection
     useEffect(() => {
-        setIsMounted(true);
-    }, []);
+        const observer = new IntersectionObserver(
+            ([entry]) => {
+                setIsInView(entry.isIntersecting);
+            },
+            { threshold: 0.2 }
+        );
 
-    useLayoutEffect(() => {
-        // Skip during SSR and before mount to prevent hydration mismatch
-        if (!isMounted) return;
-
-        // Re-register in case context was lost
-        gsap.registerPlugin(ScrollTrigger);
-
-        // CRITICAL: Prevent iOS Safari viewport resize from causing ScrollTrigger recalculation
-        ScrollTrigger.config({ ignoreMobileResize: true });
-
-        // Detect mobile devices - DISABLE GSAP pinning completely on mobile to prevent crashes
-        const isMobile = window.matchMedia("(max-width: 768px)").matches;
-        const isLowPowerDevice = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-
-        // On mobile, skip all GSAP animations to prevent crash
-        // Cards will display as a simple scrollable list instead
-        if (isMobile || isLowPowerDevice) {
-            console.log("[Certificates] Mobile detected - GSAP pinning disabled for stability");
-            return;
+        if (containerRef.current) {
+            observer.observe(containerRef.current);
         }
 
-        const ctx = gsap.context(() => {
-            const cards = cardRefs.current.filter(Boolean) as HTMLDivElement[];
-            const lastCardIndex = cards.length - 1;
-
-            if (cards.length < 2) return;
-
-            const lastCard = cards[lastCardIndex];
-
-            // Desktop only: Iterate over each card (except last - it doesn't get pinned)
-            cards.forEach((card, index) => {
-                // Skip last card - it scrolls naturally, other cards stack on it
-                if (index === lastCardIndex) return;
-
-                // Scale down as cards stack
-                const targetScale = 0.85 + (0.15 * (index / lastCardIndex));
-
-                const scaleDown = gsap.to(card, {
-                    scale: targetScale,
-                    opacity: 0.6,
-                    ease: "none",
-                });
-
-                ScrollTrigger.create({
-                    trigger: card,
-                    start: "center center",
-                    endTrigger: lastCard,
-                    end: "center center",
-                    pin: true,
-                    pinSpacing: false,
-                    anticipatePin: 1,
-                    scrub: 0.5,
-                    animation: scaleDown,
-                });
-            });
-        }, sectionRef);
-
-        // Delayed refresh for first load stability
-        const refreshTimeout = setTimeout(() => {
-            ScrollTrigger.refresh();
-        }, 200);
-
         return () => {
-            clearTimeout(refreshTimeout);
-            ctx.revert();
+            if (containerRef.current) {
+                observer.unobserve(containerRef.current);
+            }
         };
-    }, [certificates.length, isMounted]);
+    }, []);
+
+    const goToNext = useCallback(() => {
+        setDirection(1);
+        setActiveIndex((prev) => (prev + 1) % certificates.length);
+    }, [certificates.length]);
+
+    const goToPrev = useCallback(() => {
+        setDirection(-1);
+        setActiveIndex((prev) => (prev - 1 + certificates.length) % certificates.length);
+    }, [certificates.length]);
+
+    // Keyboard navigation
+    useEffect(() => {
+        const handleKeyDown = (e: KeyboardEvent) => {
+            if (e.key === "ArrowLeft") goToPrev();
+            if (e.key === "ArrowRight") goToNext();
+        };
+        window.addEventListener("keydown", handleKeyDown);
+        return () => window.removeEventListener("keydown", handleKeyDown);
+    }, [goToNext, goToPrev]);
+
+    // Auto-scroll logic: only when in view and not hovered
+    useEffect(() => {
+        if (!isInView || isHovered) return;
+        const interval = setInterval(() => {
+            goToNext();
+        }, 2000);
+        return () => clearInterval(interval);
+    }, [isInView, isHovered, goToNext]);
+
+    const activeCert = certificates[activeIndex];
+
+    const slideVariants = {
+        enter: (dir: number) => ({
+            x: dir > 0 ? 300 : -300,
+            opacity: 0,
+            scale: 0.95,
+        }),
+        center: {
+            x: 0,
+            opacity: 1,
+            scale: 1,
+        },
+        exit: (dir: number) => ({
+            x: dir > 0 ? -300 : 300,
+            opacity: 0,
+            scale: 0.95,
+        }),
+    };
 
     return (
         <section
-            ref={sectionRef}
             id="certificates"
-            className="relative text-white overflow-hidden border-t"
+            className="relative z-20 text-white border-t"
             style={{
                 backgroundColor: 'var(--background-experience)',
                 borderColor: 'var(--border-color)'
             }}
         >
-            {/* Enhanced Background - Mobile-safe decorations (no heavy blur) */}
+            {/* Subtle background decoration */}
             <div className="absolute inset-0 pointer-events-none">
-                {/* Top gradient fade from previous section */}
-                <div className="absolute top-0 left-0 right-0 h-24 bg-gradient-to-b from-[rgba(39,203,206,0.06)] to-transparent" />
-                {/* Subtle ambient glow */}
-                <div className="absolute top-1/4 left-1/2 -translate-x-1/2 h-[400px] w-[80%] bg-[radial-gradient(ellipse_at_center,rgba(39,203,206,0.05),transparent_70%)]" />
-                {/* Bottom fade to contact section */}
-                <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-[var(--background-contact)] to-transparent" />
+                <div className="absolute top-0 left-0 right-0 h-24 bg-gradient-to-b from-[rgba(39,203,206,0.04)] to-transparent" />
+                <div className="absolute top-1/3 left-1/2 -translate-x-1/2 h-[300px] w-[60%] bg-[radial-gradient(ellipse_at_center,rgba(39,203,206,0.04),transparent_70%)]" />
             </div>
 
-            {/* Section Header */}
-            <div className="relative z-10 py-16 px-4 sm:px-6 lg:px-8">
+            <div className="relative z-10 mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 py-16 sm:py-20 lg:py-28">
+                {/* Section Header — always visible */}
                 <motion.div
                     initial={{ opacity: 0, y: 20 }}
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true }}
                     transition={{ duration: 0.6 }}
-                    className="text-center max-w-7xl mx-auto"
+                    className="text-center mb-12 sm:mb-16"
                 >
-                    <BlurText
-                        className="text-xs tracking-[0.4em] uppercase text-text-muted mb-4 font-sans"
-                        delay={0}
-                    >
+                    <p className="text-xs tracking-[0.4em] uppercase text-text-muted mb-4 font-sans">
                         Credentials & Achievements
-                    </BlurText>
-                    <h2 className="font-serif text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold bg-gradient-to-r from-cyan-400 via-blue-400 to-purple-400 bg-clip-text text-transparent mb-6 tracking-tight leading-tight">
+                    </p>
+                    <h2 className="font-serif text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold bg-gradient-to-r from-cyan-400 via-blue-400 to-purple-400 bg-clip-text text-transparent mb-4 tracking-tight leading-tight">
                         Professional Certificates
                     </h2>
-                    <p className="max-w-3xl mx-auto text-base sm:text-lg text-text-muted leading-relaxed font-sans">
+                    <p className="max-w-2xl mx-auto text-sm sm:text-base text-text-muted leading-relaxed font-sans">
                         Validated expertise in data analytics, business intelligence, and advanced Power BI techniques through industry-recognized certifications.
                     </p>
                 </motion.div>
-            </div>
 
-            {/* Stacked Cards Container */}
-            <div ref={cardsContainerRef} className="relative z-10 px-4 sm:px-6 lg:px-8 pb-8">
-                <div className="max-w-4xl mx-auto flex flex-col items-center">
-                    {certificates.map((cert, index) => (
-                        <div
-                            key={`${cert.title}-${index}`}
-                            ref={(el) => { cardRefs.current[index] = el; }}
-                            className={`c-card w-full max-w-[90vw] sm:max-w-none ${index === certificates.length - 1 ? '' : 'mb-8'}`}
-                            style={{
-                                zIndex: index + 1,
-                                backgroundColor: 'var(--background-experience)',
-                            }}
-                        >
-                            <CertificateStackedCard certificate={cert} index={index} />
+                {/* Carousel */}
+                <div 
+                    ref={containerRef} 
+                    className="relative group px-1 sm:px-14 md:px-20"
+                    onMouseEnter={() => setIsHovered(true)}
+                    onMouseLeave={() => setIsHovered(false)}
+                >
+                    {/* Navigation arrows — Positioned on opposite sides */}
+                    <div className="absolute left-0 sm:-left-6 md:-left-12 top-1/2 -translate-y-1/2 z-20">
+                        <MagneticButton intensity={0.4} range="p-4 sm:p-8">
+                            <button
+                                onClick={goToPrev}
+                                className="flex items-center justify-center w-10 h-10 sm:w-12 sm:h-12 rounded-full border backdrop-blur-md transition-all duration-200 hover:scale-110 active:scale-95 shadow-lg"
+                                style={{
+                                    backgroundColor: 'rgba(10, 14, 26, 0.9)',
+                                    borderColor: 'rgba(39, 203, 206, 0.4)',
+                                    color: 'rgba(39, 203, 206, 1)',
+                                }}
+                                aria-label="Previous certificate"
+                            >
+                                <ChevronLeft className="h-5 w-5" />
+                            </button>
+                        </MagneticButton>
+                    </div>
+
+                    <div className="absolute right-0 sm:-right-6 md:-right-12 top-1/2 -translate-y-1/2 z-20">
+                        <MagneticButton intensity={0.4} range="p-4 sm:p-8">
+                            <button
+                                onClick={goToNext}
+                                className="flex items-center justify-center w-10 h-10 sm:w-12 sm:h-12 rounded-full border backdrop-blur-md transition-all duration-200 hover:scale-110 active:scale-95 shadow-lg"
+                                style={{
+                                    backgroundColor: 'rgba(10, 14, 26, 0.9)',
+                                    borderColor: 'rgba(39, 203, 206, 0.4)',
+                                    color: 'rgba(39, 203, 206, 1)',
+                                }}
+                                aria-label="Next certificate"
+                            >
+                                <ChevronRight className="h-5 w-5" />
+                            </button>
+                        </MagneticButton>
+                    </div>
+
+                    {/* Main card area */}
+                    <div className="relative w-full overflow-hidden rounded-3xl border" style={{
+                        borderColor: 'var(--border-color)',
+                        backgroundColor: 'var(--surface-elevated)',
+                        minHeight: '420px',
+                    }}>
+                        <AnimatePresence mode="wait" custom={direction}>
+                            <motion.div
+                                key={activeIndex}
+                                custom={direction}
+                                variants={slideVariants}
+                                initial="enter"
+                                animate="center"
+                                exit="exit"
+                                transition={{
+                                    duration: 0.35,
+                                    ease: [0.25, 0.46, 0.45, 0.94],
+                                }}
+                            >
+                                <CertificateCard certificate={activeCert} />
+                            </motion.div>
+                        </AnimatePresence>
+                    </div>
+
+                    {/* Dots indicator + counter */}
+                    <div className="flex items-center justify-center gap-4 mt-6 sm:mt-8">
+                        <span className="text-xs text-text-muted font-mono">
+                            {String(activeIndex + 1).padStart(2, '0')} / {String(certificates.length).padStart(2, '0')}
+                        </span>
+                        <div className="flex items-center gap-2">
+                            {certificates.map((_, idx) => (
+                                <button
+                                    key={idx}
+                                    onClick={() => {
+                                        setDirection(idx > activeIndex ? 1 : -1);
+                                        setActiveIndex(idx);
+                                    }}
+                                    className={`transition-all duration-300 rounded-full ${
+                                        idx === activeIndex
+                                            ? 'w-6 h-2 bg-accent-cyan'
+                                            : 'w-2 h-2 bg-text-muted/30 hover:bg-text-muted/50'
+                                    }`}
+                                    aria-label={`Go to certificate ${idx + 1}`}
+                                />
+                            ))}
                         </div>
-                    ))}
+                    </div>
                 </div>
             </div>
         </section>
     );
 }
 
-function CertificateStackedCard({
-    certificate,
-    index,
-}: {
-    certificate: Certificate;
-    index: number;
-}) {
+function CertificateCard({ certificate }: { certificate: Certificate }) {
     const [imageError, setImageError] = useState(false);
 
     const hasImage = certificate.imagePath &&
-        (certificate.imagePath.endsWith('.png') ||
-            certificate.imagePath.endsWith('.jpg') ||
-            certificate.imagePath.endsWith('.jpeg') ||
-            certificate.imagePath.endsWith('.webp') ||
-            certificate.imagePath.endsWith('.PNG') ||
-            certificate.imagePath.endsWith('.JPG') ||
-            certificate.imagePath.endsWith('.JPEG'));
+        /\.(png|jpg|jpeg|webp)$/i.test(certificate.imagePath);
 
     const showImage = hasImage && !imageError;
 
@@ -197,31 +239,24 @@ function CertificateStackedCard({
     };
 
     return (
-        <div
-            className="group cursor-pointer rounded-3xl border shadow-2xl transition-all duration-300 will-change-transform"
-            style={{
-                backgroundColor: 'var(--surface-elevated)',
-                borderColor: 'var(--border-color)',
-            }}
-            onMouseEnter={(e) => e.currentTarget.style.borderColor = 'var(--border-glow)'}
-            onMouseLeave={(e) => e.currentTarget.style.borderColor = 'var(--border-color)'}
-            onClick={handleClick}
-        >
-            {/* Certificate Image - 70% of card */}
-            <div className="relative w-full aspect-[16/9] overflow-hidden rounded-t-3xl" style={{ backgroundColor: 'var(--background)' }}>
+        <div className="flex flex-col md:flex-row cursor-pointer group" onClick={handleClick}>
+            {/* Certificate Image — left side on desktop, top on mobile */}
+            <div
+                className="relative w-full md:w-1/2 aspect-[4/3] md:aspect-auto md:min-h-[420px] overflow-hidden"
+                style={{ backgroundColor: 'var(--background)' }}
+            >
                 {showImage ? (
                     <Image
                         src={certificate.imagePath!}
                         alt={certificate.title}
                         fill
-                        sizes="(max-width: 768px) 100vw, 800px"
-                        className="object-contain p-6 transition-transform duration-500 group-hover:scale-105"
+                        sizes="(max-width: 768px) 100vw, 50vw"
+                        className="object-contain p-4 sm:p-6 transition-transform duration-500 group-hover:scale-105"
                         onError={() => setImageError(true)}
-                        priority={index < 4}
-                        loading={index < 4 ? undefined : "lazy"}
+                        priority
                     />
                 ) : (
-                    <div className="w-full h-full flex items-center justify-center p-6">
+                    <div className="w-full h-full flex items-center justify-center p-6 min-h-[280px]">
                         <div className="text-center space-y-3">
                             <Award className="h-16 w-16 text-accent-cyan/30 mx-auto" />
                             <p className="text-sm text-text-muted font-sans">{certificate.title}</p>
@@ -232,15 +267,22 @@ function CertificateStackedCard({
                 {/* Issuer Badge */}
                 {certificate.issuer && (
                     <div className="absolute top-4 right-4 z-10">
-                        <div className="px-3 py-1.5 rounded-full border text-sm font-medium font-sans" style={{ backgroundColor: 'var(--surface)', borderColor: 'var(--border-color)', color: 'var(--text-primary)' }}>
+                        <div className="px-3 py-1.5 rounded-full border text-sm font-medium font-sans" style={{
+                            backgroundColor: 'var(--surface)',
+                            borderColor: 'var(--border-color)',
+                            color: 'var(--text-primary)'
+                        }}>
                             {certificate.issuer}
                         </div>
                     </div>
                 )}
 
-                {/* Hover overlay */}
+                {/* View overlay on hover */}
                 <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 flex items-center justify-center transition-all duration-300 opacity-0 group-hover:opacity-100">
-                    <div className="px-5 py-2.5 rounded-full border transform scale-90 group-hover:scale-100 transition-transform duration-300" style={{ backgroundColor: 'rgba(39, 203, 206, 0.15)', borderColor: 'var(--accent-cyan)' }}>
+                    <div className="px-5 py-2.5 rounded-full border transform scale-90 group-hover:scale-100 transition-transform duration-300" style={{
+                        backgroundColor: 'rgba(39, 203, 206, 0.15)',
+                        borderColor: 'var(--accent-cyan)'
+                    }}>
                         <div className="flex items-center gap-2 text-sm font-medium font-sans" style={{ color: 'var(--accent-cyan)' }}>
                             <ExternalLink className="h-4 w-4" />
                             <span>View Certificate</span>
@@ -249,8 +291,10 @@ function CertificateStackedCard({
                 </div>
             </div>
 
-            {/* Content - 20-30% of card */}
-            <div className="p-6 space-y-4 rounded-b-3xl" style={{ background: 'linear-gradient(to top, var(--background), var(--surface-elevated))' }}>
+            {/* Certificate Details — right side on desktop, bottom on mobile */}
+            <div className="flex-1 p-6 sm:p-8 md:p-10 flex flex-col justify-center space-y-5"
+                style={{ background: 'linear-gradient(135deg, var(--surface-elevated), var(--background))' }}
+            >
                 {/* Title */}
                 <div className="flex items-start gap-3">
                     <div className="flex-shrink-0 p-2.5 rounded-xl bg-gradient-to-br from-accent-cyan/20 to-blue-500/20 border border-accent-cyan/30">
@@ -268,7 +312,7 @@ function CertificateStackedCard({
 
                 {/* Description */}
                 {certificate.description && (
-                    <p className="text-sm text-text-muted leading-relaxed font-sans">
+                    <p className="text-sm sm:text-base text-text-muted leading-relaxed font-sans">
                         {certificate.description}
                     </p>
                 )}
@@ -280,7 +324,7 @@ function CertificateStackedCard({
                             {certificate.skills.map((skill) => (
                                 <span
                                     key={skill}
-                                    className="px-3 py-1.5 rounded-full bg-accent-cyan/5 border border-accent-cyan/20 text-xs uppercase tracking-wider text-accent-cyan font-semibold font-sans hover:bg-accent-cyan/10 transition-colors duration-200"
+                                    className="px-3 py-1.5 rounded-full bg-accent-cyan/5 border border-accent-cyan/20 text-xs uppercase tracking-wider text-accent-cyan font-semibold font-sans"
                                 >
                                     {skill}
                                 </span>
@@ -288,6 +332,12 @@ function CertificateStackedCard({
                         </div>
                     </div>
                 )}
+
+                {/* CTA hint */}
+                <p className="text-xs text-text-muted/50 font-sans flex items-center gap-1.5 mt-auto pt-2">
+                    <ExternalLink className="h-3 w-3" />
+                    Click to view full certificate
+                </p>
             </div>
         </div>
     );

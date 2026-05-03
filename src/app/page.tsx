@@ -23,6 +23,7 @@ import {
 import type { LucideIcon } from "lucide-react";
 
 import dynamic from "next/dynamic";
+import { MagneticButton } from "@/components/ui/magnetic-button";
 
 // Dynamically import Silk background to reduce initial bundle size and avoid SSR issues
 // Only load when in view to improve initial page load
@@ -35,11 +36,10 @@ const Silk = dynamic(
 );
 
 // Dynamically import StackedCardCertificates (below the fold - lazy load)
-// This is a heavy component with GSAP animations
 const StackedCardCertificates = dynamic(
   () => import("@/components/ui/stacked-card-certificates").then(mod => ({ default: mod.StackedCardCertificates })),
   {
-    ssr: false, // Client-side only for GSAP compatibility and performance
+    ssr: false,
     loading: () => (
       <div className="flex items-center justify-center min-h-[400px]">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-accent-cyan"></div>
@@ -211,6 +211,18 @@ export default function HomePage() {
 
   const experienceTimeline = [
     {
+      title: "AI-Analyst",
+      company: "Innodata Inc., Noida (Remote)",
+      duration: "Jan 2026 – Present",
+      summary:
+        "Spearheaded Multi-Modal Prompt Engineering across diverse AI models (text, image, audio, and video). Engineered and refined complex prompts, and conducted comparative evaluations to improve model performance.",
+      achievements: [
+        "Achieved an average quality score of 3.29/4.00, surpassing the target benchmark of 2.00 by over 64%, as independently verified by senior QA reviewers.",
+        "Conducted rigorous comparative evaluations and A/B testing of AI-generated content to resolve factual and structural inconsistencies."
+      ],
+      skillTags: ["Prompt Engineering", "Quality Assurance", "AI Training", "Process Standardization"],
+    },
+    {
       title: "Certified Data Analyst",
       company: "Ducat, Noida",
       duration: "Jul 2024 – Nov 2025",
@@ -265,7 +277,7 @@ export default function HomePage() {
       icon: FileText,
       label: "Resume",
       value: "Download resume (PDF)",
-      href: "/Konark Resume.pdf",
+      href: "/KONARK_PARIHAR_RESUME.pdf",
       download: true,
     },
     {
@@ -377,14 +389,12 @@ export default function HomePage() {
       {/* Client-only rendering to prevent hydration mismatches from browser extensions */}
       {isMounted ? (
         <div className="relative" suppressHydrationWarning>
-          {/* Hero section - First Sticky Slide */}
+          {/* Hero section - Standard Flow */}
           <div
-            className="sticky top-0 min-h-screen z-0"
+            className="relative min-h-screen z-0"
             suppressHydrationWarning
             style={{
               backgroundColor: 'var(--background-hero)',
-              willChange: 'transform', // GPU hint for smoother sticky
-              transform: 'translateZ(0)' // Force GPU layer
             }}
           >
             {/* Silk Background */}
@@ -407,7 +417,7 @@ export default function HomePage() {
             <div className="absolute inset-0 z-[1] bg-[radial-gradient(circle_at_50%_50%,rgba(39,203,206,0.08),transparent_70%)] pointer-events-none" />
 
             {/* Content container with proper spacing from header */}
-            <div className="relative z-10 flex flex-col items-center justify-center min-h-[85vh] pt-24 sm:pt-28 lg:pt-32 pb-8 px-4 sm:px-6" suppressHydrationWarning>
+            <div className="relative z-10 flex flex-col items-center justify-center min-h-screen pt-24 sm:pt-28 lg:pt-32 pb-8 px-4 sm:px-6" suppressHydrationWarning>
               {/* Main heading */}
               <div className="text-center max-w-6xl mx-auto space-y-4 sm:space-y-6" suppressHydrationWarning>
                 <h1 className="font-serif text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl 2xl:text-8xl font-bold tracking-tight leading-[1.1] text-white px-2" suppressHydrationWarning>
@@ -419,11 +429,16 @@ export default function HomePage() {
               </div>
 
               {/* Action buttons */}
-              <div className="mt-8 sm:mt-12 lg:mt-16 flex flex-col sm:flex-row justify-center items-center gap-4 w-full max-w-xl mx-auto px-4" suppressHydrationWarning>
-                <a
-                  href="/Konark Resume.pdf"
-                  download
-                  className="cursor-pointer hover:scale-105 transition-all duration-300 hover:shadow-lg pointer-events-auto group"
+              <div className="mt-8 sm:mt-12 lg:mt-16 flex flex-col sm:flex-row justify-center items-center gap-0 w-full max-w-xl mx-auto px-4" suppressHydrationWarning>
+                <MagneticButton
+                  intensity={0.6}
+                  className="cursor-pointer pointer-events-auto group"
+                  onClick={() => {
+                    const a = document.createElement('a');
+                    a.href = '/KONARK_PARIHAR_RESUME.pdf';
+                    a.download = 'KONARK_PARIHAR_RESUME.pdf';
+                    a.click();
+                  }}
                 >
                   <GlassButton
                     width={220}
@@ -437,16 +452,16 @@ export default function HomePage() {
                       Resume
                     </span>
                   </GlassButton>
-                </a>
-                <div
-                  className="cursor-pointer hover:scale-105 transition-all duration-300 hover:shadow-lg pointer-events-auto group"
+                </MagneticButton>
+                <MagneticButton
+                  intensity={0.6}
+                  className="cursor-pointer pointer-events-auto group"
                   onClick={(e) => {
                     e.preventDefault();
                     const element = document.getElementById('projects');
                     if (element) {
                       const headerHeight = 115;
                       const elementPosition = element.offsetTop - headerHeight;
-                      // Use requestAnimationFrame for smoother scroll
                       requestAnimationFrame(() => {
                         window.scrollTo({
                           top: elementPosition,
@@ -454,7 +469,6 @@ export default function HomePage() {
                         });
                       });
                     } else {
-                      // Fallback: navigate if section not found
                       window.location.href = '/portfolio';
                     }
                   }}
@@ -470,12 +484,12 @@ export default function HomePage() {
                       My Portfolio
                     </span>
                   </GlassButton>
-                </div>
+                </MagneticButton>
               </div>
             </div>
           </div>
 
-          {/* About Section - Second Sticky Slide (Covers Hero) */}
+          {/* About Section - Standard Flow */}
           <AboutSection shouldReduceMotion={shouldReduceMotion} />
         </div>
       ) : (
@@ -606,39 +620,52 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Experience Section */}
+      {/* Experience Section - Standard Flow */}
       <section id="experience" className="relative z-20 text-foreground border-t" style={{
         backgroundColor: 'var(--background-experience)',
         borderColor: 'var(--border-color)'
       }}>
         {/* Subtle turquoise gradient overlay */}
         <div className="absolute inset-0 bg-gradient-to-br from-transparent via-[rgba(39,203,206,0.02)] to-transparent pointer-events-none" />
-        <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 py-12 sm:py-16 lg:py-24 relative z-10">
-          <div className="space-y-3 sm:space-y-4 mb-12 sm:mb-16 max-w-3xl">
-            <p className="text-xs uppercase tracking-[0.55em] text-text-muted font-sans">Experience</p>
-            <h2 className="font-serif text-3xl sm:text-4xl md:text-5xl font-bold text-text-primary tracking-tight leading-tight">
-              Hands-on history
-            </h2>
-            <p className="text-sm sm:text-base md:text-lg text-text-muted leading-relaxed font-sans">
-              A chronological overview of my professional journey, highlighting key achievements, responsibilities, and technical expertise gained at each position.
-            </p>
-          </div>
-          {/* Stacked cards container - uses CSS sticky */}
-          <div className="relative" style={{ paddingBottom: `${(experienceTimeline.length - 1) * 80}px` }}>
-            {experienceTimeline.map((item, index) => (
-              <ExperienceEntry
-                key={item.title}
-                {...item}
-                index={index}
-                isLast={index === experienceTimeline.length - 1}
-              />
-            ))}
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-20 sm:py-28 lg:py-36 relative z-10">
+          <div className="flex flex-col lg:flex-row gap-12 lg:gap-20">
+            {/* Left Column - Heading (Sticky on Desktop) */}
+            <div className="lg:w-1/3">
+              <div className="lg:sticky lg:top-36 lg:h-fit space-y-4 sm:space-y-6">
+                <p className="text-xs uppercase tracking-[0.55em] text-text-muted font-sans font-semibold">Professional Journey</p>
+                <h2 className="font-serif text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-text-primary tracking-tight leading-tight">
+                  Hands-on history
+                </h2>
+                <p className="text-sm sm:text-base md:text-lg text-text-muted leading-relaxed font-sans max-w-md">
+                  A chronological overview of my professional journey, highlighting key achievements, responsibilities, and technical expertise gained at each position.
+                </p>
+                <div className="pt-8 hidden lg:block">
+                  <div className="h-px w-24 bg-accent-cyan/30" />
+                </div>
+              </div>
+            </div>
+            
+            {/* Right Column - Timeline */}
+            <div className="lg:w-2/3">
+              <div className="relative space-y-12 sm:space-y-16">
+                {/* Timeline line - aligned with dots */}
+                <div className="absolute left-[21px] sm:left-[31px] top-8 bottom-0 w-px bg-gradient-to-b from-accent-cyan/40 via-accent-cyan/15 to-transparent hidden sm:block" />
+                {experienceTimeline.map((item, index) => (
+                  <ExperienceEntry
+                    key={item.title + item.company}
+                    {...item}
+                    index={index}
+                    isLast={index === experienceTimeline.length - 1}
+                  />
+                ))}
+              </div>
+            </div>
           </div>
         </div>
       </section>
 
-      {/* Projects Section - overlays Experience section with negative margin */}
-      <section id="projects" className="relative z-30 pt-12 sm:pt-16 lg:pt-24 pb-12 sm:pb-16 lg:pb-20 px-4 sm:px-6 overflow-hidden border-t -mt-[40vh]" style={{
+      {/* Projects Section */}
+      <section id="projects" className="relative z-20 pt-16 sm:pt-20 lg:pt-28 pb-12 sm:pb-16 lg:pb-20 px-4 sm:px-6 overflow-hidden border-t" style={{
         backgroundColor: 'var(--background-projects)',
         borderColor: 'var(--border-color)'
       }}>
@@ -754,135 +781,138 @@ export default function HomePage() {
         ]}
       />
 
-      {/* Contact Section */}
+      {/* Contact Section - Unified Communication Hub */}
       <section id="contact" className="relative z-20 text-foreground border-t" style={{
         backgroundColor: 'var(--background-contact)',
         borderColor: 'var(--border-color)'
       }}>
         {/* Subtle turquoise ambient glow */}
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_50%,rgba(39,203,206,0.06),transparent_60%)] pointer-events-none" />
-        <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 py-12 sm:py-16 lg:py-24 grid gap-8 sm:gap-12 lg:grid-cols-2 relative z-10">
-          <div className="space-y-4 sm:space-y-6">
-            <p className="text-xs uppercase tracking-[0.55em] text-text-muted font-sans">Contact</p>
-            <h2 className="font-serif text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold text-text-primary tracking-tight leading-tight">
-              Let&rsquo;s work together
-            </h2>
-            <p className="text-sm sm:text-base md:text-lg lg:text-xl text-text-muted leading-relaxed font-sans">
-              I&apos;m always open to discussing new opportunities, collaborations, or data analytics projects. Feel free to reach out using the form below or through any of my direct contact channels.
-            </p>
-            <p className="text-xs sm:text-sm md:text-base text-text-muted leading-relaxed font-sans">
-              I typically respond within 24-48 hours. For urgent matters, please use the direct contact channels in the Connect section below.
-            </p>
-          </div>
-          <Card className="border-border bg-card/80 shadow-glass-soft">
-            <CardContent className="space-y-4 pt-6">
-              {/* Suppress hydration warnings inside the form because some browser extensions (password managers, Grammarly, etc.) inject inline styles/attributes before React hydrates, which can trigger noisy hydration mismatches in dev. */}
-              {/* Render form only on client to avoid hydration mismatches from extensions */}
-              {isMounted ? (
-                <form className="space-y-5" onSubmit={handleSubmit} suppressHydrationWarning>
-                  <div>
-                    <label htmlFor="contact-name" className="block text-sm font-semibold text-text-primary mb-2 font-sans">
-                      Name *
-                    </label>
-                    <input
-                      id="contact-name"
-                      type="text"
-                      value={formData.name}
-                      onChange={handleInputChange}
-                      placeholder="Your name"
-                      suppressHydrationWarning
-                      className={`w-full rounded-2xl border ${formErrors.name ? "border-red-500/50" : "border-border"
-                        } bg-white/5 px-4 py-3 text-sm text-text-primary focus:outline-none focus:ring-2 focus:ring-accent-cyan/60 font-sans`}
-                    />
-                    {formErrors.name && (
-                      <p className="mt-1 text-xs text-red-400 font-sans">{formErrors.name}</p>
-                    )}
-                  </div>
-                  <div>
-                    <label htmlFor="contact-email" className="block text-sm font-semibold text-text-primary mb-2 font-sans">
-                      Email *
-                    </label>
-                    <input
-                      id="contact-email"
-                      type="email"
-                      value={formData.email}
-                      onChange={handleInputChange}
-                      placeholder="your@email.com"
-                      suppressHydrationWarning
-                      className={`w-full rounded-2xl border ${formErrors.email ? "border-red-500/50" : "border-border"
-                        } bg-white/5 px-4 py-3 text-sm text-text-primary focus:outline-none focus:ring-2 focus:ring-accent-cyan/60 font-sans`}
-                    />
-                    {formErrors.email && (
-                      <p className="mt-1 text-xs text-red-400 font-sans">{formErrors.email}</p>
-                    )}
-                  </div>
-                  <div>
-                    <label htmlFor="contact-message" className="block text-sm font-semibold text-text-primary mb-2 font-sans">
-                      Message *
-                    </label>
-                    <textarea
-                      id="contact-message"
-                      rows={5}
-                      value={formData.message}
-                      onChange={handleInputChange}
-                      placeholder="Tell me about your project or opportunity..."
-                      suppressHydrationWarning
-                      className={`w-full rounded-2xl border ${formErrors.message ? "border-red-500/50" : "border-border"
-                        } bg-white/5 px-4 py-3 text-sm text-text-primary focus:outline-none focus:ring-2 focus:ring-accent-cyan/60 resize-none font-sans`}
-                    />
-                    {formErrors.message && (
-                      <p className="mt-1 text-xs text-red-400 font-sans">{formErrors.message}</p>
-                    )}
-                  </div>
-                  {formStatus === "success" && (
-                    <div className="rounded-2xl bg-emerald-500/10 border border-emerald-500/30 px-4 py-3 text-sm text-emerald-300 font-sans">
-                      Message sent successfully! I&apos;ll get back to you soon.
-                    </div>
-                  )}
-                  {formStatus === "error" && (
-                    <div className="rounded-2xl bg-red-500/10 border border-red-500/30 px-4 py-3 text-sm text-red-300 font-sans">
-                      Something went wrong. Please try again or use the direct contact channels.
-                    </div>
-                  )}
-                  <button
-                    type="submit"
-                    disabled={formStatus === "submitting"}
-                    className="w-full rounded-2xl bg-accent-cyan/90 px-6 py-3 text-sm font-semibold text-background transition hover:bg-accent-cyan focus:outline-none focus:ring-2 focus:ring-accent-bright/60 disabled:opacity-50 disabled:cursor-not-allowed font-sans"
-                  >
-                    {formStatus === "submitting" ? "Sending..." : "Send Message"}
-                  </button>
-                </form>
-              ) : (
-                <div className="h-[400px] flex items-center justify-center">
-                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-accent-cyan"></div>
-                </div>
-              )}
-            </CardContent>
-          </Card>
-        </div>
-      </section>
 
-      {/* Connect Section */}
-      <section id="connect" className="relative z-10 text-foreground border-t" style={{
-        backgroundColor: 'var(--background)',
-        borderColor: 'var(--border-color)'
-      }}>
-        {/* Subtle gradient overlay */}
-        <div className="absolute inset-0 bg-gradient-to-br from-[rgba(39,203,206,0.03)] via-transparent to-transparent pointer-events-none" />
-        <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 py-12 sm:py-16 lg:py-20 space-y-8 sm:space-y-12 relative z-10">
-          <div className="text-center space-y-4 sm:space-y-6 max-w-4xl mx-auto">
-            <p className="text-xs uppercase tracking-[0.6em] text-text-muted font-sans">Connect to me</p>
-            <h2 className="font-serif text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold text-text-primary tracking-tight leading-tight">
-              Direct lines & quick actions
-            </h2>
-            <p className="text-sm sm:text-base md:text-lg lg:text-xl text-text-muted leading-relaxed font-sans">
-              Quick access to direct contact channels. Choose your preferred method to get in touch—I&apos;m always open to connecting with potential collaborators, employers, or fellow data professionals.
-            </p>
-          </div>
-          <div className="grid gap-4 sm:grid-cols-2">
-            {contactChannels.map((channel) => (
-              <ContactChannelCard key={channel.label} {...channel} />
-            ))}
+        <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 py-12 sm:py-16 lg:py-24 relative z-10">
+          <div className="grid gap-12 lg:grid-cols-2">
+            {/* Left Column: Context & Direct Channels */}
+            <div className="space-y-10 sm:space-y-12">
+              <div className="space-y-4 sm:space-y-6">
+                <p className="text-xs uppercase tracking-[0.55em] text-text-muted font-sans">Get in touch</p>
+                <h2 className="font-serif text-4xl sm:text-5xl md:text-6xl font-bold text-text-primary tracking-tight leading-tight">
+                  Let&rsquo;s work together
+                </h2>
+                <p className="text-sm sm:text-base md:text-lg text-text-muted leading-relaxed font-sans max-w-lg">
+                  I&apos;m always open to discussing new opportunities, collaborations, or data analytics projects. Reach out via the form or through my direct channels.
+                </p>
+              </div>
+
+              <div className="space-y-6">
+                <h3 className="text-lg font-semibold text-text-primary font-serif flex items-center gap-2">
+                  <span className="w-8 h-px bg-accent-cyan/30" />
+                  Direct Channels
+                </h3>
+                <div className="grid gap-4 sm:grid-cols-2">
+                  {contactChannels.map((channel) => (
+                    <ContactChannelCard key={channel.label} {...channel} />
+                  ))}
+                </div>
+              </div>
+
+              <div className="pt-6 border-t border-border/40">
+                <p className="text-xs sm:text-sm text-text-muted leading-relaxed font-sans italic">
+                  I typically respond within 24-48 hours. For urgent matters, LinkedIn or Email is usually fastest.
+                </p>
+              </div>
+            </div>
+
+            {/* Right Column: Contact Form */}
+            <div className="relative">
+              <Card className="border-border bg-card/80 shadow-glass-soft backdrop-blur-sm sticky top-32">
+                <CardContent className="space-y-4 pt-6 p-6 sm:p-8">
+                  {isMounted ? (
+                    <form className="space-y-5" onSubmit={handleSubmit} suppressHydrationWarning>
+                      <div>
+                        <label htmlFor="contact-name" className="block text-sm font-semibold text-text-primary mb-2 font-sans">
+                          Name *
+                        </label>
+                        <input
+                          id="contact-name"
+                          type="text"
+                          value={formData.name}
+                          onChange={handleInputChange}
+                          placeholder="Your name"
+                          suppressHydrationWarning
+                          className={`w-full rounded-2xl border ${formErrors.name ? "border-red-500/50" : "border-border"
+                            } bg-white/5 px-4 py-3 text-sm text-text-primary focus:outline-none focus:ring-2 focus:ring-accent-cyan/60 font-sans`}
+                        />
+                        {formErrors.name && (
+                          <p className="mt-1 text-xs text-red-400 font-sans">{formErrors.name}</p>
+                        )}
+                      </div>
+                      <div>
+                        <label htmlFor="contact-email" className="block text-sm font-semibold text-text-primary mb-2 font-sans">
+                          Email *
+                        </label>
+                        <input
+                          id="contact-email"
+                          type="email"
+                          value={formData.email}
+                          onChange={handleInputChange}
+                          placeholder="your@email.com"
+                          suppressHydrationWarning
+                          className={`w-full rounded-2xl border ${formErrors.email ? "border-red-500/50" : "border-border"
+                            } bg-white/5 px-4 py-3 text-sm text-text-primary focus:outline-none focus:ring-2 focus:ring-accent-cyan/60 font-sans`}
+                        />
+                        {formErrors.email && (
+                          <p className="mt-1 text-xs text-red-400 font-sans">{formErrors.email}</p>
+                        )}
+                      </div>
+                      <div>
+                        <label htmlFor="contact-message" className="block text-sm font-semibold text-text-primary mb-2 font-sans">
+                          Message *
+                        </label>
+                        <textarea
+                          id="contact-message"
+                          rows={5}
+                          value={formData.message}
+                          onChange={handleInputChange}
+                          placeholder="Tell me about your project or opportunity..."
+                          suppressHydrationWarning
+                          className={`w-full rounded-2xl border ${formErrors.message ? "border-red-500/50" : "border-border"
+                            } bg-white/5 px-4 py-3 text-sm text-text-primary focus:outline-none focus:ring-2 focus:ring-accent-cyan/60 resize-none font-sans`}
+                        />
+                        {formErrors.message && (
+                          <p className="mt-1 text-xs text-red-400 font-sans">{formErrors.message}</p>
+                        )}
+                      </div>
+                      {formStatus === "success" && (
+                        <div className="rounded-2xl bg-emerald-500/10 border border-emerald-500/30 px-4 py-3 text-sm text-emerald-300 font-sans">
+                          Message sent successfully! I&apos;ll get back to you soon.
+                        </div>
+                      )}
+                      {formStatus === "error" && (
+                        <div className="rounded-2xl bg-red-500/10 border border-red-500/30 px-4 py-3 text-sm text-red-300 font-sans">
+                          Something went wrong. Please try again or use direct channels.
+                        </div>
+                      )}
+                      <MagneticButton
+                        intensity={0.5}
+                        className="w-full"
+                      >
+                        <button 
+                          type="submit"
+                          disabled={formStatus === "submitting"}
+                          className="w-full rounded-2xl bg-accent-cyan/90 px-6 py-3 text-sm font-semibold text-background transition hover:bg-accent-cyan focus:outline-none focus:ring-2 focus:ring-accent-bright/60 disabled:opacity-50 disabled:cursor-not-allowed font-sans flex items-center justify-center"
+                        >
+                          {formStatus === "submitting" ? "Sending..." : "Send Message"}
+                        </button>
+                      </MagneticButton>
+                    </form>
+                  ) : (
+                    <div className="h-[400px] flex items-center justify-center">
+                      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-accent-cyan"></div>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            </div>
           </div>
         </div>
       </section>
@@ -984,76 +1014,69 @@ function ExperienceEntry({
   achievements,
   skillTags,
   index,
+  isLast,
 }: ExperienceEntryProps): React.JSX.Element {
-  // Format index as 01, 02, 03
   const formattedIndex = String(index + 1).padStart(2, '0');
-
-  // Calculate z-index - higher cards (later in list) should be on top
-  const zIndex = index + 1;
-
-  // All cards stick at the SAME position - this creates the "cover" effect
-  // where each new card scrolls up and completely overlaps the previous one
-  const topOffset = 100; // Same for all cards
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 100 }}
+      initial={{ opacity: 0, y: 40 }}
       whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: "-50px" }}
+      viewport={{ once: true, margin: "-80px" }}
       transition={{
-        duration: 0.6,
+        duration: 0.5,
+        delay: index * 0.1,
         ease: [0.25, 0.46, 0.45, 0.94]
       }}
-      className="sticky mb-32"
-      style={{
-        top: `${topOffset}px`,
-        zIndex: zIndex,
-      }}
+      className="relative sm:pl-16"
     >
-      {/* Card container with solid background to cover previous card */}
+      {/* Timeline dot - precisely aligned with the line */}
+      <div className="hidden sm:flex absolute sm:left-[26px] top-8 w-3 h-3 rounded-full border-2 border-accent-cyan bg-background z-10" />
+
+      {/* Card */}
       <div
-        className="rounded-3xl border border-border p-6 sm:p-8 transition-all duration-500 hover:border-accent-cyan/30"
+        className="rounded-2xl sm:rounded-3xl border border-border p-6 sm:p-8 transition-all duration-300 hover:border-accent-cyan/40 group"
         style={{
-          backgroundColor: 'var(--background-experience)',
-          boxShadow: `0 -20px 50px -10px rgba(0,0,0,0.9), 0 0 0 1px rgba(39,203,206,0.08)`,
+          backgroundColor: 'var(--surface-elevated)',
+          boxShadow: '0 4px 24px -12px rgba(0,0,0,0.5)',
         }}
       >
-        {/* Numbered prefix - validgraphs.com style */}
-        <div className="mb-4">
-          <span className="text-sm text-accent-cyan/70 font-mono tracking-wide">« {formattedIndex}</span>
+        {/* Top row: Number + Duration */}
+        <div className="flex items-center justify-between mb-4">
+          <span className="text-[10px] sm:text-xs text-accent-cyan/60 font-mono tracking-widest uppercase">Entry {formattedIndex}</span>
+          <span className="text-[10px] sm:text-xs text-text-muted/60 font-sans font-medium px-3 py-1 rounded-full bg-white/5 border border-white/10">{duration}</span>
         </div>
 
-        {/* Title */}
-        <h3 className="text-xl sm:text-2xl md:text-3xl font-bold text-text-primary font-serif mb-2 group-hover:text-accent-cyan transition-colors duration-300">
-          {title}
-        </h3>
-
-        {/* Company and Duration */}
-        <div className="flex flex-wrap items-center gap-2 sm:gap-4 mb-4">
-          <p className="text-sm sm:text-base text-text-muted font-sans">{company}</p>
-          <span className="text-text-muted/40">|</span>
-          <p className="text-sm text-text-muted/70 font-sans">{duration}</p>
+        {/* Title & Company */}
+        <div className="mb-6">
+          <h3 className="text-xl sm:text-2xl font-bold text-text-primary font-serif mb-1 group-hover:text-accent-cyan transition-colors duration-300">
+            {title}
+          </h3>
+          <p className="text-sm sm:text-base text-accent-cyan/80 font-sans font-medium">{company}</p>
         </div>
 
         {/* Summary */}
-        <p className="text-sm sm:text-base text-text-muted leading-relaxed font-sans mb-6">{summary}</p>
+        <p className="text-sm sm:text-base text-text-muted leading-relaxed font-sans mb-6 italic opacity-90">{summary}</p>
 
         {/* Achievements */}
-        <ul className="space-y-3 text-sm text-text-muted leading-relaxed font-sans mb-6">
-          {achievements.map((item) => (
-            <li key={item} className="flex items-start gap-3">
-              <span className="text-accent-cyan mt-0.5 flex-shrink-0">▹</span>
-              <span>{item}</span>
-            </li>
-          ))}
-        </ul>
+        <div className="space-y-4 mb-8">
+          <p className="text-[10px] uppercase tracking-[0.3em] text-text-muted/50 font-sans font-bold">Key Accomplishments</p>
+          <ul className="space-y-3">
+            {achievements.map((item) => (
+              <li key={item} className="flex items-start gap-3 text-sm sm:text-base text-text-muted/90 leading-relaxed font-sans">
+                <span className="text-accent-cyan mt-1.5 flex-shrink-0 text-xs">▹</span>
+                <span>{item}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
 
         {/* Skill Tags */}
-        <div className="flex flex-wrap gap-2">
+        <div className="flex flex-wrap gap-2 pt-6 border-t border-white/5">
           {skillTags.map((tag) => (
             <span
               key={tag}
-              className="text-xs uppercase tracking-[0.2em] rounded-full border border-accent-cyan/20 bg-accent-cyan/5 px-3 py-1.5 text-accent-cyan/80 font-sans hover:bg-accent-cyan/10 hover:border-accent-cyan/40 transition-all duration-300"
+              className="text-[10px] sm:text-[11px] uppercase tracking-wider rounded-lg border border-accent-cyan/20 bg-accent-cyan/5 px-3 py-1.5 text-accent-cyan/70 font-sans font-semibold hover:bg-accent-cyan/10 hover:border-accent-cyan/40 transition-colors duration-200"
             >
               {tag}
             </span>
