@@ -5,6 +5,7 @@ import Link from 'next/link';
 import GlassButton from "@/components/ui/GlassButton";
 import { Menu, X } from 'lucide-react';
 import { detectDeviceCapabilities } from "@/lib/performance";
+import { MagneticButton } from "@/components/ui/magnetic-button";
 
 function Header() {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -183,8 +184,8 @@ function Header() {
       <div className="flex-shrink-0">
         <Link href="/" className="flex items-center gap-2">
           <span
-            className="text-xl sm:text-2xl md:text-3xl lg:text-4xl xl:text-4xl font-bold text-text-primary font-serif tracking-tight"
-            style={{ fontSize: 'clamp(1.5rem, 5vw, 2.5rem)' }}
+            className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-5xl font-bold text-text-primary font-serif tracking-tight"
+            style={{ fontSize: 'clamp(1.75rem, 6vw, 3rem)' }}
           >
             Konark Parihar
           </span>
@@ -200,30 +201,54 @@ function Header() {
           className="ring-1 ring-border px-1"
         >
           <div className="flex items-center gap-0.5">
-            <button
-              onClick={scrollToTop}
-              className="relative z-10 rounded-full px-3 py-1.5 text-base font-medium text-white/80 hover:text-white transition-colors duration-200 hover:scale-105"
-            >
-              Home
-            </button>
-            <button
-              onClick={() => scrollToSection('about')}
-              className="relative z-10 rounded-full px-3 py-1.5 text-base font-medium text-white/80 hover:text-white transition-colors duration-200 hover:scale-105"
-            >
-              About
-            </button>
-            <button
-              onClick={scrollToPortfolio}
-              className="relative z-10 rounded-full px-3 py-1.5 text-base font-medium text-white/80 hover:text-white transition-colors duration-200 hover:scale-105"
-            >
-              Portfolio
-            </button>
-            <button
-              onClick={() => scrollToSection('certificates')}
-              className="relative z-10 rounded-full px-3 py-1.5 text-base font-medium text-white/80 hover:text-white transition-colors duration-200 hover:scale-105"
-            >
-              Certificates
-            </button>
+            <MagneticButton intensity={0.4} range="p-1 sm:p-1.5">
+              <button
+                onClick={scrollToTop}
+                className="relative z-10 rounded-full px-3 py-1.5 text-base font-medium text-white/80 hover:text-white transition-colors duration-200"
+              >
+                Home
+              </button>
+            </MagneticButton>
+            <MagneticButton intensity={0.4} range="p-1 sm:p-1.5">
+              <button
+                onClick={() => scrollToSection('about')}
+                className="relative z-10 rounded-full px-3 py-1.5 text-base font-medium text-white/80 hover:text-white transition-colors duration-200"
+              >
+                About
+              </button>
+            </MagneticButton>
+            <MagneticButton intensity={0.4} range="p-1 sm:p-1.5">
+              <button
+                onClick={() => scrollToSection('experience')}
+                className="relative z-10 rounded-full px-3 py-1.5 text-base font-medium text-white/80 hover:text-white transition-colors duration-200"
+              >
+                Experience
+              </button>
+            </MagneticButton>
+            <MagneticButton intensity={0.4} range="p-1 sm:p-1.5">
+              <button
+                onClick={scrollToPortfolio}
+                className="relative z-10 rounded-full px-3 py-1.5 text-base font-medium text-white/80 hover:text-white transition-colors duration-200"
+              >
+                Portfolio
+              </button>
+            </MagneticButton>
+            <MagneticButton intensity={0.4} range="p-1 sm:p-1.5">
+              <button
+                onClick={() => scrollToSection('certificates')}
+                className="relative z-10 rounded-full px-3 py-1.5 text-base font-medium text-white/80 hover:text-white transition-colors duration-200"
+              >
+                Certificates
+              </button>
+            </MagneticButton>
+            <MagneticButton intensity={0.4} range="p-1 sm:p-1.5">
+              <button
+                onClick={() => scrollToSection('contact')}
+                className="relative z-10 rounded-full px-3 py-1.5 text-base font-medium text-white/80 hover:text-white transition-colors duration-200"
+              >
+                Contact
+              </button>
+            </MagneticButton>
           </div>
         </GlassButton>
       </div>
@@ -268,24 +293,24 @@ function Header() {
       {/* Container A - Top State: Full-width transparent */}
       <div className={`absolute inset-0 transition-opacity duration-300 ease-in-out ${!isScrolled ? 'opacity-100' : 'opacity-0 pointer-events-none'
         }`}>
-        <div className="flex items-center justify-between w-full h-20 sm:h-24 lg:h-28 px-4 sm:px-6 lg:px-8">
+        <div className="flex items-center justify-between w-full h-24 sm:h-28 lg:h-32 px-4 sm:px-6 lg:px-8">
           <HeaderContent />
         </div>
       </div>
 
       {/* Container B - Scrolled State: Centered GlassSurface */}
-      <div className={`transition-opacity duration-300 ease-in-out py-3.5 ${isScrolled ? 'opacity-100' : 'opacity-0 pointer-events-none'
+      <div className={`transition-opacity duration-300 ease-in-out py-4 ${isScrolled ? 'opacity-100' : 'opacity-0 pointer-events-none'
         }`}>
         <div className={`mx-auto transition-all duration-300 ease-in-out ${isScrolled ? 'w-4/5 md:w-4/5' : 'w-full'
           }`}>
-          <div className="relative h-[52px]">
+          <div className="relative h-[60px]">
             {/* Lightweight CSS-only glass header */}
             <div
               className="absolute left-1/2 transform -translate-x-1/2 flex items-center justify-center overflow-hidden"
               style={{
                 width: '114%',
-                height: '52px',
-                borderRadius: '45px',
+                height: '60px',
+                borderRadius: '50px',
                 background: 'rgba(255, 255, 255, 0.1)',
                 backdropFilter: 'blur(12px) saturate(1.2)',
                 WebkitBackdropFilter: 'blur(12px) saturate(1.2)',
@@ -355,6 +380,12 @@ function Header() {
                     About
                   </button>
                   <button
+                    onClick={() => scrollToSection('experience')}
+                    className="block text-white hover:text-gray-300 transition-colors text-lg font-medium w-full font-sans"
+                  >
+                    Experience
+                  </button>
+                  <button
                     onClick={scrollToPortfolio}
                     className="block text-white hover:text-gray-300 transition-colors text-lg font-medium w-full font-sans"
                   >
@@ -365,6 +396,12 @@ function Header() {
                     className="block text-white hover:text-gray-300 transition-colors text-lg font-medium w-full font-sans"
                   >
                     Certificates
+                  </button>
+                  <button
+                    onClick={() => scrollToSection('contact')}
+                    className="block text-white hover:text-gray-300 transition-colors text-lg font-medium w-full font-sans"
+                  >
+                    Contact
                   </button>
                 </div>
               );
@@ -421,6 +458,12 @@ function Header() {
                   About
                 </button>
                 <button
+                  onClick={() => scrollToSection('experience')}
+                  className="block text-white hover:text-gray-300 transition-colors text-lg font-medium w-full font-sans"
+                >
+                  Experience
+                </button>
+                <button
                   onClick={scrollToPortfolio}
                   className="block text-white hover:text-gray-300 transition-colors text-lg font-medium w-full font-sans"
                 >
@@ -431,6 +474,12 @@ function Header() {
                   className="block text-white hover:text-gray-300 transition-colors text-lg font-medium w-full font-sans"
                 >
                   Certificates
+                </button>
+                <button
+                  onClick={() => scrollToSection('contact')}
+                  className="block text-white hover:text-gray-300 transition-colors text-lg font-medium w-full font-sans"
+                >
+                  Contact
                 </button>
               </div>
             );

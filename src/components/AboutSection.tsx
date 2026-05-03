@@ -66,11 +66,9 @@ export default function AboutSection({ shouldReduceMotion }: AboutSectionProps):
         <section
             ref={sectionRef}
             id="about"
-            className="sticky top-0 z-10 min-h-screen flex items-center justify-center px-4 sm:px-6 lg:px-8 py-24 sm:py-32 lg:py-40"
+            className="relative z-10 min-h-screen flex items-center justify-center px-4 sm:px-6 lg:px-8 py-24 sm:py-32 lg:py-40"
             style={{
                 backgroundColor: 'var(--background-about)',
-                willChange: 'transform', // GPU hint for smoother sticky
-                transform: 'translateZ(0)' // Force GPU layer
             }}
         >
             {/* Solid background to cover hero section */}

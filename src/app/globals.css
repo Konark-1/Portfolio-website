@@ -58,13 +58,12 @@ body {
 html {
   overflow-x: clip;
   /* Use clip instead of hidden to preserve sticky positioning */
-  /* IMPORTANT: scroll-behavior: smooth conflicts with GSAP ScrollTrigger on mobile */
   /* Smooth scroll is now applied only on desktop devices with fine pointer (mouse) */
   scrollbar-width: none;
   /* Firefox */
 }
 
-/* Enable smooth scroll only on desktop devices - prevents GSAP ScrollTrigger conflicts on mobile */
+/* Enable smooth scroll only on desktop devices */
 @media (min-width: 768px) and (pointer: fine) {
   html {
     scroll-behavior: smooth;
@@ -1056,21 +1055,4 @@ body::-webkit-scrollbar {
 .tabs_let-content {
   -ms-overflow-style: none;
   scrollbar-width: none;
-}
-
-/* GSAP Stacked Cards Styles */
-.c-card {
-  position: relative;
-  transform-origin: center top;
-  will-change: transform, opacity;
-}
-
-.c-card:last-child {
-  margin-bottom: 0;
-}
-
-/* Ensure proper stacking during GSAP animations */
-.c-card[style*="position: fixed"] {
-  transform-style: preserve-3d;
-  backface-visibility: hidden;
-}
+}

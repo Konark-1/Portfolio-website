@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Inter, Playfair_Display } from "next/font/google";
 import "./globals.css";
 import Header from "./components/header"; // Import the header
+import Footer from "./components/footer"; // Import the footer
 import Script from "next/script";
 import CursorMount from "./components/CursorMount";
 import { ServiceWorkerRegistration } from "@/components/ServiceWorkerRegistration";
@@ -78,6 +79,7 @@ export default function RootLayout({
         <CursorMount />
         <Header /> {/* Add the header here */}
         {children}
+        <Footer />
         <SpeedInsights />
         <Analytics />
       </body>
