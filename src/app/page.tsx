@@ -78,6 +78,22 @@ export default function HomePage() {
     setIsMounted(true);
   }, []);
 
+  // Experience section scroll progress tracking
+  const experienceRef = useRef<HTMLElement>(null);
+  const { scrollYProgress: experienceProgress } = useScroll({
+    target: experienceRef,
+    offset: ["start center", "end center"]
+  });
+
+  const smoothProgress = useSpring(experienceProgress, {
+    stiffness: 100,
+    damping: 30,
+    restDelta: 0.001
+  });
+
+  const sparkY = useTransform(smoothProgress, [0, 1], ["0%", "100%"]);
+  const sparkOpacity = useTransform(smoothProgress, [0, 0.05, 0.95, 1], [0, 1, 1, 0]);
+
   // Optimized input handler with debouncing for error clearing
   const handleInputChange = useCallback((e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { id, value } = e.target;
@@ -211,16 +227,40 @@ export default function HomePage() {
 
   const experienceTimeline = [
     {
-      title: "AI-Analyst",
-      company: "Innodata Inc., Noida (Remote)",
-      duration: "Jan 2026 – Present",
+      title: "Bachelor of Commerce (Hons)",
+      company: "Amity University, Noida",
+      duration: "May 2019 – Nov 2022",
       summary:
-        "Spearheaded Multi-Modal Prompt Engineering across diverse AI models (text, image, audio, and video). Engineered and refined complex prompts, and conducted comparative evaluations to improve model performance.",
+        "Developed a strong foundation in business logic, accounting, and finance, which now informs my analytical approach to commerce-driven data insights.",
       achievements: [
-        "Achieved an average quality score of 3.29/4.00, surpassing the target benchmark of 2.00 by over 64%, as independently verified by senior QA reviewers.",
-        "Conducted rigorous comparative evaluations and A/B testing of AI-generated content to resolve factual and structural inconsistencies."
+        "Major in Accounting and Finance with a CGPA of 7.55/10.0.",
+        "Built core competencies in financial modeling and business process understanding.",
       ],
-      skillTags: ["Prompt Engineering", "Quality Assurance", "AI Training", "Process Standardization"],
+      skillTags: ["Accounting", "Finance", "Business Logic"],
+    },
+    {
+      title: "Marketing & Sales Trainee",
+      company: "IFortis Corporate",
+      duration: "May 2021 – Jul 2021",
+      summary:
+        "Built foundational business intelligence skills through consumer trend analysis, market segmentation, and the alignment of sales operations with corporate strategy.",
+      achievements: [
+        "Leveraged market segmentation analysis to refine targeting approaches for active campaigns.",
+        "Managed sales operations to ensure seamless execution of strategic promotional plans.",
+      ],
+      skillTags: ["Market Analysis", "Consumer Behavior", "Stakeholder Ops"],
+    },
+    {
+      title: "Claims Analyst",
+      company: "Xceedance Consulting India Pvt. Ltd.",
+      duration: "Jul 2023 – Feb 2024",
+      summary:
+        "Delivered high-velocity data processing and database maintenance for US-based healthcare clients, consistently outperforming production targets through rapid process adaptation.",
+      achievements: [
+        "Maintained 99.9% data integrity for the Medical Provider Network (MPN) database with zero compliance errors.",
+        "Surpassed daily production KPIs by 15% within the first month of operations.",
+      ],
+      skillTags: ["Data Integrity", "SLA Management", "Healthcare Ops"],
     },
     {
       title: "Certified Data Analyst",
@@ -235,28 +275,16 @@ export default function HomePage() {
       skillTags: ["SQL", "Python", "Power BI", "Excel", "VBA", "Generative AI"],
     },
     {
-      title: "Claims Analyst",
-      company: "Xceedance Consulting India Pvt. Ltd.",
-      duration: "Jul 2023 – Jan 2024",
+      title: "AI-Analyst",
+      company: "Innodata Inc., Noida (Remote)",
+      duration: "Jan 2026 – Present",
       summary:
-        "Delivered high-velocity data processing and database maintenance for US-based healthcare clients, consistently outperforming production targets through rapid process adaptation.",
+        "Spearheaded Multi-Modal Prompt Engineering across diverse AI models (text, image, audio, and video). Engineered and refined complex prompts, and conducted comparative evaluations to improve model performance.",
       achievements: [
-        "Maintained 99% data integrity for the Medical Provider Network (MPN) database with zero compliance errors.",
-        "Surpassed daily production KPIs by 15% within the first month of operations.",
+        "Achieved an average quality score of 3.29/4.00, surpassing the target benchmark of 2.00 by over 64%, as independently verified by senior QA reviewers.",
+        "Conducted rigorous comparative evaluations and A/B testing of AI-generated content to resolve factual and structural inconsistencies."
       ],
-      skillTags: ["Data Integrity", "SLA Management", "Healthcare Ops"],
-    },
-    {
-      title: "Marketing & Sales",
-      company: "IFortis Corporate",
-      duration: "May 2021 – Jul 2021",
-      summary:
-        "Built foundational business intelligence skills through consumer trend analysis, market segmentation, and the alignment of sales operations with corporate strategy.",
-      achievements: [
-        "Leveraged market segmentation analysis to refine targeting approaches for active campaigns.",
-        "Managed sales operations to ensure seamless execution of strategic promotional plans.",
-      ],
-      skillTags: ["Market Analysis", "Consumer Behavior", "Stakeholder Ops"],
+      skillTags: ["Prompt Engineering", "Quality Assurance", "AI Training", "Process Standardization"],
     },
   ];
 
@@ -543,13 +571,30 @@ export default function HomePage() {
               Technical expertise
             </motion.p>
             <motion.h2
-              className="font-serif text-3xl sm:text-4xl md:text-5xl font-bold text-text-primary tracking-tight leading-tight"
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.6, delay: 0.2 }}
+              className="font-serif text-3xl sm:text-4xl md:text-5xl font-bold text-text-primary tracking-tight leading-tight flex flex-wrap justify-center gap-x-3"
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true, margin: "-100px" }}
+              variants={{
+                visible: {
+                  transition: {
+                    staggerChildren: 0.1,
+                  },
+                },
+              }}
             >
-              Toolbox for insight generation
+              {"Toolbox for insight generation".split(" ").map((word, i) => (
+                <motion.span
+                  key={i}
+                  variants={{
+                    hidden: { opacity: 0, y: 20 },
+                    visible: { opacity: 1, y: 0 },
+                  }}
+                  transition={{ duration: 0.6, ease: [0.2, 0.65, 0.3, 0.9] }}
+                >
+                  {word}
+                </motion.span>
+              ))}
             </motion.h2>
             <motion.p
               className="text-base sm:text-lg text-text-muted leading-relaxed font-sans"
@@ -621,21 +666,49 @@ export default function HomePage() {
       </section>
 
       {/* Experience Section - Standard Flow */}
-      <section id="experience" className="relative z-20 text-foreground border-t" style={{
-        backgroundColor: 'var(--background-experience)',
-        borderColor: 'var(--border-color)'
-      }}>
+      <section 
+        id="experience" 
+        ref={experienceRef}
+        className="relative z-20 text-foreground border-t" 
+        style={{
+          backgroundColor: 'var(--background-experience)',
+          borderColor: 'var(--border-color)'
+        }}
+      >
         {/* Subtle turquoise gradient overlay */}
         <div className="absolute inset-0 bg-gradient-to-br from-transparent via-[rgba(39,203,206,0.02)] to-transparent pointer-events-none" />
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-20 sm:py-28 lg:py-36 relative z-10">
           <div className="flex flex-col lg:flex-row gap-12 lg:gap-20">
             {/* Left Column - Heading (Sticky on Desktop) */}
             <div className="lg:w-1/3">
-              <div className="lg:sticky lg:top-36 lg:h-fit space-y-4 sm:space-y-6">
+              <div className="lg:sticky lg:top-40 lg:h-fit space-y-4 sm:space-y-6">
                 <p className="text-xs uppercase tracking-[0.55em] text-text-muted font-sans font-semibold">Professional Journey</p>
-                <h2 className="font-serif text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-text-primary tracking-tight leading-tight">
-                  Hands-on history
-                </h2>
+                <motion.h2
+                  className="font-serif text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-text-primary tracking-tight leading-tight flex flex-wrap gap-x-3"
+                  initial="hidden"
+                  whileInView="visible"
+                  viewport={{ once: true, margin: "-100px" }}
+                  variants={{
+                    visible: {
+                      transition: {
+                        staggerChildren: 0.1,
+                      },
+                    },
+                  }}
+                >
+                  {"Hands-on history".split(" ").map((word, i) => (
+                    <motion.span
+                      key={i}
+                      variants={{
+                        hidden: { opacity: 0, y: 20 },
+                        visible: { opacity: 1, y: 0 },
+                      }}
+                      transition={{ duration: 0.6, ease: [0.2, 0.65, 0.3, 0.9] }}
+                    >
+                      {word}
+                    </motion.span>
+                  ))}
+                </motion.h2>
                 <p className="text-sm sm:text-base md:text-lg text-text-muted leading-relaxed font-sans max-w-md">
                   A chronological overview of my professional journey, highlighting key achievements, responsibilities, and technical expertise gained at each position.
                 </p>
@@ -649,7 +722,25 @@ export default function HomePage() {
             <div className="lg:w-2/3">
               <div className="relative space-y-12 sm:space-y-16">
                 {/* Timeline line - aligned with dots */}
-                <div className="absolute left-[21px] sm:left-[31px] top-8 bottom-0 w-px bg-gradient-to-b from-accent-cyan/40 via-accent-cyan/15 to-transparent hidden sm:block" />
+                <div className="absolute left-[21px] sm:left-[31px] top-8 bottom-0 w-px bg-gradient-to-b from-accent-cyan/40 via-accent-cyan/15 to-transparent hidden sm:block">
+                  {/* Dynamic Progress Spark */}
+                  <motion.div
+                    style={{ 
+                      top: sparkY,
+                      opacity: sparkOpacity
+                    }}
+                    className="absolute left-1/2 -translate-x-1/2 z-30"
+                  >
+                    {/* Glowing Spark */}
+                    <div className="relative">
+                      <div className="absolute inset-0 bg-accent-cyan blur-[6px] rounded-full scale-150 animate-pulse" />
+                      <div className="h-2.5 w-2.5 rounded-full bg-accent-cyan border border-white shadow-[0_0_15px_#27CBCE]" />
+                      
+                      {/* Trailing light effect */}
+                      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-8 h-8 bg-accent-cyan/20 blur-xl rounded-full" />
+                    </div>
+                  </motion.div>
+                </div>
                 {experienceTimeline.map((item, index) => (
                   <ExperienceEntry
                     key={item.title + item.company}
@@ -674,13 +765,34 @@ export default function HomePage() {
         <div className="absolute inset-0 bg-gradient-to-b from-transparent via-[rgba(10,14,26,0.8)] to-[var(--background-projects)] pointer-events-none" />
 
         <div className="max-w-7xl mx-auto relative z-10 space-y-8">
-          <div className="text-center space-y-6 max-w-7xl mx-auto px-4">
-            <h2 className="font-serif text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold bg-gradient-to-r from-[#27CBCE] via-[#20B2AA] to-[#00D9FF] bg-clip-text text-transparent tracking-tight leading-[1.1] mb-4">
-              Interactive Analytics
-            </h2>
-            <p className="text-base sm:text-lg md:text-xl lg:text-2xl text-text-muted leading-relaxed font-sans max-w-5xl mx-auto">
-              A cinematic showcase of embedded Power BI dashboards. <span className="text-accent-cyan font-medium whitespace-nowrap">Fully interactive</span>, real-time data visualizations built with advanced DAX, optimized queries, and storytelling design principles.
-            </p>
+          <div className="text-center space-y-4 sm:space-y-6 max-w-7xl mx-auto px-4">
+            <motion.p
+              className="text-xs sm:text-sm uppercase tracking-[0.6em] text-accent-cyan font-sans font-semibold"
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5 }}
+            >
+              Selected Works
+            </motion.p>
+            <motion.h2
+              className="font-serif text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold bg-gradient-to-r from-[#27CBCE] via-[#20B2AA] to-[#00D9FF] bg-clip-text text-transparent tracking-tight leading-[1.1] mb-2"
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: "-50px" }}
+              transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
+            >
+              Data Intelligence & Strategic Dashboards
+            </motion.h2>
+            <motion.p 
+              className="text-base sm:text-lg md:text-xl lg:text-2xl text-text-muted leading-relaxed font-sans max-w-5xl mx-auto"
+              initial={{ opacity: 0 }}
+              whileInView={{ opacity: 1 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.8, delay: 0.2 }}
+            >
+              <span className="text-white font-medium">A curated portfolio of high-impact Power BI solutions.</span> Featuring fully interactive, real-time visualizations engineered with advanced DAX, high-performance query optimization, and strategic storytelling to drive data-led business intelligence.
+            </motion.p>
           </div>
 
           <div className="space-y-20">
@@ -795,9 +907,32 @@ export default function HomePage() {
             <div className="space-y-10 sm:space-y-12">
               <div className="space-y-4 sm:space-y-6">
                 <p className="text-xs uppercase tracking-[0.55em] text-text-muted font-sans">Get in touch</p>
-                <h2 className="font-serif text-4xl sm:text-5xl md:text-6xl font-bold text-text-primary tracking-tight leading-tight">
-                  Let&rsquo;s work together
-                </h2>
+                <motion.h2
+                  className="font-serif text-4xl sm:text-5xl md:text-6xl font-bold text-text-primary tracking-tight leading-tight flex flex-wrap gap-x-4"
+                  initial="hidden"
+                  whileInView="visible"
+                  viewport={{ once: true, margin: "-100px" }}
+                  variants={{
+                    visible: {
+                      transition: {
+                        staggerChildren: 0.1,
+                      },
+                    },
+                  }}
+                >
+                  {"Let's work together".split(" ").map((word, i) => (
+                    <motion.span
+                      key={i}
+                      variants={{
+                        hidden: { opacity: 0, y: 20 },
+                        visible: { opacity: 1, y: 0 },
+                      }}
+                      transition={{ duration: 0.6, ease: [0.2, 0.65, 0.3, 0.9] }}
+                    >
+                      {word}
+                    </motion.span>
+                  ))}
+                </motion.h2>
                 <p className="text-sm sm:text-base md:text-lg text-text-muted leading-relaxed font-sans max-w-lg">
                   I&apos;m always open to discussing new opportunities, collaborations, or data analytics projects. Reach out via the form or through my direct channels.
                 </p>
@@ -815,11 +950,7 @@ export default function HomePage() {
                 </div>
               </div>
 
-              <div className="pt-6 border-t border-border/40">
-                <p className="text-xs sm:text-sm text-text-muted leading-relaxed font-sans italic">
-                  I typically respond within 24-48 hours. For urgent matters, LinkedIn or Email is usually fastest.
-                </p>
-              </div>
+
             </div>
 
             {/* Right Column: Contact Form */}
@@ -1017,6 +1148,21 @@ function ExperienceEntry({
   isLast,
 }: ExperienceEntryProps): React.JSX.Element {
   const formattedIndex = String(index + 1).padStart(2, '0');
+  const dotRef = useRef<HTMLDivElement>(null);
+
+  // Individual dot activation tracking
+  const { scrollYProgress: dotProgress } = useScroll({
+    target: dotRef,
+    offset: ["start center", "end center"]
+  });
+
+  // Activate when spark passes (progress hits center)
+  const dotActivation = useSpring(useTransform(dotProgress, [0, 0.1], [0, 1]), {
+    stiffness: 100,
+    damping: 30
+  });
+  
+  const dotScale = useTransform(dotActivation, [0, 1], [0.4, 1]);
 
   return (
     <motion.div
@@ -1030,8 +1176,24 @@ function ExperienceEntry({
       }}
       className="relative sm:pl-16"
     >
-      {/* Timeline dot - precisely aligned with the line */}
-      <div className="hidden sm:flex absolute sm:left-[26px] top-8 w-3 h-3 rounded-full border-2 border-accent-cyan bg-background z-10" />
+      {/* Timeline dot Ref for activation detection */}
+      <div ref={dotRef} className="absolute sm:left-[25px] top-1/2 -translate-y-1/2 w-3 h-3 pointer-events-none" />
+      
+      {/* Timeline dot - centered with the box (center at 31px) */}
+      <div className="hidden sm:flex absolute sm:left-[25px] top-1/2 -translate-y-1/2 w-3 h-3 rounded-full border-2 border-white/20 bg-background z-10 transition-colors duration-500">
+        <motion.div 
+          style={{ 
+            opacity: dotActivation,
+            scale: dotScale,
+          }}
+          className="absolute inset-[-2px] rounded-full bg-accent-cyan shadow-[0_0_15px_#27CBCE] z-20"
+        />
+        {/* Inner core to keep it looking sharp */}
+        <motion.div 
+          style={{ opacity: dotActivation }}
+          className="absolute inset-[2px] rounded-full bg-white z-30"
+        />
+      </div>
 
       {/* Card */}
       <div
@@ -1154,6 +1316,7 @@ function DashboardCard({
   gradient,
 }: DashboardCardProps): React.JSX.Element {
   const cardRef = useRef(null);
+  const dashboardRef = useRef<HTMLDivElement>(null);
   const [isMounted, setIsMounted] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
 
@@ -1206,26 +1369,11 @@ function DashboardCard({
           <p className="text-sm sm:text-base md:text-lg text-text-muted leading-relaxed font-sans">{description}</p>
         </div>
 
-        <div
-          role="region"
-          aria-label={`${title} - Interactive Power BI Dashboard`}
-          className="rounded-2xl overflow-hidden border-2 transition-colors relative group/dashboard"
-          style={{
-            borderColor: 'var(--border-color)',
-          }}
-          onMouseEnter={(e) => {
-            e.currentTarget.style.borderColor = 'rgba(39, 203, 206, 0.4)';
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.borderColor = 'var(--border-color)';
-          }}
-        >
-          {/* Full Screen Button Overlay - Enhanced for mobile visibility */}
+        <div className="hidden sm:flex items-center justify-end mb-4">
           <button
-            onClick={(e) => {
-              const container = e.currentTarget.parentElement;
+            onClick={() => {
+              const container = dashboardRef.current;
               if (container) {
-                // Check for fullscreen API support (not available on iOS Safari for iframes)
                 const fullscreenSupported = document.fullscreenEnabled ||
                   (document as any).webkitFullscreenEnabled;
 
@@ -1241,46 +1389,76 @@ function DashboardCard({
                       (container as any).webkitRequestFullscreen;
                     if (requestFS) {
                       requestFS.call(container).catch((err: any) => {
-                        // Fallback: open dashboard URL directly
                         window.open(embedUrl, '_blank');
                       });
                     }
                   }
                 } else {
-                  // iOS Safari fallback: open dashboard in new tab for better mobile experience
                   window.open(embedUrl, '_blank');
                 }
               }
             }}
-            className="hidden sm:flex absolute top-2 right-2 sm:top-3 sm:right-3 z-20 items-center gap-1.5 sm:gap-2 px-3 py-2 sm:px-4 sm:py-2.5 rounded-xl border backdrop-blur-md transition-all duration-300 hover:scale-105 active:scale-95 touch-manipulation"
+            className="flex items-center gap-2 px-4 py-2 rounded-xl border backdrop-blur-md transition-all duration-300 hover:scale-105 active:scale-95 touch-manipulation group/fs"
             style={{
               backgroundColor: 'rgba(10, 14, 26, 0.95)',
-              borderColor: 'rgba(39, 203, 206, 0.6)',
+              borderColor: 'rgba(39, 203, 206, 0.4)',
               color: 'rgba(39, 203, 206, 1)',
-              boxShadow: '0 2px 12px rgba(39, 203, 206, 0.25)',
+              boxShadow: '0 2px 8px rgba(39, 203, 206, 0.15)',
             }}
             aria-label="View dashboard in full screen"
-            title="View in Full Screen (opens in new tab on mobile)"
+            title="View in Full Screen"
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
-              width="18"
-              height="18"
+              width="16"
+              height="16"
               viewBox="0 0 24 24"
               fill="none"
               stroke="currentColor"
               strokeWidth="2.5"
               strokeLinecap="round"
               strokeLinejoin="round"
-              className="sm:w-5 sm:h-5"
+              className="group-hover/fs:rotate-12 transition-transform"
             >
               <path d="M8 3H5a2 2 0 0 0-2 2v3" />
               <path d="M21 8V5a2 2 0 0 0-2-2h-3" />
               <path d="M3 16v3a2 2 0 0 0 2 2h3" />
               <path d="M16 21h3a2 2 0 0 0 2-2v-3" />
             </svg>
-            <span className="text-xs sm:text-sm font-semibold font-sans tracking-wide">Full Screen</span>
+            <span className="text-sm font-semibold font-sans tracking-wide">Full Screen</span>
           </button>
+        </div>
+
+        <div
+          ref={dashboardRef}
+          role="region"
+          aria-label={`${title} - Interactive Power BI Dashboard`}
+          className="rounded-2xl overflow-hidden border-2 transition-colors relative group/dashboard"
+          style={{
+            borderColor: 'var(--border-color)',
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.borderColor = 'rgba(39, 203, 206, 0.4)';
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.borderColor = 'var(--border-color)';
+          }}
+        >
+          {/* Mobile Overlay Button - Stays inside for touch UX */}
+          {isMounted && isMobile && (
+            <button
+              onClick={() => window.open(embedUrl, '_blank')}
+              className="sm:hidden absolute top-3 right-3 z-20 flex items-center gap-1.5 px-3 py-2 rounded-lg border backdrop-blur-md"
+              style={{
+                backgroundColor: 'rgba(10, 14, 26, 0.9)',
+                borderColor: 'rgba(39, 203, 206, 0.5)',
+                color: 'rgba(39, 203, 206, 1)',
+              }}
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M15 3h6v6"/><path d="M10 14L21 3"/><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/></svg>
+              <span className="text-xs font-bold uppercase tracking-wider">Expand</span>
+            </button>
+          )}
           <div className="relative w-full" style={{ backgroundColor: 'rgba(10, 14, 26, 0.95)' }}>
             <div className="relative pt-[56.25%] sm:pt-[59.77%] overflow-hidden">
               {isMounted && isMobile ? (

@@ -184,8 +184,8 @@ function Header() {
       <div className="flex-shrink-0">
         <Link href="/" className="flex items-center gap-2">
           <span
-            className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-5xl font-bold text-text-primary font-serif tracking-tight"
-            style={{ fontSize: 'clamp(1.75rem, 6vw, 3rem)' }}
+            className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-bold text-text-primary font-serif tracking-tight"
+            style={{ fontSize: 'clamp(2rem, 7vw, 4rem)' }}
           >
             Konark Parihar
           </span>
