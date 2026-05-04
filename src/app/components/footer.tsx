@@ -100,7 +100,7 @@ const STYLES = `
 }
 `;
 
-const MagneticButton = ({ children, className, as: Component = "button", ...props }: any) => {
+const MagneticButton = ({ children, className, ...props }: any) => {
   const localRef = useRef<HTMLElement>(null);
 
   useEffect(() => {
@@ -151,14 +151,16 @@ const MagneticButton = ({ children, className, as: Component = "button", ...prop
     return () => ctx.revert();
   }, []);
 
+  const Tag = props.href ? "a" : "button";
+
   return (
-    <Component
+    <Tag
       ref={localRef}
-      className={cn("cursor-pointer", className)}
+      className={cn("inline-block", className)}
       {...props}
     >
       {children}
-    </Component>
+    </Tag>
   );
 };
 
@@ -242,18 +244,20 @@ export default function Footer() {
         className="relative h-[400px] w-full pointer-events-none"
         style={{ clipPath: "polygon(0% 0, 100% 0%, 100% 100%, 0 100%)" }}
       >
-        <footer className="fixed bottom-0 left-0 flex h-[400px] w-full flex-col justify-between overflow-hidden bg-[#0A0E1A] text-foreground py-12 md:py-16 z-0 pointer-events-auto">
+        <footer className="fixed bottom-0 left-0 flex h-[400px] w-full flex-col justify-between bg-[#0A0E1A] text-foreground py-12 md:py-16 z-0 pointer-events-auto">
           
           {/* Ambient Light & Grid Background */}
           <div className="footer-aurora absolute left-1/2 top-1/2 h-[300px] w-[500px] -translate-x-1/2 -translate-y-1/2 animate-footer-breathe rounded-[50%] blur-[80px] pointer-events-none z-0" />
           <div className="footer-bg-grid absolute inset-0 z-0 pointer-events-none opacity-40" />
 
-          {/* Giant background text */}
-          <div
-            ref={giantTextRef}
-            className="footer-giant-bg-text absolute bottom-0 left-1/2 -translate-x-1/2 whitespace-nowrap z-0 pointer-events-none select-none uppercase opacity-20"
-          >
-            Konark
+          {/* Giant background text - moved to a container with overflow-hidden */}
+          <div className="absolute inset-0 overflow-hidden pointer-events-none">
+            <div
+              ref={giantTextRef}
+              className="footer-giant-bg-text absolute bottom-0 left-1/2 -translate-x-1/2 whitespace-nowrap select-none uppercase opacity-20"
+            >
+              Konark
+            </div>
           </div>
 
           {/* Main Center Content - Social Pills only */}

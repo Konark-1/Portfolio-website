@@ -71,6 +71,8 @@ export default function AboutSection({ shouldReduceMotion }: AboutSectionProps):
                 backgroundColor: 'var(--background-about)',
             }}
         >
+            {/* Ambient Transition Glow */}
+            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-4xl h-32 bg-accent-cyan/10 blur-[100px] pointer-events-none" />
             {/* Solid background to cover hero section */}
             <div className="absolute inset-0" style={{ backgroundColor: 'var(--background-about)' }} />
 
@@ -100,13 +102,13 @@ export default function AboutSection({ shouldReduceMotion }: AboutSectionProps):
                 {/* Header with Dynamic Scaling */}
                 <div className="text-center mb-12 sm:mb-16 lg:mb-20">
                     <motion.p
-                        className="text-xs tracking-[0.5em] uppercase text-text-muted font-sans mb-4 sm:mb-6"
+                        className="text-xs sm:text-sm uppercase tracking-[0.6em] text-accent-cyan font-sans font-semibold mb-4 sm:mb-6"
                         initial={{ opacity: 0, y: 20 }}
                         whileInView={{ opacity: 1, y: 0 }}
                         viewport={{ once: true }}
                         transition={{ duration: 0.6 }}
                     >
-                        About
+                        About Me
                     </motion.p>
 
                     {/* Dynamic Scaling Name */}
