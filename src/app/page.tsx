@@ -304,14 +304,14 @@ export default function HomePage() {
     {
       icon: FileText,
       label: "Resume",
-      value: "Download resume (PDF)",
+      value: "Download PDF",
       href: "/KONARK_PARIHAR_RESUME.pdf",
       download: true,
     },
     {
       icon: Linkedin,
       label: "LinkedIn",
-      value: "linkedin.com/in/konarkparihar",
+      value: "Visit Profile",
       href: "https://www.linkedin.com/in/konarkparihar",
     },
   ];
@@ -554,50 +554,27 @@ export default function HomePage() {
         {/* Subtle gradient overlay */}
         <div className="absolute inset-0 bg-gradient-to-br from-[rgba(39,203,206,0.03)] via-transparent to-transparent pointer-events-none" />
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-12 sm:py-16 lg:py-24 space-y-12 sm:space-y-16 relative z-10">
-          <motion.div
-            className="text-center space-y-4 max-w-3xl mx-auto"
-            initial={{ opacity: 0, y: 40 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: "-100px" }}
-            transition={{ duration: 0.6, ease: [0.25, 0.46, 0.45, 0.94] }}
-          >
+          <div className="text-center space-y-4 max-w-4xl mx-auto px-4">
             <motion.p
-              className="text-xs uppercase tracking-[0.6em] text-text-muted font-sans"
+              className="text-xs sm:text-sm uppercase tracking-[0.6em] text-accent-cyan font-sans font-semibold"
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              transition={{ duration: 0.5, delay: 0.1 }}
+              transition={{ duration: 0.5 }}
             >
               Technical expertise
             </motion.p>
             <motion.h2
-              className="font-serif text-3xl sm:text-4xl md:text-5xl font-bold text-text-primary tracking-tight leading-tight flex flex-wrap justify-center gap-x-3"
-              initial="hidden"
-              whileInView="visible"
-              viewport={{ once: true, margin: "-100px" }}
-              variants={{
-                visible: {
-                  transition: {
-                    staggerChildren: 0.1,
-                  },
-                },
-              }}
+              className="font-serif text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-text-primary tracking-tight leading-tight"
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6, delay: 0.2 }}
             >
-              {"Toolbox for insight generation".split(" ").map((word, i) => (
-                <motion.span
-                  key={i}
-                  variants={{
-                    hidden: { opacity: 0, y: 20 },
-                    visible: { opacity: 1, y: 0 },
-                  }}
-                  transition={{ duration: 0.6, ease: [0.2, 0.65, 0.3, 0.9] }}
-                >
-                  {word}
-                </motion.span>
-              ))}
+              Toolbox for insight generation
             </motion.h2>
             <motion.p
-              className="text-base sm:text-lg text-text-muted leading-relaxed font-sans"
+              className="text-base sm:text-lg md:text-xl text-text-muted leading-relaxed font-sans"
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
@@ -605,7 +582,7 @@ export default function HomePage() {
             >
               A comprehensive overview of my technical expertise and proficiency levels across key data analytics tools and methodologies.
             </motion.p>
-          </motion.div>
+          </div>
 
           <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
             {skillsShowcase.map((skill) => (
@@ -682,36 +659,33 @@ export default function HomePage() {
             {/* Left Column - Heading (Sticky on Desktop) */}
             <div className="lg:w-1/3">
               <div className="lg:sticky lg:top-40 lg:h-fit space-y-4 sm:space-y-6">
-                <p className="text-xs uppercase tracking-[0.55em] text-text-muted font-sans font-semibold">Professional Journey</p>
-                <motion.h2
-                  className="font-serif text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-text-primary tracking-tight leading-tight flex flex-wrap gap-x-3"
-                  initial="hidden"
-                  whileInView="visible"
-                  viewport={{ once: true, margin: "-100px" }}
-                  variants={{
-                    visible: {
-                      transition: {
-                        staggerChildren: 0.1,
-                      },
-                    },
-                  }}
+                <motion.p 
+                  className="text-xs sm:text-sm uppercase tracking-[0.6em] text-accent-cyan font-sans font-semibold"
+                  initial={{ opacity: 0, x: -20 }}
+                  whileInView={{ opacity: 1, x: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.5 }}
                 >
-                  {"Hands-on history".split(" ").map((word, i) => (
-                    <motion.span
-                      key={i}
-                      variants={{
-                        hidden: { opacity: 0, y: 20 },
-                        visible: { opacity: 1, y: 0 },
-                      }}
-                      transition={{ duration: 0.6, ease: [0.2, 0.65, 0.3, 0.9] }}
-                    >
-                      {word}
-                    </motion.span>
-                  ))}
+                  Professional Journey
+                </motion.p>
+                <motion.h2
+                  className="font-serif text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-text-primary tracking-tight leading-tight"
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.6, delay: 0.1 }}
+                >
+                  Hands-on history
                 </motion.h2>
-                <p className="text-sm sm:text-base md:text-lg text-text-muted leading-relaxed font-sans max-w-md">
+                <motion.p 
+                  className="text-sm sm:text-base md:text-lg text-text-muted leading-relaxed font-sans max-w-md"
+                  initial={{ opacity: 0 }}
+                  whileInView={{ opacity: 1 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.6, delay: 0.2 }}
+                >
                   A chronological overview of my professional journey, highlighting key achievements, responsibilities, and technical expertise gained at each position.
-                </p>
+                </motion.p>
                 <div className="pt-8 hidden lg:block">
                   <div className="h-px w-24 bg-accent-cyan/30" />
                 </div>
@@ -905,37 +879,34 @@ export default function HomePage() {
           <div className="grid gap-12 lg:grid-cols-2">
             {/* Left Column: Context & Direct Channels */}
             <div className="space-y-10 sm:space-y-12">
-              <div className="space-y-4 sm:space-y-6">
-                <p className="text-xs uppercase tracking-[0.55em] text-text-muted font-sans">Get in touch</p>
-                <motion.h2
-                  className="font-serif text-4xl sm:text-5xl md:text-6xl font-bold text-text-primary tracking-tight leading-tight flex flex-wrap gap-x-4"
-                  initial="hidden"
-                  whileInView="visible"
-                  viewport={{ once: true, margin: "-100px" }}
-                  variants={{
-                    visible: {
-                      transition: {
-                        staggerChildren: 0.1,
-                      },
-                    },
-                  }}
+              <div className="space-y-6">
+                <motion.p 
+                  className="text-xs sm:text-sm uppercase tracking-[0.6em] text-accent-cyan font-sans font-semibold"
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.5 }}
                 >
-                  {"Let's work together".split(" ").map((word, i) => (
-                    <motion.span
-                      key={i}
-                      variants={{
-                        hidden: { opacity: 0, y: 20 },
-                        visible: { opacity: 1, y: 0 },
-                      }}
-                      transition={{ duration: 0.6, ease: [0.2, 0.65, 0.3, 0.9] }}
-                    >
-                      {word}
-                    </motion.span>
-                  ))}
+                  Get in touch
+                </motion.p>
+                <motion.h2
+                  className="font-serif text-4xl sm:text-5xl md:text-6xl font-bold text-text-primary tracking-tight leading-tight"
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.6, delay: 0.1 }}
+                >
+                  Let&rsquo;s work together
                 </motion.h2>
-                <p className="text-sm sm:text-base md:text-lg text-text-muted leading-relaxed font-sans max-w-lg">
+                <motion.p 
+                  className="text-sm sm:text-base md:text-lg text-text-muted leading-relaxed font-sans max-w-lg"
+                  initial={{ opacity: 0 }}
+                  whileInView={{ opacity: 1 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.6, delay: 0.2 }}
+                >
                   I&apos;m always open to discussing new opportunities, collaborations, or data analytics projects. Reach out via the form or through my direct channels.
-                </p>
+                </motion.p>
               </div>
 
               <div className="space-y-6">
@@ -1259,15 +1230,15 @@ type ContactChannelProps = {
 
 function ContactChannelCard({ icon: Icon, label, value, href, download }: ContactChannelProps): React.JSX.Element {
   const content = (
-    <div className="flex items-center justify-between rounded-3xl border px-5 py-4 shadow-glass-soft transition-all duration-300 hover:scale-[1.02]" style={{
+    <div className="flex items-center justify-between gap-4 rounded-3xl border px-5 py-4 shadow-glass-soft transition-all duration-300 hover:scale-[1.02] group/card" style={{
       borderColor: 'var(--border-color)',
       backgroundColor: 'var(--card)',
     }}>
-      <div>
-        <p className="text-xs uppercase tracking-[0.4em] text-text-muted font-sans">{label}</p>
-        <p className="mt-1 text-sm font-semibold text-text-primary font-sans">{value}</p>
+      <div className="min-w-0 flex-1">
+        <p className="text-xs uppercase tracking-[0.4em] text-text-muted font-sans font-medium">{label}</p>
+        <p className="mt-1 text-sm font-semibold text-text-primary font-sans truncate group-hover/card:text-accent-cyan transition-colors">{value}</p>
       </div>
-      <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-accent-cyan/10 text-accent-cyan">
+      <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-accent-cyan/10 text-accent-cyan group-hover/card:bg-accent-cyan/20 transition-colors">
         <Icon className="h-5 w-5" />
       </div>
     </div>
