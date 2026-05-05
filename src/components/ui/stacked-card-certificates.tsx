@@ -212,11 +212,11 @@ export function StackedCardCertificates({ certificates }: StackedCardCertificate
                     </div>
 
                     {/* Dots indicator + counter */}
-                    <div className="flex items-center justify-center gap-3 sm:gap-4 mt-6 sm:mt-8">
-                        <span className="text-[10px] sm:text-xs text-text-muted font-mono">
+                    <div className="flex items-center justify-center gap-2.5 sm:gap-4 mt-4 sm:mt-8">
+                        <span className="text-[9px] sm:text-xs text-text-muted font-mono">
                             {String(activeIndex + 1).padStart(2, '0')} / {String(certificates.length).padStart(2, '0')}
                         </span>
-                        <div className="flex items-center gap-1.5 sm:gap-2">
+                        <div className="flex items-center gap-1 sm:gap-2">
                             {certificates.map((_, idx) => (
                                 <button
                                     key={idx}
@@ -226,7 +226,7 @@ export function StackedCardCertificates({ certificates }: StackedCardCertificate
                                     }}
                                     className={`transition-all duration-300 rounded-full ${
                                         idx === activeIndex
-                                            ? 'w-3 h-1 sm:w-6 sm:h-2 bg-accent-cyan'
+                                            ? 'w-2 h-1 sm:w-6 sm:h-2 bg-accent-cyan'
                                             : 'w-1 h-1 sm:w-2 sm:h-2 bg-text-muted/30 hover:bg-text-muted/50'
                                     }`}
                                     aria-label={`Go to certificate ${idx + 1}`}
