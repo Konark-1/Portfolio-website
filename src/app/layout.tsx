@@ -16,11 +16,12 @@ const playfair = Playfair_Display({
 });
 
 export const metadata: Metadata = {
-  title: "Konark Parihar - Data Analyst & AI Innovator",
-  description: "Multi-disciplinary technologist & AI innovator. Built full-stack portfolio with interactive dashboards and analytics. Leveraging Generative AI for 3x faster insights.",
+  title: "Konark Parihar | Data Analyst & Business Analyst | Delhi NCR",
+  description: "Data Analyst & Business Analyst based in Noida, Delhi NCR. Specializing in Power BI, SQL, Python, DAX, ETL pipelines, and API integration. View live dashboards and projects.",
+  keywords: ["Data Analyst Noida", "Business Analyst Delhi NCR", "Power BI Developer", "SQL Analyst", "Python Data Analyst", "Konark Parihar", "ETL Pipeline", "DAX", "fresher data analyst India"],
   openGraph: {
-    title: "Konark Parihar - Data Analyst & AI Innovator",
-    description: "Multi-disciplinary technologist & AI innovator. Built full-stack portfolio with interactive dashboards and analytics. Leveraging Generative AI for 3x faster insights.",
+    title: "Konark Parihar | Data Analyst & Business Analyst | Delhi NCR",
+    description: "Data Analyst & Business Analyst based in Noida, Delhi NCR. Power BI, SQL, Python, DAX, ETL pipelines. View live dashboards and projects.",
     url: "https://konarkparihar.vercel.app",
     siteName: "Konark Parihar Portfolio",
     images: [
@@ -28,7 +29,7 @@ export const metadata: Metadata = {
         url: "https://konarkparihar.vercel.app/og-thumbnail.webp",
         width: 1200,
         height: 630,
-        alt: "Konark Parihar - Data Analyst & AI Innovator",
+        alt: "Konark Parihar - Data Analyst & Business Analyst Portfolio",
       },
     ],
     locale: "en_US",
@@ -36,8 +37,8 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Konark Parihar - Data Analyst & AI Innovator",
-    description: "Multi-disciplinary technologist & AI innovator. Built full-stack portfolio with interactive dashboards and analytics. Leveraging Generative AI for 3x faster insights.",
+    title: "Konark Parihar | Data Analyst & Business Analyst | Delhi NCR",
+    description: "Data Analyst & Business Analyst based in Noida, Delhi NCR. Power BI, SQL, Python, DAX, ETL pipelines. View live dashboards and projects.",
     images: ["https://konarkparihar.vercel.app/og-thumbnail.webp"],
   },
 };
