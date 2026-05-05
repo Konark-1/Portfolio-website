@@ -16,6 +16,7 @@ const playfair = Playfair_Display({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://konarkparihar.vercel.app"),
   title: "Konark Parihar | Data Analyst & Business Analyst | Delhi NCR",
   description: "Data Analyst & Business Analyst based in Noida, Delhi NCR. Specializing in Power BI, SQL, Python, DAX, ETL pipelines, and API integration. View live dashboards and projects.",
   keywords: ["Data Analyst Noida", "Business Analyst Delhi NCR", "Power BI Developer", "SQL Analyst", "Python Data Analyst", "Konark Parihar", "ETL Pipeline", "DAX", "fresher data analyst India"],
@@ -26,7 +27,7 @@ export const metadata: Metadata = {
     siteName: "Konark Parihar Portfolio",
     images: [
       {
-        url: "https://konarkparihar.vercel.app/og-thumbnail.webp",
+        url: "/og-thumbnail.webp",
         width: 1200,
         height: 630,
         alt: "Konark Parihar - Data Analyst & Business Analyst Portfolio",
@@ -39,8 +40,23 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "Konark Parihar | Data Analyst & Business Analyst | Delhi NCR",
     description: "Data Analyst & Business Analyst based in Noida, Delhi NCR. Power BI, SQL, Python, DAX, ETL pipelines. View live dashboards and projects.",
-    images: ["https://konarkparihar.vercel.app/og-thumbnail.webp"],
+    images: ["/og-thumbnail.webp"],
   },
+};
+
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@type": "Person",
+  "name": "Konark Parihar",
+  "url": "https://konarkparihar.vercel.app",
+  "jobTitle": "Data Analyst & Business Analyst",
+  "alumniOf": "Amity University",
+  "sameAs": [
+    "https://www.linkedin.com/in/konarkparihar",
+    "https://github.com/Konark-1"
+  ],
+  "knowsAbout": ["Data Analytics", "Power BI", "SQL", "Python", "Business Intelligence", "DAX", "ETL Pipelines"],
+  "description": "Data Analyst & Business Analyst based in Noida, Delhi NCR specializing in Power BI, SQL, and Python."
 };
 
 import { SpeedInsights } from "@vercel/speed-insights/next";
@@ -73,6 +89,12 @@ export default function RootLayout({
         <link rel="dns-prefetch" href="https://app.fabric.microsoft.com" />
         <link rel="preconnect" href="https://wabi-us-east2-redirect.analysis.windows.net" crossOrigin="anonymous" />
         <link rel="dns-prefetch" href="https://wabi-us-east2-redirect.analysis.windows.net" />
+
+        {/* Structured Data for Google Search */}
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        />
       </head>
       <body className={`${inter.variable} ${playfair.variable} ${inter.className} dark`} suppressHydrationWarning>
         <ServiceWorkerRegistration />
