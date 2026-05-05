@@ -1296,7 +1296,7 @@ function DashboardCard({
   useEffect(() => {
     setIsMounted(true);
     const checkMobile = () => {
-      const mobile = window.matchMedia('(max-width: 768px)').matches ||
+      const mobile = window.matchMedia('(max-width: 639px)').matches ||
         window.matchMedia('(pointer: coarse)').matches;
       setIsMobile(mobile);
     };
@@ -1416,22 +1416,7 @@ function DashboardCard({
           }}
         >
           {/* Unified mobile interaction overlay */}
-          {isMounted && isMobile && (
-            <div className="sm:hidden absolute inset-0 z-20 flex items-center justify-center pointer-events-none">
-              <button
-                onClick={() => window.open(embedUrl, '_blank')}
-                className="pointer-events-auto flex items-center gap-2 px-5 py-2.5 rounded-full border backdrop-blur-lg shadow-2xl active:scale-95 transition-all"
-                style={{
-                  backgroundColor: 'rgba(10, 14, 26, 0.9)',
-                  borderColor: 'var(--accent-cyan)',
-                  color: 'var(--accent-cyan)',
-                }}
-              >
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M15 3h6v6"/><path d="M10 14L21 3"/><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/></svg>
-                <span className="text-xs font-bold uppercase tracking-wider">Full Screen</span>
-              </button>
-            </div>
-          )}
+
           <div className="relative w-full" style={{ backgroundColor: 'rgba(10, 14, 26, 0.95)' }}>
             <div className="relative pt-[56.25%] sm:pt-[59.77%] overflow-hidden">
               {isMounted && isMobile ? (
