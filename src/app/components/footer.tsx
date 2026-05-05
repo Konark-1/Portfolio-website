@@ -241,10 +241,10 @@ export default function Footer() {
       {/* Spacer to allow reveal effect */}
       <div
         ref={wrapperRef}
-        className="relative h-[400px] w-full pointer-events-none"
-        style={{ clipPath: "polygon(0% 0, 100% 0%, 100% 100%, 0 100%)" }}
+        className="relative h-[450px] w-full pointer-events-none overflow-visible"
+        style={{ clipPath: "polygon(0% -20%, 100% -20%, 100% 100%, 0 100%)" }}
       >
-        <footer className="fixed bottom-0 left-0 flex h-[400px] w-full flex-col justify-between bg-[#0A0E1A] text-foreground py-12 md:py-16 z-0 pointer-events-auto">
+        <footer className="fixed bottom-0 left-0 flex h-[450px] w-full flex-col justify-between bg-[#0A0E1A] text-foreground py-12 md:py-16 z-0 pointer-events-auto overflow-visible">
           
           {/* Ambient Light & Grid Background */}
           <div className="footer-aurora absolute left-1/2 top-1/2 h-[300px] w-[500px] -translate-x-1/2 -translate-y-1/2 animate-footer-breathe rounded-[50%] blur-[80px] pointer-events-none z-0" />
@@ -261,9 +261,9 @@ export default function Footer() {
           </div>
 
           {/* Main Center Content - Social Pills only */}
-          <div className="relative z-10 flex flex-1 flex-col items-center justify-center px-6 w-full max-w-6xl mx-auto">
+          <div className="relative z-10 flex flex-1 flex-col items-center justify-center px-6 w-full max-w-6xl mx-auto overflow-visible">
             {/* Interactive Magnetic Social Pills */}
-            <div ref={linksRef} className="flex flex-wrap justify-center gap-4 md:gap-8 w-full">
+            <div ref={linksRef} className="flex flex-wrap justify-center gap-4 md:gap-8 w-full py-16 overflow-visible">
               <MagneticButton 
                 href="https://www.linkedin.com/in/konarkparihar" 
                 target="_blank"

@@ -226,8 +226,8 @@ export function StackedCardCertificates({ certificates }: StackedCardCertificate
                                     }}
                                     className={`transition-all duration-300 rounded-full ${
                                         idx === activeIndex
-                                            ? 'w-6 h-2 bg-accent-cyan'
-                                            : 'w-2 h-2 bg-text-muted/30 hover:bg-text-muted/50'
+                                            ? 'w-4 h-1.5 sm:w-6 sm:h-2 bg-accent-cyan'
+                                            : 'w-1.5 h-1.5 sm:w-2 sm:h-2 bg-text-muted/30 hover:bg-text-muted/50'
                                     }`}
                                     aria-label={`Go to certificate ${idx + 1}`}
                                 />
@@ -264,10 +264,12 @@ function CertificateCard({ certificate }: { certificate: Certificate }) {
                         src={certificate.imagePath!}
                         alt={certificate.title}
                         fill
-                        sizes="(max-width: 768px) 100vw, 50vw"
+                        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                        quality={85}
                         className="object-contain p-4 sm:p-6 transition-transform duration-500 group-hover:scale-105"
                         onError={() => setImageError(true)}
                         priority
+                        loading="eager"
                     />
                 ) : (
                     <div className="w-full h-full flex items-center justify-center p-6 min-h-[280px]">
