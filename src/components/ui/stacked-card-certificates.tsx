@@ -148,12 +148,12 @@ export function StackedCardCertificates({ certificates }: StackedCardCertificate
                 {/* Carousel */}
                 <div 
                     ref={containerRef} 
-                    className="relative group px-1 sm:px-14 md:px-20"
+                    className="relative group px-4 sm:px-14 md:px-20"
                     onMouseEnter={() => setIsHovered(true)}
                     onMouseLeave={() => setIsHovered(false)}
                 >
-                    {/* Navigation arrows — Positioned on opposite sides */}
-                    <div className="absolute left-0 sm:-left-6 md:-left-12 top-1/2 -translate-y-1/2 z-20">
+                    {/* Navigation arrows — Desktop Only */}
+                    <div className="hidden sm:flex absolute left-0 sm:-left-6 md:-left-12 top-1/2 -translate-y-1/2 z-20">
                         <MagneticButton intensity={0.4} range="p-4 sm:p-8">
                             <button
                                 onClick={goToPrev}
@@ -170,7 +170,7 @@ export function StackedCardCertificates({ certificates }: StackedCardCertificate
                         </MagneticButton>
                     </div>
 
-                    <div className="absolute right-0 sm:-right-6 md:-right-12 top-1/2 -translate-y-1/2 z-20">
+                    <div className="hidden sm:flex absolute right-0 sm:-right-6 md:-right-12 top-1/2 -translate-y-1/2 z-20">
                         <MagneticButton intensity={0.4} range="p-4 sm:p-8">
                             <button
                                 onClick={goToNext}
