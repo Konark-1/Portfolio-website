@@ -305,7 +305,7 @@ export default function HomePage() {
       icon: FileText,
       label: "Resume",
       value: "Download PDF",
-      href: "/KONARK_PARIHAR_RESUME.pdf",
+      href: "/KONARK_PARIHAR.pdf",
       download: true,
     },
     {
@@ -463,8 +463,8 @@ export default function HomePage() {
                   className="cursor-pointer pointer-events-auto group"
                   onClick={() => {
                     const a = document.createElement('a');
-                    a.href = '/KONARK_PARIHAR_RESUME.pdf';
-                    a.download = 'KONARK_PARIHAR_RESUME.pdf';
+                    a.href = '/KONARK_PARIHAR.pdf';
+                    a.download = 'KONARK_PARIHAR.pdf';
                     a.click();
                   }}
                 >
