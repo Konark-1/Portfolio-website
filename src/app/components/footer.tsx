@@ -251,10 +251,10 @@ export default function Footer() {
           <div className="footer-bg-grid absolute inset-0 z-0 pointer-events-none opacity-40" />
 
           {/* Giant background text - moved to a container with overflow-hidden */}
-          <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          <div className="absolute inset-0 overflow-hidden pointer-events-none flex items-end justify-center">
             <div
               ref={giantTextRef}
-              className="footer-giant-bg-text absolute bottom-0 left-1/2 -translate-x-1/2 whitespace-nowrap select-none uppercase opacity-20"
+              className="footer-giant-bg-text whitespace-nowrap select-none uppercase opacity-20 pb-4 md:pb-0"
             >
               Konark
             </div>
