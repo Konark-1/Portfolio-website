@@ -1,5 +1,5 @@
+import React, { forwardRef, useRef, useMemo, useLayoutEffect, useEffect, useState } from 'react';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
-import { forwardRef, useRef, useMemo, useLayoutEffect, useEffect, useState } from 'react';
 import { Color } from 'three';
 
 const hexToNormalizedRGB = hex => {
@@ -68,7 +68,7 @@ void main() {
 }
 `;
 
-const SilkPlane = forwardRef(function SilkPlane({ uniforms, isInViewport, isDocumentVisible }, ref) {
+const SilkPlane = forwardRef(function SilkPlane({ uniforms, isInViewport, isDocumentVisible, isLowPower }, ref) {
   const { viewport } = useThree();
   const lastUpdateRef = useRef(0);
 
@@ -83,9 +83,10 @@ const SilkPlane = forwardRef(function SilkPlane({ uniforms, isInViewport, isDocu
     // This saves significant GPU resources especially on mobile
     if (!isInViewport.current || !isDocumentVisible.current) return;
 
-    // Throttle updates to reduce CPU usage - update every ~16ms (60fps max)
+    // Throttle updates to reduce CPU usage - update every ~33ms (30fps) on lowPower, ~16ms (60fps) on highPower
     const now = state.clock.elapsedTime;
-    if (now - lastUpdateRef.current < 0.016) return;
+    const throttleInterval = isLowPower ? 0.033 : 0.016;
+    if (now - lastUpdateRef.current < throttleInterval) return;
 
     lastUpdateRef.current = now;
 
@@ -112,12 +113,50 @@ const SilkPlane = forwardRef(function SilkPlane({ uniforms, isInViewport, isDocu
 });
 SilkPlane.displayName = 'SilkPlane';
 
+class SilkErrorBoundary extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = { hasError: false };
+  }
+
+  static getDerivedStateFromError() {
+    return { hasError: true };
+  }
+
+  componentDidCatch(error, errorInfo) {
+    console.error("Silk Canvas render error caught:", error, errorInfo);
+  }
+
+  render() {
+    if (this.state.hasError) {
+      return (
+        <div style={{
+          width: '100%',
+          height: '100%',
+          background: 'radial-gradient(circle at 50% 50%, rgba(39, 203, 206, 0.15), rgba(10, 14, 26, 1))',
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          zIndex: 0
+        }} />
+      );
+    }
+    return this.props.children;
+  }
+}
+
 const Silk = ({ speed = 5, scale = 1, color = '#7B7481', noiseIntensity = 1.5, rotation = 0 }) => {
   const meshRef = useRef();
   const canvasRef = useRef();
   const containerRef = useRef();
   const isInViewportRef = useRef(true); // Assume in viewport initially (hero section)
-  const isDocumentVisibleRef = useRef(!document.hidden);
+  const isDocumentVisibleRef = useRef(true);
+
+  // Synchronous client-side detection (safe because component is loaded with ssr: false)
+  const isLowPower = useMemo(() => {
+    if (typeof window === 'undefined' || typeof navigator === 'undefined') return false;
+    return /Mobi|Android|iPhone|iPad|iPod|Windows Phone/i.test(navigator.userAgent);
+  }, []);
 
   const uniforms = useMemo(
     () => ({
@@ -133,6 +172,8 @@ const Silk = ({ speed = 5, scale = 1, color = '#7B7481', noiseIntensity = 1.5, r
 
   // Handle visibility and viewport intersection - optimized for performance
   useEffect(() => {
+    isDocumentVisibleRef.current = !document.hidden;
+
     const handleVisibilityChange = () => {
       isDocumentVisibleRef.current = !document.hidden;
     };
@@ -143,18 +184,22 @@ const Silk = ({ speed = 5, scale = 1, color = '#7B7481', noiseIntensity = 1.5, r
     const setupObserver = () => {
       if (!containerRef.current) return;
 
-      observer = new IntersectionObserver(
-        (entries) => {
-          const entry = entries[0];
-          isInViewportRef.current = entry.isIntersecting;
-        },
-        {
-          threshold: [0, 0.1], // Trigger at 0% and 10% visibility
-          rootMargin: '100px' // Larger margin for earlier detection
-        }
-      );
-
-      observer.observe(containerRef.current);
+      // Guard IntersectionObserver against older browsers/devices
+      if (typeof window !== 'undefined' && 'IntersectionObserver' in window) {
+        observer = new IntersectionObserver(
+          (entries) => {
+            const entry = entries[0];
+            isInViewportRef.current = entry.isIntersecting;
+          },
+          {
+            threshold: [0, 0.1], // Trigger at 0% and 10% visibility
+            rootMargin: '100px' // Larger margin for earlier detection
+          }
+        );
+        observer.observe(containerRef.current);
+      } else {
+        isInViewportRef.current = true;
+      }
     };
 
     // Setup observer immediately
@@ -172,16 +217,16 @@ const Silk = ({ speed = 5, scale = 1, color = '#7B7481', noiseIntensity = 1.5, r
   }, []);
 
   return (
-    <div ref={containerRef} style={{ width: '100%', height: '100%' }}>
+    <div ref={containerRef} style={{ width: '100%', height: '100%', position: 'absolute', top: 0, left: 0, pointerEvents: 'none' }}>
       <Canvas
         ref={canvasRef}
-        dpr={[1, 2]}
+        dpr={isLowPower ? 1 : [1, 2]}
         frameloop="always"
         gl={{
           preserveDrawingBuffer: false,
-          powerPreference: 'high-performance',
-          antialias: true,
-          alpha: false,
+          powerPreference: 'default',
+          antialias: !isLowPower,
+          alpha: true,
           // Disable stencil and depth buffers for better performance when not needed
           stencil: false,
           depth: false,
@@ -190,12 +235,45 @@ const Silk = ({ speed = 5, scale = 1, color = '#7B7481', noiseIntensity = 1.5, r
           width: '100%',
           height: '100%',
           backgroundColor: 'transparent',
+          pointerEvents: 'none',
         }}
       >
-        <SilkPlane ref={meshRef} uniforms={uniforms} isInViewport={isInViewportRef} isDocumentVisible={isDocumentVisibleRef} />
+        <SilkPlane ref={meshRef} uniforms={uniforms} isInViewport={isInViewportRef} isDocumentVisible={isDocumentVisibleRef} isLowPower={isLowPower} />
       </Canvas>
     </div>
   );
 };
 
-export default Silk;
+const SafeSilk = (props) => {
+  const hasWebGL = useMemo(() => {
+    if (typeof window === 'undefined' || typeof document === 'undefined') return false;
+    try {
+      const canvas = document.createElement('canvas');
+      return !!(window.WebGLRenderingContext && (canvas.getContext('webgl') || canvas.getContext('experimental-webgl')));
+    } catch (e) {
+      return false;
+    }
+  }, []);
+
+  if (!hasWebGL) {
+    return (
+      <div style={{
+        width: '100%',
+        height: '100%',
+        background: 'radial-gradient(circle at 50% 50%, rgba(39, 203, 206, 0.15), rgba(10, 14, 26, 1))',
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        zIndex: 0
+      }} />
+    );
+  }
+
+  return (
+    <SilkErrorBoundary>
+      <Silk {...props} />
+    </SilkErrorBoundary>
+  );
+};
+
+export default SafeSilk;
