@@ -56,7 +56,7 @@ function SkillCard({ icon: Icon, title, level, description }: SkillCardProps): R
     <motion.div
       initial={{ opacity: 0, y: 30, scale: 0.95 }}
       whileInView={{ opacity: 1, y: 0, scale: 1 }}
-      viewport={{ once: true, amount: 0.1 }}
+      viewport={{ once: true, margin: "50px" }}
       transition={{
         duration: 0.5,
         ease: [0.25, 0.46, 0.45, 0.94]
@@ -168,7 +168,7 @@ export default function SkillsSection() {
           className="rounded-3xl border border-accent-cyan/40 bg-accent-cyan/10 p-8 shadow-glass-soft"
           initial={{ opacity: 0, scale: 0.95, y: 30 }}
           whileInView={{ opacity: 1, scale: 1, y: 0 }}
-          viewport={{ once: true, amount: 0.1 }}
+          viewport={{ once: true, margin: "50px" }}
           transition={{
             duration: 0.6,
             delay: 0.4,

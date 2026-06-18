@@ -436,7 +436,7 @@ export default function ProjectsSection() {
             className="font-serif text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold bg-gradient-to-r from-[#27CBCE] via-[#20B2AA] to-[#00D9FF] bg-clip-text text-transparent tracking-tight leading-[1.1] mb-2"
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, amount: 0.1 }}
+            viewport={{ once: true, margin: "50px" }}
             transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
           >
             Data Intelligence & Strategic Dashboards
