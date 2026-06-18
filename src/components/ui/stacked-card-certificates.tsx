@@ -25,7 +25,26 @@ export function StackedCardCertificates({ certificates }: StackedCardCertificate
     const [direction, setDirection] = useState(0); // -1 for left, 1 for right
     const [isHovered, setIsHovered] = useState(false);
     const [isInView, setIsInView] = useState(false);
+    const [isPageLoaded, setIsPageLoaded] = useState(false);
     const containerRef = useRef<HTMLDivElement>(null);
+
+    // Preload trigger on page load
+    useEffect(() => {
+        if (typeof document !== 'undefined') {
+            if (document.readyState === "complete") {
+                setIsPageLoaded(true);
+            } else {
+                const handleLoad = () => setIsPageLoaded(true);
+                window.addEventListener("load", handleLoad);
+                // Fallback timeout just in case load event was missed
+                const fallback = setTimeout(handleLoad, 3000);
+                return () => {
+                    window.removeEventListener("load", handleLoad);
+                    clearTimeout(fallback);
+                };
+            }
+        }
+    }, []);
 
     // Visibility detection
     useEffect(() => {
@@ -117,6 +136,25 @@ export function StackedCardCertificates({ certificates }: StackedCardCertificate
                 <div className="absolute top-0 left-0 right-0 h-24 bg-gradient-to-b from-[rgba(39,203,206,0.04)] to-transparent" />
                 <div className="absolute top-1/3 left-1/2 -translate-x-1/2 h-[300px] w-[60%] bg-[radial-gradient(ellipse_at_center,rgba(39,203,206,0.04),transparent_70%)]" />
             </div>
+
+            {/* Background preloading of all images once page is fully loaded */}
+            {isPageLoaded && (
+                <div className="hidden" aria-hidden="true">
+                    {certificates.map((cert) => (
+                        cert.imagePath && /\.(png|jpg|jpeg|webp)$/i.test(cert.imagePath) ? (
+                            <Image
+                                key={`preload-${cert.imagePath}`}
+                                src={cert.imagePath}
+                                alt="preload"
+                                width={800}
+                                height={600}
+                                quality={85}
+                                loading="eager"
+                            />
+                        ) : null
+                    ))}
+                </div>
+            )}
 
             <div className="relative z-10 mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 py-16 sm:py-20 lg:py-28">
                 {/* Section Header — always visible */}
