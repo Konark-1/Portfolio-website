@@ -29,6 +29,11 @@ export function StackedCardCertificates({ certificates }: StackedCardCertificate
 
     // Visibility detection
     useEffect(() => {
+        if (typeof window === 'undefined' || !('IntersectionObserver' in window)) {
+            setIsInView(true); // Fallback: assume component is in view so certificates show
+            return;
+        }
+
         const observer = new IntersectionObserver(
             ([entry]) => {
                 setIsInView(entry.isIntersecting);

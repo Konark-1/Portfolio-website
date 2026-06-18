@@ -426,17 +426,15 @@ export default function HomePage() {
             }}
           >
             {/* Silk Background */}
-            {!shouldReduceMotion && (
-              <div className="absolute inset-0 z-0">
-                <Silk
-                  speed={7.5}
-                  scale={1}
-                  color="#27CBCE"
-                  noiseIntensity={5.9}
-                  rotation={0}
-                />
-              </div>
-            )}
+            <div className="absolute inset-0 z-0 pointer-events-none">
+              <Silk
+                speed={shouldReduceMotion ? 0 : 7.5}
+                scale={1}
+                color="#27CBCE"
+                noiseIntensity={5.9}
+                rotation={0}
+              />
+            </div>
 
             {/* Enhanced gradient overlay with turquoise tint */}
             <div className="absolute inset-0 z-[1] bg-gradient-to-b from-transparent via-transparent to-[rgba(10,14,26,0.4)] pointer-events-none" />
