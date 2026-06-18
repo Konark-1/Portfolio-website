@@ -17,6 +17,8 @@ const Silk = dynamic(
 );
 
 // Dynamically import below the fold sections
+const LazyLoader = dynamic(() => import("@/components/ui/LazyLoader"));
+
 const StackedCardCertificates = dynamic(
   () => import("@/components/ui/stacked-card-certificates").then(mod => ({ default: mod.StackedCardCertificates })),
   {
@@ -156,16 +158,25 @@ export default function HomePage() {
         </div>
 
         {/* About Section */}
-        <AboutSection shouldReduceMotion={shouldReduceMotion} />
+        <LazyLoader minHeight="100vh">
+          <AboutSection shouldReduceMotion={shouldReduceMotion} />
+        </LazyLoader>
       </div>
 
-      <SkillsSection />
+      <LazyLoader minHeight="100vh">
+        <SkillsSection />
+      </LazyLoader>
       
-      <ExperienceSection />
+      <LazyLoader minHeight="150vh">
+        <ExperienceSection />
+      </LazyLoader>
       
-      <ProjectsSection />
+      <LazyLoader minHeight="200vh">
+        <ProjectsSection />
+      </LazyLoader>
       
-      <StackedCardCertificates
+      <LazyLoader minHeight="100vh">
+        <StackedCardCertificates
         certificates={[
           {
             title: "Professional Training Certificate",
@@ -240,9 +251,12 @@ export default function HomePage() {
             skills: ["Data Workflow", "ETL", "Visualization", "Insights"],
           },
         ]}
-      />
+        />
+      </LazyLoader>
 
-      <ContactSection />
+      <LazyLoader minHeight="100vh">
+        <ContactSection />
+      </LazyLoader>
     </main>
   );
 }

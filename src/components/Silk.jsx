@@ -221,7 +221,7 @@ const Silk = ({ speed = 5, scale = 1, color = '#7B7481', noiseIntensity = 1.5, r
       <Canvas
         ref={canvasRef}
         dpr={isLowPower ? 1 : [1, 2]}
-        frameloop="always"
+        frameloop={isLowPower ? "demand" : "always"}
         gl={{
           preserveDrawingBuffer: false,
           powerPreference: 'default',
