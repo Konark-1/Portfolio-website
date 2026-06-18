@@ -66,6 +66,7 @@ export default function HomePage() {
   const [formStatus, setFormStatus] = useState<"idle" | "submitting" | "success" | "error">("idle");
   const [formErrors, setFormErrors] = useState<{ name?: string; email?: string; message?: string }>({});
   const [isMounted, setIsMounted] = useState(false);
+  const [isIdle, setIsIdle] = useState(false);
   const [isPending, startTransition] = useTransition();
 
   // Use deferred value for form data to reduce input lag
@@ -76,6 +77,16 @@ export default function HomePage() {
 
   useEffect(() => {
     setIsMounted(true);
+    
+    // Defer heavy components (like WebGL) until the main thread is idle
+    const idle = (cb: () => void) => {
+      if (typeof window !== "undefined" && "requestIdleCallback" in window) {
+        (window as Window & { requestIdleCallback: Function }).requestIdleCallback(() => cb(), { timeout: 1500 });
+      } else {
+        setTimeout(cb, 500);
+      }
+    };
+    idle(() => setIsIdle(true));
   }, []);
 
   // Experience section scroll progress tracking
@@ -414,19 +425,18 @@ export default function HomePage() {
       {/* Connection warming handled via preconnect/dns-prefetch in layout */}
 
       {/* Sticky Full-Page Slides Container - Hero slides under About */}
-      {/* Client-only rendering to prevent hydration mismatches from browser extensions */}
-      {isMounted ? (
-        <div className="relative" suppressHydrationWarning>
-          {/* Hero section - Standard Flow */}
-          <div
-            className="relative min-h-screen z-0"
-            suppressHydrationWarning
-            style={{
-              backgroundColor: 'var(--background-hero)',
-            }}
-          >
-            {/* Silk Background */}
-            <div className="absolute inset-0 z-0 pointer-events-none">
+      <div className="relative" suppressHydrationWarning>
+        {/* Hero section - Standard Flow */}
+        <div
+          className="relative min-h-screen z-0"
+          suppressHydrationWarning
+          style={{
+            backgroundColor: 'var(--background-hero)',
+          }}
+        >
+          {/* Silk Background - Deferred until idle to prevent main thread blocking */}
+          <div className="absolute inset-0 z-0 pointer-events-none">
+            {isIdle && (
               <Silk
                 speed={shouldReduceMotion ? 0 : 7.5}
                 scale={1}
@@ -434,7 +444,8 @@ export default function HomePage() {
                 noiseIntensity={5.9}
                 rotation={0}
               />
-            </div>
+            )}
+          </div>
 
             {/* Enhanced gradient overlay with turquoise tint */}
             <div className="absolute inset-0 z-[1] bg-gradient-to-b from-transparent via-transparent to-[rgba(10,14,26,0.4)] pointer-events-none" />
@@ -518,31 +529,6 @@ export default function HomePage() {
           {/* About Section - Standard Flow */}
           <AboutSection shouldReduceMotion={shouldReduceMotion} />
         </div>
-      ) : (
-        /* SSR Placeholder - matches client structure to minimize layout shift */
-        <div className="relative">
-          <div
-            className="sticky top-0 min-h-screen z-0"
-            style={{ backgroundColor: 'var(--background-hero)' }}
-          >
-            <div className="relative z-10 flex flex-col items-center justify-center min-h-[85vh] pt-24 sm:pt-28 lg:pt-32 pb-8 px-4 sm:px-6">
-              <div className="text-center max-w-6xl mx-auto space-y-4 sm:space-y-6">
-                <h1 className="font-serif text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl 2xl:text-8xl font-bold tracking-tight leading-[1.1] text-white px-2">
-                  Data Analyst & Business Intelligence Specialist
-                </h1>
-                <p className="max-w-3xl mx-auto text-sm sm:text-base md:text-lg lg:text-xl leading-relaxed text-white/80 font-sans px-2">
-                  I find the signal in the noise. Transforming complex data into actionable business intelligence.
-                </p>
-              </div>
-              <div className="mt-8 sm:mt-12 lg:mt-16 flex flex-col sm:flex-row justify-center items-center gap-4 w-full max-w-xl mx-auto px-4">
-                {/* Placeholder buttons with same dimensions */}
-                <div className="w-[220px] h-[55px] rounded-[50px] bg-white/10 backdrop-blur-sm border border-white/15" />
-                <div className="w-[220px] h-[55px] rounded-[50px] bg-white/10 backdrop-blur-sm border border-white/15" />
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
 
       {/* Skills / Technical Expertise Section */}
       <section id="skills" className="relative z-20 text-foreground border-t" style={{
@@ -592,7 +578,7 @@ export default function HomePage() {
             className="rounded-3xl border border-accent-cyan/40 bg-accent-cyan/10 p-8 shadow-glass-soft"
             initial={{ opacity: 0, scale: 0.95, y: 30 }}
             whileInView={{ opacity: 1, scale: 1, y: 0 }}
-            viewport={{ once: true, margin: "-50px" }}
+            viewport={{ once: true, amount: 0.1 }}
             transition={{
               duration: 0.6,
               delay: 0.4,
@@ -751,7 +737,7 @@ export default function HomePage() {
               className="font-serif text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold bg-gradient-to-r from-[#27CBCE] via-[#20B2AA] to-[#00D9FF] bg-clip-text text-transparent tracking-tight leading-[1.1] mb-2"
               initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "-50px" }}
+              viewport={{ once: true, amount: 0.1 }}
               transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
             >
               Data Intelligence & Strategic Dashboards
@@ -1032,7 +1018,7 @@ function SkillCard({ icon: Icon, title, level, description }: SkillCardProps): R
     <motion.div
       initial={{ opacity: 0, y: 30, scale: 0.95 }}
       whileInView={{ opacity: 1, y: 0, scale: 1 }}
-      viewport={{ once: true, margin: "-50px" }}
+      viewport={{ once: true, amount: 0.1 }}
       transition={{
         duration: 0.5,
         ease: [0.25, 0.46, 0.45, 0.94]
@@ -1137,7 +1123,7 @@ function ExperienceEntry({
     <motion.div
       initial={{ opacity: 0, y: 40 }}
       whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: "-80px" }}
+      viewport={{ once: true, amount: 0.1 }}
       transition={{
         duration: 0.5,
         delay: index * 0.1,

@@ -37,7 +37,7 @@ export default function AboutSection({ shouldReduceMotion }: AboutSectionProps):
     const descOpacity = useTransform(smoothProgress, [0.1, 0.3], [0, 1]); // Narrowed range
 
     // Cards stagger effect
-    const cardsInView = useInView(cardsRef, { once: true, margin: "-100px" });
+    const cardsInView = useInView(cardsRef, { once: true, amount: 0.1 });
 
     const capabilities = [
         {
