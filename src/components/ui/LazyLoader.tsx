@@ -4,11 +4,12 @@ import React, { useRef, useState, useEffect } from "react";
 import { useInView } from "framer-motion";
 
 interface LazyLoaderProps {
-  children: React.ReactNode;
+  children?: React.ReactNode;
+  render?: () => React.ReactNode;
   minHeight?: string;
 }
 
-export default function LazyLoader({ children, minHeight = "100vh" }: LazyLoaderProps) {
+export default function LazyLoader({ children, render, minHeight = "100vh" }: LazyLoaderProps) {
   const ref = useRef<HTMLDivElement>(null);
   const [isLoaded, setIsLoaded] = useState(false);
   
@@ -31,7 +32,7 @@ export default function LazyLoader({ children, minHeight = "100vh" }: LazyLoader
         contain: isLoaded ? 'none' : 'content' // Prevent layout recalculations for unloaded sections
       }}
     >
-      {isLoaded ? children : null}
+      {isLoaded ? (render ? render() : children) : null}
     </div>
   );
 }

@@ -31,11 +31,11 @@ const StackedCardCertificates = dynamic(
   }
 );
 
-const AboutSection = dynamic(() => import("@/components/AboutSection"), { ssr: true });
-const SkillsSection = dynamic(() => import("@/components/sections/SkillsSection"));
-const ExperienceSection = dynamic(() => import("@/components/sections/ExperienceSection"));
-const ProjectsSection = dynamic(() => import("@/components/sections/ProjectsSection"));
-const ContactSection = dynamic(() => import("@/components/sections/ContactSection"));
+const AboutSection = dynamic(() => import("@/components/AboutSection"), { ssr: false });
+const SkillsSection = dynamic(() => import("@/components/sections/SkillsSection"), { ssr: false });
+const ExperienceSection = dynamic(() => import("@/components/sections/ExperienceSection"), { ssr: false });
+const ProjectsSection = dynamic(() => import("@/components/sections/ProjectsSection"), { ssr: false });
+const ContactSection = dynamic(() => import("@/components/sections/ContactSection"), { ssr: false });
 
 export default function HomePage() {
   const shouldReduceMotion = useReducedMotion();
@@ -158,24 +158,19 @@ export default function HomePage() {
         </div>
 
         {/* About Section */}
-        <LazyLoader minHeight="100vh">
-          <AboutSection shouldReduceMotion={shouldReduceMotion} />
-        </LazyLoader>
+        <LazyLoader 
+          minHeight="100vh" 
+          render={() => <AboutSection shouldReduceMotion={shouldReduceMotion} />} 
+        />
       </div>
 
-      <LazyLoader minHeight="100vh">
-        <SkillsSection />
-      </LazyLoader>
+      <LazyLoader minHeight="100vh" render={() => <SkillsSection />} />
       
-      <LazyLoader minHeight="150vh">
-        <ExperienceSection />
-      </LazyLoader>
+      <LazyLoader minHeight="150vh" render={() => <ExperienceSection />} />
       
-      <LazyLoader minHeight="200vh">
-        <ProjectsSection />
-      </LazyLoader>
+      <LazyLoader minHeight="200vh" render={() => <ProjectsSection />} />
       
-      <LazyLoader minHeight="100vh">
+      <LazyLoader minHeight="100vh" render={() => (
         <StackedCardCertificates
         certificates={[
           {
@@ -252,11 +247,9 @@ export default function HomePage() {
           },
         ]}
         />
-      </LazyLoader>
+      )} />
 
-      <LazyLoader minHeight="100vh">
-        <ContactSection />
-      </LazyLoader>
+      <LazyLoader minHeight="100vh" render={() => <ContactSection />} />
     </main>
   );
 }
