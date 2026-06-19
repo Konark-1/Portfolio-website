@@ -86,7 +86,7 @@ export default function AboutSection({ shouldReduceMotion }: AboutSectionProps):
             />
 
             {/* Enhanced turquoise ambient glow - uses CSS containment for performance */}
-            <div className="pointer-events-none absolute inset-0" style={{ contain: 'paint' }}>
+            <div className="pointer-events-none absolute inset-0 overflow-hidden">
                 <motion.div
                     className="absolute top-0 left-1/2 -translate-x-1/2 h-[600px] w-[800px] rounded-full"
                     style={{

@@ -24,16 +24,7 @@ const nextConfig: NextConfig = {
   // HTTP headers for caching and security
   async headers() {
     return [
-      {
-        // Cache static assets aggressively
-        source: '/_next/static/:path*',
-        headers: [
-          {
-            key: 'Cache-Control',
-            value: 'public, max-age=31536000, immutable',
-          },
-        ],
-      },
+
       {
         // Cache images for 1 year
         source: '/images/:path*',

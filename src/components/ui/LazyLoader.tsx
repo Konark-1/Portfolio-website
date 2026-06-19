@@ -28,8 +28,7 @@ export default function LazyLoader({ children, render, minHeight = "100vh" }: La
       ref={ref} 
       className="w-full"
       style={{ 
-        minHeight: isLoaded ? 'auto' : minHeight,
-        contain: isLoaded ? 'none' : 'content' // Prevent layout recalculations for unloaded sections
+        minHeight: isLoaded ? 'auto' : minHeight
       }}
     >
       {isLoaded ? (render ? render() : children) : null}

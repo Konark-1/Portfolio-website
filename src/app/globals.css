@@ -669,7 +669,8 @@ body::-webkit-scrollbar {
 
   /* Ensure About section is fully visible on mobile */
   #about {
-    min-height: 100vh;
+    min-height: 100vh; /* Fallback for older browsers */
+    min-height: 100dvh;
     height: auto;
     display: flex;
     align-items: center;
@@ -927,6 +928,7 @@ body::-webkit-scrollbar {
 
 .tabs_sticky-wrapper {
   height: 100vh;
+  height: 100dvh;
   position: sticky;
   top: 0;
   display: flex;
