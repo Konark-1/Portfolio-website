@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef } from "react";
+import { useRef, useState, useEffect } from "react";
 import { motion, useScroll, useTransform, useSpring, useInView } from "framer-motion";
 
 type AboutSectionProps = {
@@ -11,6 +11,25 @@ export default function AboutSection({ shouldReduceMotion }: AboutSectionProps):
     const sectionRef = useRef<HTMLElement>(null);
     const nameRef = useRef<HTMLHeadingElement>(null);
     const cardsRef = useRef<HTMLDivElement>(null);
+
+    const [isMobile, setIsMobile] = useState(false);
+
+    // Detect mobile/iOS to disable scroll-linked parallax
+    useEffect(() => {
+        if (typeof window !== 'undefined') {
+            const checkMobile = () => {
+                const mobile = window.matchMedia('(max-width: 768px)').matches ||
+                    window.matchMedia('(pointer: coarse)').matches ||
+                    /iPad|iPhone|iPod/.test(navigator.userAgent);
+                setIsMobile(mobile);
+            };
+            checkMobile();
+            window.addEventListener('resize', checkMobile);
+            return () => window.removeEventListener('resize', checkMobile);
+        }
+    }, []);
+
+    const disableScrollEffects = shouldReduceMotion || isMobile;
 
     // Scroll progress for the section - optimized for better INP
     const { scrollYProgress } = useScroll({
@@ -85,14 +104,21 @@ export default function AboutSection({ shouldReduceMotion }: AboutSectionProps):
                 }}
             />
 
-            {/* Enhanced turquoise ambient glow - uses CSS containment for performance */}
+            {/* Enhanced turquoise ambient glow */}
             <div className="pointer-events-none absolute inset-0 overflow-hidden">
                 <motion.div
                     className="absolute top-0 left-1/2 -translate-x-1/2 h-[600px] w-[800px] rounded-full"
-                    style={{
+                    initial={disableScrollEffects ? { opacity: 0.8 } : undefined}
+                    whileInView={disableScrollEffects ? { opacity: 1 } : undefined}
+                    viewport={{ once: true }}
+                    transition={{ duration: 1 }}
+                    style={disableScrollEffects ? {
+                        background: 'radial-gradient(circle, rgba(39,203,206,0.15) 0%, transparent 70%)',
+                        filter: 'blur(200px)'
+                    } : {
                         opacity: smoothProgress,
                         background: 'radial-gradient(circle, rgba(39,203,206,0.15) 0%, transparent 70%)',
-                        filter: 'blur(200px)', // Slightly reduced blur for better performance
+                        filter: 'blur(200px)',
                         willChange: 'opacity'
                     }}
                 />
@@ -112,29 +138,58 @@ export default function AboutSection({ shouldReduceMotion }: AboutSectionProps):
                     </motion.p>
 
                     {/* Dynamic Scaling Name */}
-                    <motion.h1
-                        ref={nameRef}
-                        className="font-serif text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-bold text-white leading-[1.1] mb-6 sm:mb-8 origin-center px-2"
-                        style={shouldReduceMotion ? {} : {
-                            scale: nameScale,
-                            opacity: nameOpacity,
-                            y: nameY
-                        }}
-                    >
-                        KONARK PARIHAR
-                    </motion.h1>
+                    {disableScrollEffects ? (
+                        <motion.h1
+                            ref={nameRef}
+                            className="font-serif text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-bold text-white leading-[1.1] mb-6 sm:mb-8 origin-center px-2"
+                            initial={{ opacity: 0, y: 20, scale: 0.95 }}
+                            whileInView={{ opacity: 1, y: 0, scale: 1 }}
+                            viewport={{ once: true }}
+                            transition={{ duration: 0.8, ease: "easeOut" }}
+                        >
+                            KONARK PARIHAR
+                        </motion.h1>
+                    ) : (
+                        <motion.h1
+                            ref={nameRef}
+                            className="font-serif text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-bold text-white leading-[1.1] mb-6 sm:mb-8 origin-center px-2"
+                            style={{
+                                scale: nameScale,
+                                opacity: nameOpacity,
+                                y: nameY
+                            }}
+                        >
+                            KONARK PARIHAR
+                        </motion.h1>
+                    )}
 
                     {/* Parallax Description */}
-                    <motion.p
-                        className="text-base sm:text-lg md:text-xl text-text-muted font-sans max-w-2xl mx-auto leading-relaxed px-2"
-                        style={shouldReduceMotion ? {} : { y: descY, opacity: descOpacity }}
-                    >
-                        Data Analyst specializing in{" "}
-                        <span className="text-accent-cyan">Power BI</span>,{" "}
-                        <span className="text-accent-cyan">SQL</span>, and{" "}
-                        <span className="text-accent-cyan">AI-powered workflows</span> —
-                        transforming complex data into strategic business decisions.
-                    </motion.p>
+                    {disableScrollEffects ? (
+                        <motion.p
+                            className="text-base sm:text-lg md:text-xl text-text-muted font-sans max-w-2xl mx-auto leading-relaxed px-2"
+                            initial={{ opacity: 0, y: 15 }}
+                            whileInView={{ opacity: 1, y: 0 }}
+                            viewport={{ once: true }}
+                            transition={{ duration: 0.8, delay: 0.15, ease: "easeOut" }}
+                        >
+                            Data Analyst specializing in{" "}
+                            <span className="text-accent-cyan">Power BI</span>,{" "}
+                            <span className="text-accent-cyan">SQL</span>, and{" "}
+                            <span className="text-accent-cyan">AI-powered workflows</span> —
+                            transforming complex data into strategic business decisions.
+                        </motion.p>
+                    ) : (
+                        <motion.p
+                            className="text-base sm:text-lg md:text-xl text-text-muted font-sans max-w-2xl mx-auto leading-relaxed px-2"
+                            style={{ y: descY, opacity: descOpacity }}
+                        >
+                            Data Analyst specializing in{" "}
+                            <span className="text-accent-cyan">Power BI</span>,{" "}
+                            <span className="text-accent-cyan">SQL</span>, and{" "}
+                            <span className="text-accent-cyan">AI-powered workflows</span> —
+                            transforming complex data into strategic business decisions.
+                        </motion.p>
+                    )}
                 </div>
 
                 {/* Key Capabilities - Staggered Slide In */}
