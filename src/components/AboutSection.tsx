@@ -118,7 +118,6 @@ export default function AboutSection(): React.JSX.Element {
                     <div className="grid grid-cols-1 lg:grid-cols-3 gap-px rounded-2xl overflow-hidden" style={{ backgroundColor: 'rgba(39, 203, 206, 0.08)' }}>
                         {capabilities.map(({ num, title, subtitle, desc }, index) => (
                             <motion.div
-                                key={num}
                                 key={index}
                                 className="relative group rounded-3xl p-6 sm:p-8 bg-card/40 border border-border backdrop-blur-md overflow-hidden hover:border-accent-cyan/50 transition-colors duration-500"
                                 initial={{ opacity: 0, y: 30 }}

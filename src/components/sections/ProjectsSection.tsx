@@ -123,21 +123,14 @@ function DashboardCard({
 }: DashboardCardProps): React.JSX.Element {
   const cardRef = useRef(null);
   const dashboardRef = useRef<HTMLDivElement>(null);
-  const [isMounted, setIsMounted] = useState(false);
-  const [isMobile, setIsMobile] = useState(false);
-
-  // Detect mobile only after mount to avoid hydration mismatch
-  useEffect(() => {
-    setIsMounted(true);
-    const checkMobile = () => {
-      const mobile = window.matchMedia('(max-width: 639px)').matches ||
-        window.matchMedia('(pointer: coarse)').matches;
-      setIsMobile(mobile);
-    };
-    checkMobile();
-  }, []);
+  const [showIframe, setShowIframe] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
   const shouldLoad = useInView(cardRef, { once: true, margin: "300px" });
+
+  const loadIframe = () => {
+    setShowIframe(true);
+  };
 
   return (
     <motion.article
@@ -248,71 +241,60 @@ function DashboardCard({
           }}
         >
           <div className="relative w-full" style={{ backgroundColor: 'rgba(10, 14, 26, 0.95)' }}>
-            <div className="relative pt-[56.25%] sm:pt-[59.77%] overflow-hidden">
-              {isMounted && isMobile ? (
-                <div className="absolute inset-0">
+            <div className="relative pt-[56.25%] sm:pt-[59.77%] overflow-hidden group/preview">
+              {!showIframe ? (
+                <div className="absolute inset-0 cursor-pointer" onClick={loadIframe}>
                   <img
                     src={previewImage}
                     alt={`${title} dashboard preview`}
-                    className="absolute inset-0 w-full h-full object-cover object-top"
+                    className="absolute inset-0 w-full h-full object-cover object-top transition-transform duration-700 group-hover/preview:scale-105"
                     loading="lazy"
                   />
-                  <div className="absolute inset-0 bg-black/30" />
-                  <button
-                    onClick={() => window.open(embedUrl, '_blank')}
-                    className="absolute inset-0 flex flex-col items-center justify-center gap-3 transition-all duration-300 active:scale-95 touch-manipulation"
-                    aria-label="View dashboard in full screen"
-                  >
+                  <div className="absolute inset-0 bg-black/40 group-hover/preview:bg-black/20 transition-colors duration-500" />
+                  <div className="absolute inset-0 flex flex-col items-center justify-center gap-4 transition-transform duration-300 active:scale-95 touch-manipulation">
                     <div
-                      className="flex items-center gap-2 px-6 py-3 rounded-xl border backdrop-blur-md"
+                      className="flex items-center gap-3 px-6 sm:px-8 py-3 sm:py-4 rounded-2xl border backdrop-blur-md bg-background/80 hover:bg-background transition-all group-hover/preview:shadow-[0_0_30px_rgba(39,203,206,0.3)]"
                       style={{
-                        backgroundColor: 'rgba(10, 14, 26, 0.9)',
-                        borderColor: 'rgba(39, 203, 206, 0.6)',
+                        borderColor: 'rgba(39, 203, 206, 0.5)',
                         color: 'rgba(39, 203, 206, 1)',
-                        boxShadow: '0 4px 20px rgba(39, 203, 206, 0.3)',
                       }}
                     >
                       <svg
                         xmlns="http://www.w3.org/2000/svg"
-                        width="20"
-                        height="20"
+                        width="24"
+                        height="24"
                         viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="2.5"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
+                        fill="currentColor"
+                        className="opacity-90"
                       >
-                        <path d="M8 3H5a2 2 0 0 0-2 2v3" />
-                        <path d="M21 8V5a2 2 0 0 0-2-2h-3" />
-                        <path d="M3 16v3a2 2 0 0 0 2 2h3" />
-                        <path d="M16 21h3a2 2 0 0 0 2-2v-3" />
+                        <polygon points="5 3 19 12 5 21 5 3" />
                       </svg>
-                      <span className="text-sm font-semibold font-sans tracking-wide">View Full Screen</span>
+                      <span className="text-sm sm:text-base font-semibold font-sans tracking-wide">Load Interactive Dashboard</span>
                     </div>
-                    <span className="text-xs text-white/70 font-sans">Tap to open interactive dashboard</span>
-                  </button>
-                </div>
-              ) : shouldLoad ? (
-                <>
-                  <div
-                    className="absolute inset-0 flex items-center justify-center transition-opacity duration-500"
-                    style={{
-                      backgroundColor: 'rgba(10, 14, 26, 0.95)',
-                      opacity: 1,
-                      pointerEvents: 'none'
-                    }}
-                  >
-                    <div className="flex flex-col items-center gap-3">
-                      <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-accent-cyan"></div>
-                      <div className="text-text-muted text-sm font-sans">Loading interactive dashboard...</div>
-                    </div>
+                    <span className="text-xs sm:text-sm text-white/80 font-sans px-4 text-center">
+                      Opens the full PowerBI dashboard
+                    </span>
                   </div>
+                </div>
+              ) : (
+                <>
+                  {isLoading && (
+                    <div
+                      className="absolute inset-0 flex items-center justify-center transition-opacity duration-500 z-10"
+                      style={{
+                        backgroundColor: 'rgba(10, 14, 26, 0.95)'
+                      }}
+                    >
+                      <div className="flex flex-col items-center gap-4">
+                        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-accent-cyan"></div>
+                        <div className="text-accent-cyan text-sm sm:text-base font-sans tracking-wide">Initializing PowerBI...</div>
+                      </div>
+                    </div>
+                  )}
                   <iframe
                     title={title}
                     src={`${embedUrl}&navContentPaneEnabled=false&transparent=1`}
-                    loading="lazy"
-                    className="absolute inset-0 h-full w-full border-0"
+                    className="absolute inset-0 h-full w-full border-0 z-0"
                     style={{
                       border: 'none',
                       margin: 0,
@@ -325,26 +307,9 @@ function DashboardCard({
                     referrerPolicy="no-referrer-when-downgrade"
                     frameBorder="0"
                     scrolling="no"
-                    onLoad={(e) => {
-                      const loadingDiv = e.currentTarget.previousElementSibling as HTMLElement;
-                      if (loadingDiv) {
-                        setTimeout(() => {
-                          loadingDiv.style.opacity = '0';
-                          setTimeout(() => {
-                            loadingDiv.style.display = 'none';
-                          }, 500);
-                        }, 300);
-                      }
-                    }}
+                    onLoad={() => setIsLoading(false)}
                   />
                 </>
-              ) : (
-                <div className="absolute inset-0 flex items-center justify-center" style={{ backgroundColor: 'rgba(10, 14, 26, 0.95)' }}>
-                  <div className="flex flex-col items-center gap-3">
-                    <div className="animate-pulse rounded-full h-10 w-10 bg-accent-cyan/20"></div>
-                    <div className="text-text-muted text-sm font-sans">Preparing dashboard...</div>
-                  </div>
-                </div>
               )}
             </div>
           </div>
