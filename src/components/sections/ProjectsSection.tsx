@@ -247,7 +247,7 @@ function DashboardCard({
                   <img
                     src={previewImage}
                     alt={`${title} dashboard preview`}
-                    className="absolute inset-0 w-full h-full object-cover object-top transition-transform duration-700 group-hover/preview:scale-105"
+                    className="absolute inset-0 w-full h-full object-contain object-center transition-transform duration-700 group-hover/preview:scale-105"
                     loading="lazy"
                   />
                   <div className="absolute inset-0 bg-black/40 group-hover/preview:bg-black/20 transition-colors duration-500" />
