@@ -245,22 +245,32 @@ const Silk = ({ speed = 5, scale = 1, color = '#7B7481', noiseIntensity = 1.5, r
 };
 
 const SafeSilk = (props) => {
-  const hasWebGL = useMemo(() => {
-    if (typeof window === 'undefined' || typeof document === 'undefined') return false;
+  const shouldSkipWebGL = useMemo(() => {
+    if (typeof window === 'undefined' || typeof document === 'undefined') return true;
+
+    // Skip WebGL entirely on iOS — context creation blocks the main thread for 2-4s
+    // and risks crashing Safari due to GPU memory pressure.
+    // The canvas was frozen (frameloop="demand") on mobile anyway, providing zero animation.
+    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) ||
+      (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1); // iPad with desktop UA
+
+    if (isIOS) return true;
+
+    // Also skip on devices without WebGL support
     try {
       const canvas = document.createElement('canvas');
-      return !!(window.WebGLRenderingContext && (canvas.getContext('webgl') || canvas.getContext('experimental-webgl')));
+      return !(window.WebGLRenderingContext && (canvas.getContext('webgl') || canvas.getContext('experimental-webgl')));
     } catch (e) {
-      return false;
+      return true;
     }
   }, []);
 
-  if (!hasWebGL) {
+  if (shouldSkipWebGL) {
     return (
       <div style={{
         width: '100%',
         height: '100%',
-        background: 'radial-gradient(circle at 50% 50%, rgba(39, 203, 206, 0.15), rgba(10, 14, 26, 1))',
+        background: 'radial-gradient(ellipse at 50% 40%, rgba(39, 203, 206, 0.18), rgba(15, 20, 30, 0.8) 60%, rgba(10, 14, 26, 1))',
         position: 'absolute',
         top: 0,
         left: 0,

@@ -7,28 +7,34 @@ interface LazyLoaderProps {
   children?: React.ReactNode;
   render?: () => React.ReactNode;
   minHeight?: string;
+  delayMs?: number;
 }
 
-export default function LazyLoader({ children, render, minHeight = "100vh" }: LazyLoaderProps) {
+export default function LazyLoader({ children, render, minHeight = "100vh", delayMs = 150 }: LazyLoaderProps) {
   const ref = useRef<HTMLDivElement>(null);
   const [isLoaded, setIsLoaded] = useState(false);
   
-  // margin: "800px 0px" triggers the load when the section is 800px away from entering the viewport.
-  // This gives it enough time to fetch the JS chunk and render before the user scrolls to it.
-  const isInView = useInView(ref, { once: true, margin: "800px 0px" });
+  // margin: "200px 0px" triggers the load when the section is closer to viewport.
+  // This prevents all sections from triggering simultaneously if the page collapses.
+  const isInView = useInView(ref, { once: true, margin: "200px 0px" });
 
   useEffect(() => {
     if (isInView) {
-      setIsLoaded(true);
+      // Add a small stagger delay to prevent multiple sections from rendering
+      // in the exact same frame, which causes massive JS spikes and crashes iOS Safari
+      const timer = setTimeout(() => {
+        setIsLoaded(true);
+      }, delayMs + Math.random() * 50); // Add slight random stagger
+      return () => clearTimeout(timer);
     }
-  }, [isInView]);
+  }, [isInView, delayMs]);
 
   return (
     <div 
       ref={ref} 
       className="w-full"
       style={{ 
-        minHeight: isLoaded ? 'auto' : minHeight
+        minHeight: minHeight
       }}
     >
       {isLoaded ? (render ? render() : children) : null}

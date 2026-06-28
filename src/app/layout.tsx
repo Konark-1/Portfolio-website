@@ -5,7 +5,6 @@ import Header from "./components/header"; // Import the header
 import Footer from "./components/footer"; // Import the footer
 import Script from "next/script";
 import CursorMount from "./components/CursorMount";
-import { ServiceWorkerRegistration } from "@/components/ServiceWorkerRegistration";
 
 const inter = Inter({ subsets: ["latin"], display: "swap", variable: "--font-sans" });
 const playfair = Playfair_Display({
@@ -97,8 +96,6 @@ export default function RootLayout({
         />
       </head>
       <body className={`${inter.variable} ${playfair.variable} ${inter.className} dark`} suppressHydrationWarning>
-        <ServiceWorkerRegistration />
-        <Script src="/pbi-resize.js" strategy="afterInteractive" />
         <CursorMount />
         <Header /> {/* Add the header here */}
         {children}
