@@ -54,12 +54,12 @@ export default function HomePage() {
   }, []);
 
   return (
-    <main className="relative min-h-screen" style={{ backgroundColor: 'var(--background)' }}>
+    <main className="relative min-h-[100dvh]" style={{ backgroundColor: 'var(--background)' }}>
       {/* Sticky Full-Page Slides Container - Hero slides under About */}
       <div className="relative" suppressHydrationWarning>
         {/* Hero section - Standard Flow */}
         <div
-          className="relative min-h-screen z-0"
+          className="relative min-h-[100dvh] z-0"
           suppressHydrationWarning
           style={{
             backgroundColor: 'var(--background-hero)',
@@ -85,7 +85,7 @@ export default function HomePage() {
           <div className="absolute inset-0 z-[1] bg-[radial-gradient(circle_at_50%_50%,rgba(39,203,206,0.08),transparent_70%)] pointer-events-none" />
 
           {/* Content container with proper spacing from header */}
-          <div className="relative z-10 flex flex-col items-center justify-center min-h-screen pt-24 sm:pt-28 lg:pt-32 pb-8 px-4 sm:px-6" suppressHydrationWarning>
+          <div className="relative z-10 flex flex-col items-center justify-center min-h-[100dvh] pt-24 sm:pt-28 lg:pt-32 pb-8 px-4 sm:px-6" suppressHydrationWarning>
             {/* Main heading */}
             <div className="text-center max-w-6xl mx-auto space-y-4 sm:space-y-6" suppressHydrationWarning>
               <h1 className="font-serif text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl 2xl:text-8xl font-bold tracking-tight leading-[1.1] text-white px-2" suppressHydrationWarning>
