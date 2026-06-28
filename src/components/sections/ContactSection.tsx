@@ -60,12 +60,29 @@ function ContactChannelCard({ icon: Icon, label, value, href, download }: Contac
   );
 
   if (href) {
+    if (download) {
+      return (
+        <a
+          href={href}
+          onClick={(e) => {
+            e.preventDefault();
+            const a = document.createElement('a');
+            a.href = href;
+            a.download = href.split('/').pop() || 'Resume.pdf';
+            a.click();
+          }}
+          className="block focus:outline-none focus-visible:ring-2 focus-visible:ring-accent-cyan/60 focus-visible:ring-offset-2 focus-visible:ring-offset-background rounded-3xl cursor-pointer"
+        >
+          {content}
+        </a>
+      );
+    }
+    
     return (
       <a
         href={href}
         target={href.startsWith("http") ? "_blank" : undefined}
         rel={href.startsWith("http") ? "noreferrer" : undefined}
-        download={download}
         className="block focus:outline-none focus-visible:ring-2 focus-visible:ring-accent-cyan/60 focus-visible:ring-offset-2 focus-visible:ring-offset-background rounded-3xl"
       >
         {content}
