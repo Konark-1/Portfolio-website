@@ -310,7 +310,7 @@ function DashboardCard({
                   </div>
                   <iframe
                     title={title}
-                    src={embedUrl}
+                    src={`${embedUrl}&navContentPaneEnabled=false&transparent=1`}
                     loading="lazy"
                     className="absolute inset-0 h-full w-full border-0"
                     style={{
