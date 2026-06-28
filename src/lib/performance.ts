@@ -120,11 +120,11 @@ export function detectDeviceCapabilities(): DeviceCapabilities {
 
 /**
  * Check if heavy animations should be disabled
- * Now only returns true for ACTUALLY low-end devices, not all mobile
+ * Now aggressively returns true for ALL mobile devices to prevent iOS Safari crashes
  */
 export function shouldDisableHeavyAnimations(): boolean {
   const caps = detectDeviceCapabilities();
-  return (caps as any).isActuallyLowEnd || !caps.hasGPU || !caps.supportsWebGL;
+  return caps.isMobile || (caps as any).isActuallyLowEnd || !caps.hasGPU || !caps.supportsWebGL;
 }
 
 /**

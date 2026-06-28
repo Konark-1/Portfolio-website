@@ -1,7 +1,7 @@
 "use client";
 
-import React, { useRef } from "react";
-import { motion, useScroll, useTransform, useSpring } from "framer-motion";
+import React from "react";
+import { motion } from "framer-motion";
 
 export const experienceTimeline = [
   {
@@ -88,50 +88,27 @@ function ExperienceEntry({
   isLast,
 }: ExperienceEntryProps): React.JSX.Element {
   const formattedIndex = String(index + 1).padStart(2, '0');
-  const dotRef = useRef<HTMLDivElement>(null);
-
-  // Individual dot activation tracking
-  const { scrollYProgress: dotProgress } = useScroll({
-    target: dotRef,
-    offset: ["start center", "end center"]
-  });
-
-  // Activate when spark passes (progress hits center)
-  const dotActivation = useSpring(useTransform(dotProgress, [0, 0.1], [0, 1]), {
-    stiffness: 100,
-    damping: 30
-  });
-  
-  const dotScale = useTransform(dotActivation, [0, 1], [0.4, 1]);
 
   return (
     <motion.div
       initial={{ opacity: 0, y: 40 }}
       whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: "50px" }}
+      viewport={{ once: true, margin: "-50px" }}
       transition={{
         duration: 0.5,
         delay: index * 0.1,
         ease: [0.25, 0.46, 0.45, 0.94]
       }}
-      className="relative sm:pl-16"
+      className="relative sm:pl-16 group/entry"
     >
-      {/* Timeline dot Ref for activation detection */}
-      <div ref={dotRef} className="absolute sm:left-[25px] top-1/2 -translate-y-1/2 w-3 h-3 pointer-events-none" />
-      
       {/* Timeline dot - centered with the box (center at 31px) */}
-      <div className="hidden sm:flex absolute sm:left-[25px] top-1/2 -translate-y-1/2 w-3 h-3 rounded-full border-2 border-white/20 bg-background z-10 transition-colors duration-500">
-        <motion.div 
-          style={{ 
-            opacity: dotActivation,
-            scale: dotScale,
-          }}
-          className="absolute inset-[-2px] rounded-full bg-accent-cyan shadow-[0_0_15px_#27CBCE] z-20"
+      <div className="hidden sm:flex absolute sm:left-[25px] top-1/2 -translate-y-1/2 w-3 h-3 rounded-full border-2 border-white/20 bg-background z-10 transition-colors duration-500 group-hover/entry:border-accent-cyan">
+        <div 
+          className="absolute inset-[-2px] rounded-full bg-accent-cyan shadow-[0_0_15px_#27CBCE] z-20 opacity-0 group-hover/entry:opacity-100 transition-opacity duration-300"
         />
         {/* Inner core to keep it looking sharp */}
-        <motion.div 
-          style={{ opacity: dotActivation }}
-          className="absolute inset-[2px] rounded-full bg-white z-30"
+        <div 
+          className="absolute inset-[2px] rounded-full bg-white z-30 opacity-0 group-hover/entry:opacity-100 transition-opacity duration-300"
         />
       </div>
 
@@ -190,25 +167,9 @@ function ExperienceEntry({
 }
 
 export default function ExperienceSection() {
-  const experienceRef = useRef<HTMLElement>(null);
-  const { scrollYProgress: experienceProgress } = useScroll({
-    target: experienceRef,
-    offset: ["start center", "end center"]
-  });
-
-  const smoothProgress = useSpring(experienceProgress, {
-    stiffness: 100,
-    damping: 30,
-    restDelta: 0.001
-  });
-
-  const sparkY = useTransform(smoothProgress, [0, 1], ["0%", "100%"]);
-  const sparkOpacity = useTransform(smoothProgress, [0, 0.05, 0.95, 1], [0, 1, 1, 0]);
-
   return (
     <section 
       id="experience" 
-      ref={experienceRef}
       className="relative z-20 text-foreground border-t" 
       style={{
         backgroundColor: 'var(--background-experience)',
@@ -260,23 +221,6 @@ export default function ExperienceSection() {
             <div className="relative space-y-12 sm:space-y-16">
               {/* Timeline line - aligned with dots */}
               <div className="absolute left-[21px] sm:left-[31px] top-8 bottom-0 w-px bg-gradient-to-b from-accent-cyan/40 via-accent-cyan/15 to-transparent hidden sm:block">
-                {/* Dynamic Progress Spark */}
-                <motion.div
-                  style={{ 
-                    top: sparkY,
-                    opacity: sparkOpacity
-                  }}
-                  className="absolute left-1/2 -translate-x-1/2 z-30"
-                >
-                  {/* Glowing Spark */}
-                  <div className="relative">
-                    <div className="absolute inset-0 bg-accent-cyan blur-[6px] rounded-full scale-150 animate-pulse" />
-                    <div className="h-2.5 w-2.5 rounded-full bg-accent-cyan border border-white shadow-[0_0_15px_#27CBCE]" />
-                    
-                    {/* Trailing light effect */}
-                    <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-8 h-8 bg-accent-cyan/20 blur-xl rounded-full" />
-                  </div>
-                </motion.div>
               </div>
               {experienceTimeline.map((item, index) => (
                 <ExperienceEntry

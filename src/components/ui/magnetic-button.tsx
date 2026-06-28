@@ -2,6 +2,7 @@
 
 import React, { useRef, useState } from "react";
 import { motion, type HTMLMotionProps } from "framer-motion";
+import { useIsMobile } from "@/hooks/useIsMobile";
 
 interface MagneticButtonProps extends React.HTMLAttributes<HTMLElement> {
   children: React.ReactNode;
@@ -29,9 +30,10 @@ export function MagneticButton({
 }: MagneticButtonProps) {
   const ref = useRef<HTMLDivElement>(null);
   const [position, setPosition] = useState({ x: 0, y: 0 });
+  const isMobile = useIsMobile();
 
   const handleMouse = (e: React.MouseEvent<HTMLElement>) => {
-    if (!ref.current) return;
+    if (!ref.current || isMobile) return;
     const { clientX, clientY } = e;
     const { height, width, left, top } = ref.current.getBoundingClientRect();
     const middleX = clientX - (left + width / 2);
@@ -58,13 +60,17 @@ export function MagneticButton({
         onClick={onClick as any}
         aria-label={ariaLabel}
       >
-        <motion.div
-          ref={ref}
-          animate={{ x: position.x, y: position.y }}
-          transition={{ type: "spring", stiffness: 150, damping: 15, mass: 0.1 }}
-        >
-          {children}
-        </motion.div>
+        {isMobile ? (
+          <div ref={ref}>{children}</div>
+        ) : (
+          <motion.div
+            ref={ref}
+            animate={{ x: position.x, y: position.y }}
+            transition={{ type: "spring", stiffness: 150, damping: 15, mass: 0.1 }}
+          >
+            {children}
+          </motion.div>
+        )}
       </a>
     );
   }
@@ -78,13 +84,17 @@ export function MagneticButton({
       aria-label={ariaLabel}
       {...(props as any)}
     >
-      <motion.div
-        ref={ref}
-        animate={{ x: position.x, y: position.y }}
-        transition={{ type: "spring", stiffness: 150, damping: 15, mass: 0.1 }}
-      >
-        {children}
-      </motion.div>
+      {isMobile ? (
+        <div ref={ref}>{children}</div>
+      ) : (
+        <motion.div
+          ref={ref}
+          animate={{ x: position.x, y: position.y }}
+          transition={{ type: "spring", stiffness: 150, damping: 15, mass: 0.1 }}
+        >
+          {children}
+        </motion.div>
+      )}
     </div>
   );
 }

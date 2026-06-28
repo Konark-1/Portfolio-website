@@ -236,9 +236,9 @@ const Silk = ({ speed = 5, scale = 1, color = '#7B7481', noiseIntensity = 1.5, r
         frameloop="always"
         gl={{
           preserveDrawingBuffer: false,
-          powerPreference: 'low-power',
+          powerPreference: 'high-performance',
           antialias: false,
-          alpha: true,
+          alpha: false, // Critical for iOS memory: opaque canvas prevents compositor crash
           // Disable stencil and depth buffers for better performance when not needed
           stencil: false,
           depth: false,
@@ -246,10 +246,10 @@ const Silk = ({ speed = 5, scale = 1, color = '#7B7481', noiseIntensity = 1.5, r
         style={{
           width: '100%',
           height: '100%',
-          backgroundColor: 'transparent',
           pointerEvents: 'none',
         }}
       >
+        <color attach="background" args={['#0A0E1A']} />
         <SilkPlane ref={meshRef} uniforms={uniforms} isInViewport={isInViewportRef} isDocumentVisible={isDocumentVisibleRef} isLowPower={isLowPower} />
       </Canvas>
     </div>
