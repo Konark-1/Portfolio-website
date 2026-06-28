@@ -249,7 +249,7 @@ export default function HomePage() {
         />
       )} />
 
-      <LazyLoader minHeight="100vh" render={() => <ContactSection />} />
+      <ContactSection />
     </main>
   );
 }
