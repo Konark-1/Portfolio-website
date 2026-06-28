@@ -168,7 +168,7 @@ export default function HomePage() {
         {/* About Section */}
         <LazyLoader 
           minHeight="100vh" 
-          render={() => <AboutSection shouldReduceMotion={shouldReduceMotion} />} 
+          render={() => <AboutSection />} 
         />
       </div>
 
