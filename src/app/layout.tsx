@@ -102,6 +102,7 @@ export default function RootLayout({
         <Footer />
         <SpeedInsights />
         <Analytics />
+        <Script src="/pbi-resize.js" strategy="lazyOnload" />
       </body>
     </html>
   );
