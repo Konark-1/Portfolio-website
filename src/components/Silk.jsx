@@ -68,9 +68,28 @@ void main() {
 }
 `;
 
+const mobileFragmentShader = `
+varying vec2 vUv;
+uniform float uTime;
+uniform vec3  uColor;
+uniform float uSpeed;
+uniform float uScale;
+
+void main() {
+  vec2 uv = vUv * uScale;
+  float tOffset = uSpeed * uTime * 0.5;
+  
+  // Dramatically simplified pattern for mobile (minimal sin calls, no procedural noise)
+  float wave1 = sin(uv.x * 3.0 + uv.y * 2.0 + tOffset);
+  float wave2 = sin(uv.y * 3.0 - uv.x * 2.0 - tOffset * 0.8);
+  float pattern = 0.75 + 0.25 * wave1 * wave2;
+  
+  gl_FragColor = vec4(uColor * pattern, 1.0);
+}
+`;
+
 const SilkPlane = forwardRef(function SilkPlane({ uniforms, isInViewport, isDocumentVisible, isLowPower }, ref) {
   const { viewport } = useThree();
-  const lastUpdateRef = useRef(0);
 
   useLayoutEffect(() => {
     if (ref.current) {
@@ -82,13 +101,6 @@ const SilkPlane = forwardRef(function SilkPlane({ uniforms, isInViewport, isDocu
     // Skip updates when not in viewport OR document is hidden (tab in background)
     // This saves significant GPU resources especially on mobile
     if (!isInViewport.current || !isDocumentVisible.current) return;
-
-    // Throttle updates to reduce CPU usage - update every ~33ms (30fps) on lowPower, ~16ms (60fps) on highPower
-    const now = state.clock.elapsedTime;
-    const throttleInterval = isLowPower ? 0.033 : 0.016;
-    if (now - lastUpdateRef.current < throttleInterval) return;
-
-    lastUpdateRef.current = now;
 
     if (ref.current && ref.current.material && ref.current.material.uniforms) {
       // Smooth delta clamping to prevent jumps when tab becomes visible
@@ -103,7 +115,7 @@ const SilkPlane = forwardRef(function SilkPlane({ uniforms, isInViewport, isDocu
       <shaderMaterial
         uniforms={uniforms}
         vertexShader={vertexShader}
-        fragmentShader={fragmentShader}
+        fragmentShader={isLowPower ? mobileFragmentShader : fragmentShader}
         transparent={false}
         depthWrite={false}
         depthTest={false}
@@ -220,12 +232,12 @@ const Silk = ({ speed = 5, scale = 1, color = '#7B7481', noiseIntensity = 1.5, r
     <div ref={containerRef} style={{ width: '100%', height: '100%', position: 'absolute', top: 0, left: 0, pointerEvents: 'none' }}>
       <Canvas
         ref={canvasRef}
-        dpr={isLowPower ? 1 : [1, 2]}
-        frameloop={isLowPower ? "demand" : "always"}
+        dpr={isLowPower ? 0.75 : [1, 2]}
+        frameloop="always"
         gl={{
           preserveDrawingBuffer: false,
-          powerPreference: 'default',
-          antialias: !isLowPower,
+          powerPreference: 'low-power',
+          antialias: false,
           alpha: true,
           // Disable stencil and depth buffers for better performance when not needed
           stencil: false,
@@ -248,15 +260,7 @@ const SafeSilk = (props) => {
   const shouldSkipWebGL = useMemo(() => {
     if (typeof window === 'undefined' || typeof document === 'undefined') return true;
 
-    // Skip WebGL entirely on iOS — context creation blocks the main thread for 2-4s
-    // and risks crashing Safari due to GPU memory pressure.
-    // The canvas was frozen (frameloop="demand") on mobile anyway, providing zero animation.
-    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) ||
-      (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1); // iPad with desktop UA
-
-    if (isIOS) return true;
-
-    // Also skip on devices without WebGL support
+    // Skip on devices without WebGL support
     try {
       const canvas = document.createElement('canvas');
       return !(window.WebGLRenderingContext && (canvas.getContext('webgl') || canvas.getContext('experimental-webgl')));
