@@ -40,8 +40,14 @@ const ContactSection = dynamic(() => import("@/components/sections/ContactSectio
 export default function HomePage() {
   const shouldReduceMotion = useReducedMotion();
   const [isIdle, setIsIdle] = useState(false);
+  const [isIOS, setIsIOS] = useState(false);
 
   useEffect(() => {
+    // Detect iOS client-side
+    const ios = /iPad|iPhone|iPod/.test(navigator.userAgent) || 
+      (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+    setIsIOS(ios);
+
     // Defer heavy components (like WebGL) until the main thread is idle
     const idle = (cb: () => void) => {
       if (typeof window !== "undefined" && "requestIdleCallback" in window) {
@@ -67,7 +73,17 @@ export default function HomePage() {
         >
           {/* Silk Background - Deferred until idle to prevent main thread blocking */}
           <div className="absolute inset-0 z-0 pointer-events-none">
-            {isIdle && (
+            {isIOS ? (
+              <div style={{
+                width: '100%',
+                height: '100%',
+                background: 'radial-gradient(ellipse at 50% 40%, rgba(39, 203, 206, 0.18), rgba(15, 20, 30, 0.8) 60%, rgba(10, 14, 26, 1))',
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                zIndex: 0
+              }} />
+            ) : isIdle && (
               <Silk
                 speed={shouldReduceMotion ? 0 : 7.5}
                 scale={1}

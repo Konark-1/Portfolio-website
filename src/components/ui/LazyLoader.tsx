@@ -34,7 +34,7 @@ export default function LazyLoader({ children, render, minHeight = "100vh", dela
       ref={ref} 
       className="w-full"
       style={{ 
-        minHeight: minHeight
+        minHeight: isLoaded ? undefined : minHeight
       }}
     >
       {isLoaded ? (render ? render() : children) : null}
