@@ -72,9 +72,9 @@ export default function HomePage() {
           {/* Background - Deferred until idle to prevent main thread blocking */}
           <div className="absolute inset-0 z-0 pointer-events-none">
             {isIdle && (
-              isMobile ? (
+              isMobile === true ? (
                 <HeroBackgroundMobile />
-              ) : (
+              ) : isMobile === false ? (
                 <Silk
                   speed={shouldReduceMotion ? 0 : 7.5}
                   scale={1}
@@ -82,7 +82,7 @@ export default function HomePage() {
                   noiseIntensity={5.9}
                   rotation={0}
                 />
-              )
+              ) : null
             )}
           </div>
 
