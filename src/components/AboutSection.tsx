@@ -119,7 +119,7 @@ export default function AboutSection(): React.JSX.Element {
                         {capabilities.map(({ num, title, subtitle, desc }, index) => (
                             <motion.div
                                 key={index}
-                                className="relative group rounded-3xl p-6 sm:p-8 bg-card/40 border border-border backdrop-blur-md overflow-hidden hover:border-accent-cyan/50 transition-colors duration-500"
+                                className="relative group p-6 sm:p-8 bg-[rgba(10,14,26,0.95)] backdrop-blur-md overflow-hidden hover:bg-[rgba(39,203,206,0.05)] transition-colors duration-500"
                                 initial={{ opacity: 0, y: 30 }}
                                 animate={cardsInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
                                 transition={{

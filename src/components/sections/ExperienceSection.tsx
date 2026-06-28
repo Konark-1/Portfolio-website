@@ -1,7 +1,8 @@
 "use client";
 
-import React from "react";
-import { motion } from "framer-motion";
+import React, { useRef } from "react";
+import { motion, useScroll, useTransform, useSpring } from "framer-motion";
+import { useIsMobile } from "@/hooks/useIsMobile";
 
 export const experienceTimeline = [
   {
@@ -166,10 +167,49 @@ function ExperienceEntry({
   );
 }
 
+function DesktopSpark({ targetRef }: { targetRef: React.RefObject<HTMLElement | null> }) {
+  const { scrollYProgress } = useScroll({
+    target: targetRef,
+    offset: ["start center", "end center"]
+  });
+
+  const smoothProgress = useSpring(scrollYProgress, {
+    stiffness: 100,
+    damping: 30,
+    restDelta: 0.001
+  });
+
+  const sparkY = useTransform(smoothProgress, [0, 1], ["0%", "100%"]);
+  const sparkOpacity = useTransform(smoothProgress, [0, 0.05, 0.95, 1], [0, 1, 1, 0]);
+
+  return (
+    <motion.div
+      style={{ 
+        top: sparkY,
+        opacity: sparkOpacity
+      }}
+      className="absolute left-1/2 -translate-x-1/2 z-30"
+    >
+      {/* Glowing Spark */}
+      <div className="relative">
+        <div className="absolute inset-0 bg-accent-cyan blur-[6px] rounded-full scale-150 animate-pulse" />
+        <div className="h-2.5 w-2.5 rounded-full bg-accent-cyan border border-white shadow-[0_0_15px_#27CBCE]" />
+        
+        {/* Trailing light effect */}
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-8 h-8 bg-accent-cyan/20 blur-xl rounded-full" />
+      </div>
+    </motion.div>
+  );
+}
+
 export default function ExperienceSection() {
+  const isMobile = useIsMobile();
+  const experienceRef = useRef<HTMLElement>(null);
+
   return (
     <section 
       id="experience" 
+      ref={experienceRef}
       className="relative z-20 text-foreground border-t" 
       style={{
         backgroundColor: 'var(--background-experience)',
@@ -221,6 +261,7 @@ export default function ExperienceSection() {
             <div className="relative space-y-12 sm:space-y-16">
               {/* Timeline line - aligned with dots */}
               <div className="absolute left-[21px] sm:left-[31px] top-8 bottom-0 w-px bg-gradient-to-b from-accent-cyan/40 via-accent-cyan/15 to-transparent hidden sm:block">
+                {isMobile === false && <DesktopSpark targetRef={experienceRef} />}
               </div>
               {experienceTimeline.map((item, index) => (
                 <ExperienceEntry
