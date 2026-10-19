@@ -27,6 +27,8 @@ export function StackedCardCertificates({ certificates }: StackedCardCertificate
     const [isInView, setIsInView] = useState(false);
     const [isPageLoaded, setIsPageLoaded] = useState(false);
     const containerRef = useRef<HTMLDivElement>(null);
+    const touchStartX = useRef<number | null>(null);
+    const touchEndX = useRef<number | null>(null);
 
     // Preload trigger on page load
     useEffect(() => {
@@ -91,12 +93,35 @@ export function StackedCardCertificates({ certificates }: StackedCardCertificate
         return () => window.removeEventListener("keydown", handleKeyDown);
     }, [goToNext, goToPrev]);
 
-    // Auto-scroll logic: only when in view and not hovered
+    // Touch swipe navigation for mobile
+    const handleTouchStart = (e: React.TouchEvent) => {
+        touchStartX.current = e.targetTouches[0].clientX;
+        setIsHovered(true);
+    };
+
+    const handleTouchMove = (e: React.TouchEvent) => {
+        touchEndX.current = e.targetTouches[0].clientX;
+    };
+
+    const handleTouchEnd = () => {
+        setIsHovered(false);
+        if (touchStartX.current === null || touchEndX.current === null) return;
+        const distance = touchStartX.current - touchEndX.current;
+        if (distance > 45) {
+            goToNext();
+        } else if (distance < -45) {
+            goToPrev();
+        }
+        touchStartX.current = null;
+        touchEndX.current = null;
+    };
+
+    // Auto-scroll logic: only when in view and not hovered / touched (5000ms comfortable cadence)
     useEffect(() => {
         if (!isInView || isHovered) return;
         const interval = setInterval(() => {
             goToNext();
-        }, 2000);
+        }, 5000);
         return () => clearInterval(interval);
     }, [isInView, isHovered, goToNext]);
 
@@ -230,12 +255,18 @@ export function StackedCardCertificates({ certificates }: StackedCardCertificate
                         </MagneticButton>
                     </div>
 
-                    {/* Main card area */}
-                    <div className="relative w-full overflow-hidden rounded-3xl border" style={{
-                        borderColor: 'var(--border-color)',
-                        backgroundColor: 'var(--surface-elevated)',
-                        minHeight: '420px',
-                    }}>
+                    {/* Main card area with touch swipe support */}
+                    <div
+                        onTouchStart={handleTouchStart}
+                        onTouchMove={handleTouchMove}
+                        onTouchEnd={handleTouchEnd}
+                        className="relative w-full overflow-hidden rounded-3xl border touch-pan-y"
+                        style={{
+                            borderColor: 'var(--border-color)',
+                            backgroundColor: 'var(--surface-elevated)',
+                            minHeight: '420px',
+                        }}
+                    >
                         <AnimatePresence mode="wait" custom={direction}>
                             <motion.div
                                 key={activeIndex}
@@ -256,7 +287,7 @@ export function StackedCardCertificates({ certificates }: StackedCardCertificate
 
                     {/* Dots indicator + counter */}
                     <div className="flex items-center justify-center gap-2.5 sm:gap-4 mt-4 sm:mt-8">
-                        <span className="text-[9px] sm:text-xs text-text-muted font-mono">
+                        <span className="text-[10px] sm:text-xs text-text-muted font-mono">
                             {String(activeIndex + 1).padStart(2, '0')} / {String(certificates.length).padStart(2, '0')}
                         </span>
                         <div className="flex items-center gap-1 sm:gap-2">
@@ -267,15 +298,52 @@ export function StackedCardCertificates({ certificates }: StackedCardCertificate
                                         setDirection(idx > activeIndex ? 1 : -1);
                                         setActiveIndex(idx);
                                     }}
-                                    className={`transition-all duration-300 rounded-full ${
-                                        idx === activeIndex
-                                            ? 'w-2 h-1 sm:w-6 sm:h-2 bg-accent-cyan'
-                                            : 'w-1 h-1 sm:w-2 sm:h-2 bg-text-muted/30 hover:bg-text-muted/50'
-                                    }`}
+                                    className="p-2 sm:p-1 flex items-center justify-center focus:outline-none"
                                     aria-label={`Go to certificate ${idx + 1}`}
-                                />
+                                >
+                                    <div
+                                        className={`transition-all duration-300 rounded-full ${
+                                            idx === activeIndex
+                                                ? 'w-6 h-2 bg-accent-cyan'
+                                                : 'w-2 h-2 bg-text-muted/30 hover:bg-text-muted/50'
+                                        }`}
+                                    />
+                                </button>
                             ))}
                         </div>
+                    </div>
+
+                    {/* Mobile Prev / Next controls */}
+                    <div className="flex sm:hidden items-center justify-between gap-4 mt-3 px-2">
+                        <button
+                            onClick={goToPrev}
+                            className="flex items-center gap-1 px-3.5 py-1.5 rounded-xl border text-xs font-semibold font-sans backdrop-blur-md active:scale-95 transition-all"
+                            style={{
+                                backgroundColor: 'rgba(10, 14, 26, 0.9)',
+                                borderColor: 'rgba(39, 203, 206, 0.4)',
+                                color: 'rgba(39, 203, 206, 1)',
+                            }}
+                            aria-label="Previous certificate"
+                        >
+                            <ChevronLeft className="h-4 w-4" />
+                            <span>Prev</span>
+                        </button>
+                        <span className="text-[11px] text-text-muted font-sans">
+                            Swipe to flip
+                        </span>
+                        <button
+                            onClick={goToNext}
+                            className="flex items-center gap-1 px-3.5 py-1.5 rounded-xl border text-xs font-semibold font-sans backdrop-blur-md active:scale-95 transition-all"
+                            style={{
+                                backgroundColor: 'rgba(10, 14, 26, 0.9)',
+                                borderColor: 'rgba(39, 203, 206, 0.4)',
+                                color: 'rgba(39, 203, 206, 1)',
+                            }}
+                            aria-label="Next certificate"
+                        >
+                            <span>Next</span>
+                            <ChevronRight className="h-4 w-4" />
+                        </button>
                     </div>
                 </div>
             </div>

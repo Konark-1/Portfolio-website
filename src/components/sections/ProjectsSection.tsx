@@ -70,10 +70,10 @@ export const dashboards = [
       "https://app.fabric.microsoft.com/view?r=eyJrIjoiNGQ0MzFkY2UtN2M1ZS00Mzg4LTk0YzAtZjc4MmVjMDhjY2ZhIiwidCI6IjE4YjExOTE3LTU2NGQtNDJhYi05M2M4LWMxY2JhZDlhNjRiMiJ9",
     tech: ["Power BI", "DAX", "Weather API", "Real-Time Data", "Advanced Visuals"],
     metrics: [
-      { label: "Visualizations", value: "Adaptive Display" },
-      { label: "Cities", value: "10+ Indian" },
-      { label: "Metrics", value: "15+ Environmental" },
-      { label: "Intelligence", value: "Actionable Insights" },
+      { label: "Cities Tracked", value: "10+" },
+      { label: "Weather Indices", value: "15+" },
+      { label: "Visualization", value: "Adaptive" },
+      { label: "Alert Engine", value: "Real-Time" },
     ],
     insights: [
       "Adaptive visualizations that dynamically change color and formatting based on environmental data severity (e.g., AQI levels, visibility warnings)",
@@ -97,10 +97,10 @@ export const dashboards = [
       "https://app.powerbi.com/view?r=eyJrIjoiNTg1OTYwMWYtNTdiZi00YjU2LWI3ZWMtMjkxZGZlMGYwZTVkIiwidCI6IjE4YjExOTE3LTU2NGQtNDJhYi05M2M4LWMxY2JhZDlhNjRiMiJ9",
     tech: ["Power BI", "DAX", "Data Modeling", "Geographic Viz", "KPI Design"],
     metrics: [
-      { label: "Architecture", value: "Dual-Layer Intelligence" },
-      { label: "Focus", value: "Profit-Driven Decision Making" },
-      { label: "Analysis", value: "Product Level Performance" },
-      { label: "Logic", value: "Multi-Variate Correlation" },
+      { label: "Architecture", value: "Dual-Layer" },
+      { label: "Target Metric", value: "Profit %" },
+      { label: "Analysis Level", value: "Product/SKU" },
+      { label: "Correlation", value: "Multivariate" },
     ],
     insights: [
       "Dual-layer intelligence architecture: Executive overview for strategic decisions and granular product-level analysis for operational managers",
@@ -124,10 +124,10 @@ export const dashboards = [
       "https://app.powerbi.com/view?r=eyJrIjoiNmE4MmRhMmItNTFlNC00MzMzLTkwZjQtNjc1NjEyZDI2ZTczIiwidCI6IjE4YjExOTE3LTU2NGQtNDJhYi05M2M4LWMxY2JhZDlhNjRiMiJ9",
     tech: ["Power BI", "Time Series", "Statistical Analysis", "Map Visuals", "DAX Measures"],
     metrics: [
-      { label: "Tracking", value: "Profit & Loss Monthly" },
-      { label: "Analytics", value: "Cost Efficiency Ratio" },
-      { label: "Dynamics", value: "Volume vs. Value Category" },
-      { label: "Analysis", value: "Quarterly Drill-Down" },
+      { label: "PnL Tracking", value: "Monthly" },
+      { label: "Cost Ratio", value: "0.99x" },
+      { label: "Drill-Down", value: "Quarterly" },
+      { label: "Map Visuals", value: "State-Level" },
     ],
     insights: [
       "Profit & Loss monthly tracking: Color-coded bar chart (Green/Red) instantly identifies loss months (May, July, Sept) for proactive health monitoring",
@@ -465,18 +465,18 @@ function DashboardCard({
 
         {/* Metrics Grid */}
         <div
-          className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6 p-6 sm:p-8 rounded-2xl border"
+          className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-6 p-4 sm:p-8 rounded-2xl border"
           style={{
             backgroundColor: "rgba(39, 203, 206, 0.05)",
             borderColor: "var(--border-color)",
           }}
         >
           {metrics.map(({ label, value }) => (
-            <div key={label} className="text-center space-y-2">
-              <p className="text-2xl sm:text-3xl md:text-4xl font-bold text-accent-cyan font-serif leading-tight">
+            <div key={label} className="text-center space-y-1.5 px-1 min-w-0">
+              <p className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold text-accent-cyan font-serif leading-tight truncate sm:whitespace-normal">
                 {value}
               </p>
-              <p className="text-xs sm:text-sm uppercase tracking-[0.15em] sm:tracking-[0.2em] text-text-muted font-sans leading-tight">
+              <p className="text-[10px] sm:text-xs uppercase tracking-[0.1em] sm:tracking-[0.2em] text-text-muted font-sans leading-tight">
                 {label}
               </p>
             </div>

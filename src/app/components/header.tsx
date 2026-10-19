@@ -62,12 +62,12 @@ function Header() {
             hideHeaderTimeout.current = null;
           }
           setIsVisible(true);
-        } else if (!isHovered && window.innerWidth >= 768) {
+        } else if (!isHovered && !isMobileMenuOpen) {
           if (!hideHeaderTimeout.current) {
             hideHeaderTimeout.current = setTimeout(() => {
               setIsVisible(false);
               hideHeaderTimeout.current = null;
-            }, 250);
+            }, 200);
           }
         }
 
@@ -333,7 +333,7 @@ function Header() {
       {/* Backdrop overlay - no blur */}
       {isMobileMenuOpen && (
         <div
-          className="fixed inset-0 bg-black/20 z-40 md:hidden"
+          className="fixed inset-0 bg-black/70 backdrop-blur-sm z-40 md:hidden transition-opacity duration-300"
           onClick={() => setIsMobileMenuOpen(false)}
         />
       )}
