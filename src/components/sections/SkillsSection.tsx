@@ -15,13 +15,13 @@ export const skillsShowcase = [
   {
     icon: Database,
     title: "SQL",
-    level: "Developing",
+    level: "Proficient",
     description: "Query optimisation, stored procedures, audit-ready outputs.",
   },
   {
     icon: Code2,
     title: "Python",
-    level: "Developing",
+    level: "Proficient",
     description: "Pandas, NumPy, data-cleaning automations with AI copilots.",
   },
   {
