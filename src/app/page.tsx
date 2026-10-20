@@ -1,26 +1,13 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import GlassButton from "@/components/ui/GlassButton";
 import { useReducedMotion } from "framer-motion";
 import { Download } from "lucide-react";
 import dynamic from "next/dynamic";
 import { MagneticButton } from "@/components/ui/magnetic-button";
-
-import { useIsMobile, isIOS } from '@/hooks/useIsMobile';
-import HeroBackgroundMobile from '@/components/HeroBackgroundMobile';
-
-// Dynamically import Silk background
-const Silk = dynamic(
-  () => import("@/components/Silk"),
-  {
-    ssr: false,
-    loading: () => null,
-  }
-);
-
-// Dynamically import below the fold sections
-const LazyLoader = dynamic(() => import("@/components/ui/LazyLoader"));
+import GlassButton from "@/components/ui/GlassButton";
+import HeroBackgroundMobile from "@/components/HeroBackgroundMobile";
+import Silk from "@/components/Silk";
+import LazyLoader from "@/components/ui/LazyLoader";
 
 const StackedCardCertificates = dynamic(
   () => import("@/components/ui/stacked-card-certificates").then(mod => ({ default: mod.StackedCardCertificates })),
@@ -42,20 +29,14 @@ const ContactSection = dynamic(() => import("@/components/sections/ContactSectio
 
 export default function HomePage() {
   const shouldReduceMotion = useReducedMotion();
-  const [mounted, setMounted] = useState(false);
-  const isMobile = useIsMobile();
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
 
   return (
-    <main className="relative min-h-[100dvh]" style={{ backgroundColor: 'var(--background)' }}>
+    <main className="relative min-h-[100svh]" style={{ backgroundColor: 'var(--background)' }}>
       {/* Sticky Full-Page Slides Container - Hero slides under About */}
       <div className="relative" suppressHydrationWarning>
         {/* Hero section - Standard Flow */}
         <div
-          className="relative min-h-[100dvh] z-0"
+          className="relative min-h-[100svh] z-0 overflow-hidden"
           suppressHydrationWarning
           style={{
             backgroundColor: 'var(--background-hero)',
@@ -63,19 +44,17 @@ export default function HomePage() {
         >
           {/* Instant Background Engine: 0ms perceived load time */}
           <div className="absolute inset-0 z-0 pointer-events-none" suppressHydrationWarning>
-            {/* Immediate ambient glow base: renders at frame 0, eliminating black screen */}
+            {/* Immediate ambient glow base: renders at frame 0 in SSR HTML, eliminating black screen */}
             <HeroBackgroundMobile />
 
-            {/* Ultra-lightweight WebGL Silk waves: loads on frame 1 without heavy 3D framework */}
-            {mounted && !isIOS() && (
-              <Silk
-                speed={shouldReduceMotion ? 0 : 7.5}
-                scale={1}
-                color="#27CBCE"
-                noiseIntensity={5.9}
-                rotation={0}
-              />
-            )}
+            {/* Ultra-lightweight WebGL Silk waves: Canvas rendered in SSR, connects instantly on mount */}
+            <Silk
+              speed={shouldReduceMotion ? 0 : 7.5}
+              scale={1}
+              color="#27CBCE"
+              noiseIntensity={5.9}
+              rotation={0}
+            />
           </div>
 
           {/* Enhanced gradient overlay with turquoise tint */}
@@ -85,10 +64,10 @@ export default function HomePage() {
           <div className="absolute inset-0 z-[1] bg-[radial-gradient(circle_at_50%_50%,rgba(39,203,206,0.08),transparent_70%)] pointer-events-none" />
 
           {/* Content container with proper spacing from header */}
-          <div className="relative z-10 flex flex-col items-center justify-center min-h-[100dvh] pt-24 sm:pt-28 lg:pt-32 pb-8 px-4 sm:px-6" suppressHydrationWarning>
+          <div className="relative z-10 flex flex-col items-center justify-center min-h-[100svh] pt-24 sm:pt-28 lg:pt-32 pb-12 px-4 sm:px-6" suppressHydrationWarning>
             {/* Main heading */}
             <div className="text-center max-w-6xl mx-auto space-y-4 sm:space-y-6" suppressHydrationWarning>
-              <h1 className="font-serif text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl 2xl:text-8xl font-bold tracking-tight leading-[1.1] text-white px-2" suppressHydrationWarning>
+              <h1 className="font-serif text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl 2xl:text-8xl font-bold tracking-tight leading-[1.1] text-white px-2 [text-wrap:balance]" suppressHydrationWarning>
                 Data Analyst & Business Intelligence Specialist
               </h1>
               <p className="max-w-3xl mx-auto text-sm sm:text-base md:text-lg lg:text-xl leading-relaxed text-white/80 font-sans px-2" suppressHydrationWarning>
@@ -97,44 +76,37 @@ export default function HomePage() {
             </div>
 
             {/* Action buttons */}
-            <div className="mt-8 sm:mt-12 lg:mt-16 flex flex-col sm:flex-row justify-center items-center gap-0 w-full max-w-xl mx-auto px-4" suppressHydrationWarning>
+            <div className="mt-8 sm:mt-12 lg:mt-16 flex flex-col sm:flex-row justify-center items-center gap-4 w-full max-w-xl mx-auto px-4" suppressHydrationWarning>
+              {/* Primary CTA: Resume Download */}
               <MagneticButton
-                intensity={0.6}
-                className="cursor-pointer pointer-events-auto group"
-                onClick={() => {
-                  const a = document.createElement('a');
-                  a.href = '/KONARK_PARIHAR.pdf';
-                  a.download = 'KONARK_PARIHAR.pdf';
-                  a.click();
-                }}
+                intensity={0.4}
+                className="cursor-pointer pointer-events-auto group w-full sm:w-auto flex justify-center"
               >
-                <GlassButton
-                  width={220}
-                  height={55}
-                  borderRadius={50}
-                  backgroundOpacity={0.1}
-                  blur={12}
+                <a
+                  href="/KONARK_PARIHAR.pdf"
+                  download="KONARK_PARIHAR.pdf"
+                  className="relative flex items-center justify-center w-full sm:w-[220px] h-[54px] rounded-full bg-accent-cyan text-[#050810] font-sans font-bold text-sm sm:text-base tracking-wider uppercase transition-all duration-300 shadow-[0_0_20px_rgba(39,203,206,0.35)] hover:shadow-[0_0_35px_rgba(39,203,206,0.6)] hover:scale-[1.02] active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-[#050810] select-none"
                 >
-                  <span className="px-6 py-3 text-text-primary font-semibold w-full h-full text-sm sm:text-base tracking-wide flex items-center justify-center gap-2 font-sans uppercase">
+                  <span className="flex items-center justify-center gap-2">
                     <Download className="h-4 w-4 sm:h-5 sm:w-5" />
                     Resume
                   </span>
-                </GlassButton>
+                </a>
               </MagneticButton>
+
+              {/* Secondary CTA: Portfolio Navigation */}
               <MagneticButton
-                intensity={0.6}
-                className="cursor-pointer pointer-events-auto group"
+                intensity={0.4}
+                className="cursor-pointer pointer-events-auto group w-full sm:w-auto flex justify-center"
                 onClick={(e) => {
                   e.preventDefault();
                   const element = document.getElementById('projects');
                   if (element) {
-                    const headerHeight = 115;
+                    const headerHeight = 90;
                     const elementPosition = element.offsetTop - headerHeight;
-                    requestAnimationFrame(() => {
-                      window.scrollTo({
-                        top: elementPosition,
-                        behavior: 'smooth'
-                      });
+                    window.scrollTo({
+                      top: elementPosition,
+                      behavior: 'smooth'
                     });
                   } else {
                     window.location.href = '/portfolio';
@@ -142,11 +114,12 @@ export default function HomePage() {
                 }}
               >
                 <GlassButton
-                  width={220}
-                  height={55}
+                  width="100%"
+                  height={54}
                   borderRadius={50}
-                  backgroundOpacity={0.1}
+                  backgroundOpacity={0.12}
                   blur={12}
+                  className="sm:w-[220px]"
                 >
                   <span className="px-6 py-3 text-text-primary font-semibold w-full h-full text-sm sm:text-base tracking-wide flex items-center justify-center gap-2 font-sans uppercase">
                     My Portfolio
@@ -159,7 +132,7 @@ export default function HomePage() {
 
         {/* About Section */}
         <LazyLoader 
-          minHeight="100vh" 
+          minHeight="100svh" 
           render={() => <AboutSection />} 
         />
       </div>
@@ -249,7 +222,7 @@ export default function HomePage() {
         />
       )} />
 
-      <ContactSection />
+      <LazyLoader minHeight="80vh" render={() => <ContactSection />} />
     </main>
   );
 }

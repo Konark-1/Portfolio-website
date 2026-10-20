@@ -80,7 +80,7 @@ export default function AboutSection(): React.JSX.Element {
                 {/* Header with Dynamic Scaling */}
                 <div className="text-center mb-12 sm:mb-16 lg:mb-20">
                     <motion.p
-                        className="text-xs sm:text-sm uppercase tracking-[0.6em] text-accent-cyan font-sans font-semibold mb-4 sm:mb-6"
+                        className="text-xs sm:text-sm uppercase tracking-[0.3em] sm:tracking-[0.5em] text-accent-cyan font-sans font-semibold mb-4 sm:mb-6"
                         initial={{ opacity: 0, y: 20 }}
                         whileInView={{ opacity: 1, y: 0 }}
                         viewport={{ once: true }}
@@ -89,9 +89,9 @@ export default function AboutSection(): React.JSX.Element {
                         About Me
                     </motion.p>
 
-                    {/* Dynamic Scaling Name */}
-                    <motion.h1
-                        ref={nameRef}
+                    {/* Dynamic Scaling Name - Semantically H2 to preserve single H1 per page */}
+                    <motion.h2
+                        ref={nameRef as any}
                         className="font-serif text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-bold text-white leading-[1.1] mb-6 sm:mb-8 origin-center px-2"
                         initial={{ opacity: 0, y: 30, scale: 0.95 }}
                         whileInView={{ opacity: 1, y: 0, scale: 1 }}
@@ -99,7 +99,7 @@ export default function AboutSection(): React.JSX.Element {
                         transition={{ duration: 0.8, ease: "easeOut" }}
                     >
                         KONARK PARIHAR
-                    </motion.h1>
+                    </motion.h2>
 
                     {/* Parallax Description */}
                     <motion.p

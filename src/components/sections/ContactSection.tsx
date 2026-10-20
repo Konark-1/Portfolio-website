@@ -212,7 +212,7 @@ export default function ContactSection() {
           <div className="space-y-10 sm:space-y-12">
             <div className="space-y-6">
               <motion.p 
-                className="text-xs sm:text-sm uppercase tracking-[0.6em] text-accent-cyan font-sans font-semibold"
+                className="text-xs sm:text-sm uppercase tracking-[0.3em] sm:tracking-[0.5em] text-accent-cyan font-sans font-semibold"
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
@@ -266,15 +266,18 @@ export default function ContactSection() {
                       <input
                         id="contact-name"
                         type="text"
+                        autoComplete="name"
+                        aria-invalid={!!formErrors.name}
+                        aria-describedby={formErrors.name ? "contact-name-error" : undefined}
                         value={formData.name}
                         onChange={handleInputChange}
                         placeholder="Your name"
                         suppressHydrationWarning
                         className={`w-full rounded-2xl border ${formErrors.name ? "border-red-500/50" : "border-border"
-                          } bg-white/5 px-4 py-3 text-sm text-text-primary focus:outline-none focus:ring-2 focus:ring-accent-cyan/60 font-sans`}
+                          } bg-white/5 px-4 py-3 text-base md:text-sm text-text-primary focus:outline-none focus:ring-2 focus:ring-accent-cyan/60 font-sans`}
                       />
                       {formErrors.name && (
-                        <p className="mt-1 text-xs text-red-400 font-sans">{formErrors.name}</p>
+                        <p id="contact-name-error" role="alert" className="mt-1 text-xs text-red-400 font-sans">{formErrors.name}</p>
                       )}
                     </div>
                     <div>
@@ -284,15 +287,18 @@ export default function ContactSection() {
                       <input
                         id="contact-email"
                         type="email"
+                        autoComplete="email"
+                        aria-invalid={!!formErrors.email}
+                        aria-describedby={formErrors.email ? "contact-email-error" : undefined}
                         value={formData.email}
                         onChange={handleInputChange}
                         placeholder="your@email.com"
                         suppressHydrationWarning
                         className={`w-full rounded-2xl border ${formErrors.email ? "border-red-500/50" : "border-border"
-                          } bg-white/5 px-4 py-3 text-sm text-text-primary focus:outline-none focus:ring-2 focus:ring-accent-cyan/60 font-sans`}
+                          } bg-white/5 px-4 py-3 text-base md:text-sm text-text-primary focus:outline-none focus:ring-2 focus:ring-accent-cyan/60 font-sans`}
                       />
                       {formErrors.email && (
-                        <p className="mt-1 text-xs text-red-400 font-sans">{formErrors.email}</p>
+                        <p id="contact-email-error" role="alert" className="mt-1 text-xs text-red-400 font-sans">{formErrors.email}</p>
                       )}
                     </div>
                     <div>
@@ -302,24 +308,26 @@ export default function ContactSection() {
                       <textarea
                         id="contact-message"
                         rows={5}
+                        aria-invalid={!!formErrors.message}
+                        aria-describedby={formErrors.message ? "contact-message-error" : undefined}
                         value={formData.message}
                         onChange={handleInputChange}
                         placeholder="Tell me about your project or opportunity..."
                         suppressHydrationWarning
                         className={`w-full rounded-2xl border ${formErrors.message ? "border-red-500/50" : "border-border"
-                          } bg-white/5 px-4 py-3 text-sm text-text-primary focus:outline-none focus:ring-2 focus:ring-accent-cyan/60 resize-none font-sans`}
+                          } bg-white/5 px-4 py-3 text-base md:text-sm text-text-primary focus:outline-none focus:ring-2 focus:ring-accent-cyan/60 resize-none font-sans`}
                       />
                       {formErrors.message && (
-                        <p className="mt-1 text-xs text-red-400 font-sans">{formErrors.message}</p>
+                        <p id="contact-message-error" role="alert" className="mt-1 text-xs text-red-400 font-sans">{formErrors.message}</p>
                       )}
                     </div>
                     {formStatus === "success" && (
-                      <div className="rounded-2xl bg-emerald-500/10 border border-emerald-500/30 px-4 py-3 text-sm text-emerald-300 font-sans">
+                      <div role="status" className="rounded-2xl bg-emerald-500/10 border border-emerald-500/30 px-4 py-3 text-sm text-emerald-300 font-sans">
                         Message sent successfully! I&apos;ll get back to you soon.
                       </div>
                     )}
                     {formStatus === "error" && (
-                      <div className="rounded-2xl bg-red-500/10 border border-red-500/30 px-4 py-3 text-sm text-red-300 font-sans">
+                      <div role="alert" className="rounded-2xl bg-red-500/10 border border-red-500/30 px-4 py-3 text-sm text-red-300 font-sans">
                         Something went wrong. Please try again or use direct channels.
                       </div>
                     )}

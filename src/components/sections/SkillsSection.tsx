@@ -2,7 +2,7 @@
 
 import React from "react";
 import { motion } from "framer-motion";
-import { BarChart3, Database, Code2, Layers, Brain, Globe, Sparkles } from "lucide-react";
+import { BarChart3, Database, Code2, Layers, Brain, Globe, Sparkles, Server } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 
 export const skillsShowcase = [
@@ -25,6 +25,12 @@ export const skillsShowcase = [
     description: "Pandas, NumPy, data-cleaning automations with AI copilots.",
   },
   {
+    icon: Server,
+    title: "Full-Stack & APIs",
+    level: "Proficient",
+    description: "M.E.R.N. architecture, webhook ingestion pipelines, REST APIs.",
+  },
+  {
     icon: Layers,
     title: "Excel",
     level: "Advanced",
@@ -35,12 +41,6 @@ export const skillsShowcase = [
     title: "AI Workflow",
     level: "Expert",
     description: "Prompt-driven tooling to accelerate analysis 3x.",
-  },
-  {
-    icon: Globe,
-    title: "Business Insight",
-    level: "Strong",
-    description: "Commerce + marketing understanding for grounded insights.",
   },
 ];
 
@@ -78,9 +78,8 @@ function SkillCard({ icon: Icon, title, level, description }: SkillCardProps): R
         <motion.div
           className="flex h-11 w-11 items-center justify-center rounded-2xl bg-accent-cyan/10 text-accent-cyan"
           whileHover={{
-            scale: 1.15,
-            rotate: 360,
-            transition: { duration: 0.5, ease: "easeInOut" }
+            scale: 1.08,
+            transition: { duration: 0.2, ease: "easeOut" }
           }}
         >
           <Icon className="h-5 w-5" />
@@ -130,7 +129,7 @@ export default function SkillsSection() {
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-12 sm:py-16 lg:py-24 space-y-12 sm:space-y-16 relative z-10">
         <div className="text-center space-y-4 max-w-4xl mx-auto px-4">
           <motion.p
-            className="text-xs sm:text-sm uppercase tracking-[0.6em] text-accent-cyan font-sans font-semibold"
+            className="text-xs sm:text-sm uppercase tracking-[0.3em] sm:tracking-[0.5em] text-accent-cyan font-sans font-semibold"
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}

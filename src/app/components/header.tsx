@@ -117,10 +117,13 @@ function Header() {
     return () => window.removeEventListener('resize', handleResize);
   }, [isMobileMenuOpen]);
 
-  // Detect device capabilities on mount
+  // Detect device capabilities after initial mount so WebGL warmup in Hero runs unimpeded
   useEffect(() => {
-    const caps = detectDeviceCapabilities();
-    setDeviceCaps(caps);
+    const timer = setTimeout(() => {
+      const caps = detectDeviceCapabilities();
+      setDeviceCaps(caps);
+    }, 1000);
+    return () => clearTimeout(timer);
   }, []);
 
   // Prevent body scroll and remove any blur effects when menu is open
@@ -184,8 +187,8 @@ function Header() {
       <div className="flex-shrink-0">
         <Link href="/" className="flex items-center gap-2">
           <span
-            className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-bold text-text-primary font-serif tracking-tight"
-            style={{ fontSize: 'clamp(2rem, 7vw, 4rem)' }}
+            className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold text-text-primary font-serif tracking-tight"
+            style={{ fontSize: 'clamp(1.25rem, 4.5vw, 2.5rem)' }}
           >
             Konark Parihar
           </span>
@@ -256,7 +259,7 @@ function Header() {
       <div className="md:hidden">
         <button
           onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-          className="p-2 text-text-primary hover:text-text-muted transition-all duration-200 hover:scale-105 active:scale-95"
+          className="p-2.5 min-w-[44px] min-h-[44px] flex items-center justify-center text-text-primary hover:text-text-muted transition-all duration-200 hover:scale-105 active:scale-95 rounded-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-cyan"
           aria-label="Toggle mobile menu"
         >
           {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
@@ -369,37 +372,37 @@ function Header() {
                 >
                   <button
                     onClick={scrollToTop}
-                    className="block text-white hover:text-gray-300 transition-colors text-lg font-medium w-full font-sans"
+                    className="block text-white hover:text-accent-cyan transition-colors text-lg font-medium w-full font-sans py-3 min-h-[44px] rounded-xl active:bg-white/10 select-none"
                   >
                     Home
                   </button>
                   <button
                     onClick={() => scrollToSection('about')}
-                    className="block text-white hover:text-gray-300 transition-colors text-lg font-medium w-full font-sans"
+                    className="block text-white hover:text-accent-cyan transition-colors text-lg font-medium w-full font-sans py-3 min-h-[44px] rounded-xl active:bg-white/10 select-none"
                   >
                     About
                   </button>
                   <button
                     onClick={() => scrollToSection('experience')}
-                    className="block text-white hover:text-gray-300 transition-colors text-lg font-medium w-full font-sans"
+                    className="block text-white hover:text-accent-cyan transition-colors text-lg font-medium w-full font-sans py-3 min-h-[44px] rounded-xl active:bg-white/10 select-none"
                   >
                     Experience
                   </button>
                   <button
                     onClick={scrollToPortfolio}
-                    className="block text-white hover:text-gray-300 transition-colors text-lg font-medium w-full font-sans"
+                    className="block text-white hover:text-accent-cyan transition-colors text-lg font-medium w-full font-sans py-3 min-h-[44px] rounded-xl active:bg-white/10 select-none"
                   >
                     Portfolio
                   </button>
                   <button
                     onClick={() => scrollToSection('certificates')}
-                    className="block text-white hover:text-gray-300 transition-colors text-lg font-medium w-full font-sans"
+                    className="block text-white hover:text-accent-cyan transition-colors text-lg font-medium w-full font-sans py-3 min-h-[44px] rounded-xl active:bg-white/10 select-none"
                   >
                     Certificates
                   </button>
                   <button
                     onClick={() => scrollToSection('contact')}
-                    className="block text-white hover:text-gray-300 transition-colors text-lg font-medium w-full font-sans"
+                    className="block text-white hover:text-accent-cyan transition-colors text-lg font-medium w-full font-sans py-3 min-h-[44px] rounded-xl active:bg-white/10 select-none"
                   >
                     Contact
                   </button>
@@ -447,37 +450,37 @@ function Header() {
               >
                 <button
                   onClick={scrollToTop}
-                  className="block text-white hover:text-gray-300 transition-colors text-lg font-medium w-full font-sans"
+                  className="block text-white hover:text-accent-cyan transition-colors text-lg font-medium w-full font-sans py-3 min-h-[44px] rounded-xl active:bg-white/10 select-none"
                 >
                   Home
                 </button>
                 <button
                   onClick={() => scrollToSection('about')}
-                  className="block text-white hover:text-gray-300 transition-colors text-lg font-medium w-full font-sans"
+                  className="block text-white hover:text-accent-cyan transition-colors text-lg font-medium w-full font-sans py-3 min-h-[44px] rounded-xl active:bg-white/10 select-none"
                 >
                   About
                 </button>
                 <button
                   onClick={() => scrollToSection('experience')}
-                  className="block text-white hover:text-gray-300 transition-colors text-lg font-medium w-full font-sans"
+                  className="block text-white hover:text-accent-cyan transition-colors text-lg font-medium w-full font-sans py-3 min-h-[44px] rounded-xl active:bg-white/10 select-none"
                 >
                   Experience
                 </button>
                 <button
                   onClick={scrollToPortfolio}
-                  className="block text-white hover:text-gray-300 transition-colors text-lg font-medium w-full font-sans"
+                  className="block text-white hover:text-accent-cyan transition-colors text-lg font-medium w-full font-sans py-3 min-h-[44px] rounded-xl active:bg-white/10 select-none"
                 >
                   Portfolio
                 </button>
                 <button
                   onClick={() => scrollToSection('certificates')}
-                  className="block text-white hover:text-gray-300 transition-colors text-lg font-medium w-full font-sans"
+                  className="block text-white hover:text-accent-cyan transition-colors text-lg font-medium w-full font-sans py-3 min-h-[44px] rounded-xl active:bg-white/10 select-none"
                 >
                   Certificates
                 </button>
                 <button
                   onClick={() => scrollToSection('contact')}
-                  className="block text-white hover:text-gray-300 transition-colors text-lg font-medium w-full font-sans"
+                  className="block text-white hover:text-accent-cyan transition-colors text-lg font-medium w-full font-sans py-3 min-h-[44px] rounded-xl active:bg-white/10 select-none"
                 >
                   Contact
                 </button>

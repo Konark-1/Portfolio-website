@@ -298,14 +298,14 @@ export function StackedCardCertificates({ certificates }: StackedCardCertificate
                                         setDirection(idx > activeIndex ? 1 : -1);
                                         setActiveIndex(idx);
                                     }}
-                                    className="p-2 sm:p-1 flex items-center justify-center focus:outline-none"
+                                    className="p-2 sm:p-1.5 min-w-[36px] min-h-[36px] flex items-center justify-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-cyan rounded-full transition-transform active:scale-90"
                                     aria-label={`Go to certificate ${idx + 1}`}
                                 >
                                     <div
                                         className={`transition-all duration-300 rounded-full ${
                                             idx === activeIndex
                                                 ? 'w-6 h-2 bg-accent-cyan'
-                                                : 'w-2 h-2 bg-text-muted/30 hover:bg-text-muted/50'
+                                                : 'w-2 h-2 bg-text-muted/40 hover:bg-text-muted/70'
                                         }`}
                                     />
                                 </button>
@@ -317,7 +317,7 @@ export function StackedCardCertificates({ certificates }: StackedCardCertificate
                     <div className="flex sm:hidden items-center justify-between gap-4 mt-3 px-2">
                         <button
                             onClick={goToPrev}
-                            className="flex items-center gap-1 px-3.5 py-1.5 rounded-xl border text-xs font-semibold font-sans backdrop-blur-md active:scale-95 transition-all"
+                            className="flex items-center justify-center gap-1.5 px-4 py-2.5 min-h-[44px] rounded-xl border text-xs font-semibold font-sans backdrop-blur-md active:scale-95 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-cyan"
                             style={{
                                 backgroundColor: 'rgba(10, 14, 26, 0.9)',
                                 borderColor: 'rgba(39, 203, 206, 0.4)',
@@ -328,12 +328,12 @@ export function StackedCardCertificates({ certificates }: StackedCardCertificate
                             <ChevronLeft className="h-4 w-4" />
                             <span>Prev</span>
                         </button>
-                        <span className="text-[11px] text-text-muted font-sans">
+                        <span className="text-[11px] text-text-muted font-sans select-none">
                             Swipe to flip
                         </span>
                         <button
                             onClick={goToNext}
-                            className="flex items-center gap-1 px-3.5 py-1.5 rounded-xl border text-xs font-semibold font-sans backdrop-blur-md active:scale-95 transition-all"
+                            className="flex items-center justify-center gap-1.5 px-4 py-2.5 min-h-[44px] rounded-xl border text-xs font-semibold font-sans backdrop-blur-md active:scale-95 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-cyan"
                             style={{
                                 backgroundColor: 'rgba(10, 14, 26, 0.9)',
                                 borderColor: 'rgba(39, 203, 206, 0.4)',

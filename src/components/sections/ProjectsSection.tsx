@@ -171,6 +171,16 @@ function DashboardCard({
   const dashboardRef = useRef<HTMLDivElement>(null);
   const [showIframe, setShowIframe] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [loadTimeout, setLoadTimeout] = useState(false);
+
+  React.useEffect(() => {
+    if (showIframe && isLoading) {
+      const timer = setTimeout(() => {
+        setLoadTimeout(true);
+      }, 12000);
+      return () => clearTimeout(timer);
+    }
+  }, [showIframe, isLoading]);
 
   const loadIframe = () => {
     if (isDirectLaunchOnly && liveUrl) {
@@ -388,16 +398,49 @@ function DashboardCard({
                 <>
                   {isLoading && (
                     <div
-                      className="absolute inset-0 flex items-center justify-center transition-opacity duration-500 z-10"
+                      className="absolute inset-0 flex items-center justify-center transition-opacity duration-500 z-10 p-6 text-center"
                       style={{
                         backgroundColor: "rgba(10, 14, 26, 0.95)",
                       }}
                     >
-                      <div className="flex flex-col items-center gap-4">
-                        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-accent-cyan"></div>
-                        <div className="text-accent-cyan text-sm sm:text-base font-sans tracking-wide">
-                          Initializing {isExternalWebApp ? "Analytics Engine" : "Power BI"}...
-                        </div>
+                      <div className="flex flex-col items-center gap-4 max-w-sm">
+                        {!loadTimeout ? (
+                          <>
+                            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-accent-cyan"></div>
+                            <div className="text-accent-cyan text-sm sm:text-base font-sans tracking-wide">
+                              Initializing {isExternalWebApp ? "Analytics Engine" : "Power BI"}...
+                            </div>
+                          </>
+                        ) : (
+                          <>
+                            <p className="text-sm text-text-muted font-sans mb-1">
+                              The interactive report is taking longer than expected to connect.
+                            </p>
+                            <div className="flex flex-wrap gap-3 justify-center mt-2">
+                              {liveUrl && (
+                                <a
+                                  href={liveUrl}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-accent-cyan text-[#050810] font-sans font-bold text-xs shadow-md hover:scale-105 transition-transform"
+                                >
+                                  <ExternalLink className="h-3.5 w-3.5" />
+                                  Open in New Tab ↗
+                                </a>
+                              )}
+                              <button
+                                onClick={() => {
+                                  setShowIframe(false);
+                                  setIsLoading(true);
+                                  setLoadTimeout(false);
+                                }}
+                                className="px-4 py-2 rounded-xl border border-white/20 text-white text-xs font-sans hover:bg-white/10 transition-colors"
+                              >
+                                Back to Preview
+                              </button>
+                            </div>
+                          </>
+                        )}
                       </div>
                     </div>
                   )}
@@ -446,7 +489,7 @@ function DashboardCard({
         >
           {metrics.map(({ label, value }) => (
             <div key={label} className="text-center space-y-1.5 px-1 min-w-0">
-              <p className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold text-accent-cyan font-serif leading-tight truncate sm:whitespace-normal">
+              <p className="text-lg sm:text-2xl md:text-3xl lg:text-4xl font-bold text-accent-cyan font-serif leading-tight break-words sm:whitespace-normal">
                 {value}
               </p>
               <p className="text-[10px] sm:text-xs uppercase tracking-[0.1em] sm:tracking-[0.2em] text-text-muted font-sans leading-tight">

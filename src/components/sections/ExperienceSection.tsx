@@ -6,40 +6,16 @@ import { useIsMobile } from "@/hooks/useIsMobile";
 
 export const experienceTimeline = [
   {
-    title: "Bachelor of Commerce (Hons)",
-    company: "Amity University, Noida",
-    duration: "May 2019 – Nov 2022",
+    title: "AI-Analyst",
+    company: "Innodata Inc., Noida (Remote)",
+    duration: "Jan 2026 – Present",
     summary:
-      "Developed a strong foundation in business logic, accounting, and finance, which now informs my analytical approach to commerce-driven data insights.",
+      "Spearheaded Multi-Modal Prompt Engineering across diverse AI models (text, image, audio, and video). Engineered and refined complex prompts, and conducted comparative evaluations to improve model performance.",
     achievements: [
-      "Major in Accounting and Finance with a CGPA of 7.55/10.0.",
-      "Built core competencies in financial modeling and business process understanding.",
+      "Achieved an average quality score of 3.29/4.00, surpassing the target benchmark of 2.00 by over 64%, as independently verified by senior QA reviewers.",
+      "Conducted rigorous comparative evaluations and A/B testing of AI-generated content to resolve factual and structural inconsistencies."
     ],
-    skillTags: ["Accounting", "Finance", "Business Logic"],
-  },
-  {
-    title: "Marketing & Sales Trainee",
-    company: "IFortis Corporate",
-    duration: "May 2021 – Jul 2021",
-    summary:
-      "Built foundational business intelligence skills through consumer trend analysis, market segmentation, and the alignment of sales operations with corporate strategy.",
-    achievements: [
-      "Leveraged market segmentation analysis to refine targeting approaches for active campaigns.",
-      "Managed sales operations to ensure seamless execution of strategic promotional plans.",
-    ],
-    skillTags: ["Market Analysis", "Consumer Behavior", "Stakeholder Ops"],
-  },
-  {
-    title: "Claims Analyst",
-    company: "Xceedance Consulting India Pvt. Ltd.",
-    duration: "Jul 2023 – Feb 2024",
-    summary:
-      "Delivered high-velocity data processing and database maintenance for US-based healthcare clients, consistently outperforming production targets through rapid process adaptation.",
-    achievements: [
-      "Maintained 99.9% data integrity for the Medical Provider Network (MPN) database with zero compliance errors.",
-      "Surpassed daily production KPIs by 15% within the first month of operations.",
-    ],
-    skillTags: ["Data Integrity", "SLA Management", "Healthcare Ops"],
+    skillTags: ["Prompt Engineering", "Quality Assurance", "AI Training", "Process Standardization"],
   },
   {
     title: "Certified Data Analyst",
@@ -54,16 +30,40 @@ export const experienceTimeline = [
     skillTags: ["SQL", "Python", "Power BI", "Excel", "VBA", "Generative AI"],
   },
   {
-    title: "AI-Analyst",
-    company: "Innodata Inc., Noida (Remote)",
-    duration: "Jan 2026 – Present",
+    title: "Claims Analyst",
+    company: "Xceedance Consulting India Pvt. Ltd.",
+    duration: "Jul 2023 – Feb 2024",
     summary:
-      "Spearheaded Multi-Modal Prompt Engineering across diverse AI models (text, image, audio, and video). Engineered and refined complex prompts, and conducted comparative evaluations to improve model performance.",
+      "Delivered high-velocity data processing and database maintenance for US-based healthcare clients, consistently outperforming production targets through rapid process adaptation.",
     achievements: [
-      "Achieved an average quality score of 3.29/4.00, surpassing the target benchmark of 2.00 by over 64%, as independently verified by senior QA reviewers.",
-      "Conducted rigorous comparative evaluations and A/B testing of AI-generated content to resolve factual and structural inconsistencies."
+      "Maintained 99.9% data integrity for the Medical Provider Network (MPN) database with zero compliance errors.",
+      "Surpassed daily production KPIs by 15% within the first month of operations.",
     ],
-    skillTags: ["Prompt Engineering", "Quality Assurance", "AI Training", "Process Standardization"],
+    skillTags: ["Data Integrity", "SLA Management", "Healthcare Ops"],
+  },
+  {
+    title: "Marketing & Sales Trainee",
+    company: "IFortis Corporate",
+    duration: "May 2021 – Jul 2021",
+    summary:
+      "Built foundational business intelligence skills through consumer trend analysis, market segmentation, and the alignment of sales operations with corporate strategy.",
+    achievements: [
+      "Leveraged market segmentation analysis to refine targeting approaches for active campaigns.",
+      "Managed sales operations to ensure seamless execution of strategic promotional plans.",
+    ],
+    skillTags: ["Market Analysis", "Consumer Behavior", "Stakeholder Ops"],
+  },
+  {
+    title: "Bachelor of Commerce (Hons)",
+    company: "Amity University, Noida",
+    duration: "May 2019 – Nov 2022",
+    summary:
+      "Developed a strong foundation in business logic, accounting, and finance, which now informs my analytical approach to commerce-driven data insights.",
+    achievements: [
+      "Major in Accounting and Finance with a CGPA of 7.55/10.0.",
+      "Built core competencies in financial modeling and business process understanding.",
+    ],
+    skillTags: ["Accounting", "Finance", "Business Logic"],
   },
 ];
 
@@ -123,8 +123,8 @@ function ExperienceEntry({
       >
         {/* Top row: Number + Duration */}
         <div className="flex items-center justify-between mb-4">
-          <span className="text-[10px] sm:text-xs text-accent-cyan/60 font-mono tracking-widest uppercase">Entry {formattedIndex}</span>
-          <span className="text-[10px] sm:text-xs text-text-muted/60 font-sans font-medium px-3 py-1 rounded-full bg-white/5 border border-white/10">{duration}</span>
+          <span className="text-[10px] sm:text-xs text-accent-cyan font-mono tracking-widest uppercase">Entry {formattedIndex}</span>
+          <span className="text-[10px] sm:text-xs text-text-primary/90 font-sans font-medium px-3 py-1 rounded-full bg-white/5 border border-white/10">{duration}</span>
         </div>
 
         {/* Title & Company */}
@@ -132,18 +132,18 @@ function ExperienceEntry({
           <h3 className="text-xl sm:text-2xl font-bold text-text-primary font-serif mb-1 group-hover:text-accent-cyan transition-colors duration-300">
             {title}
           </h3>
-          <p className="text-sm sm:text-base text-accent-cyan/80 font-sans font-medium">{company}</p>
+          <p className="text-sm sm:text-base text-accent-cyan font-sans font-medium">{company}</p>
         </div>
 
         {/* Summary */}
-        <p className="text-sm sm:text-base text-text-muted leading-relaxed font-sans mb-6 italic opacity-90">{summary}</p>
+        <p className="text-sm sm:text-base text-text-muted leading-relaxed font-sans mb-6 italic opacity-95">{summary}</p>
 
         {/* Achievements */}
         <div className="space-y-4 mb-8">
-          <p className="text-[10px] uppercase tracking-[0.3em] text-text-muted/50 font-sans font-bold">Key Accomplishments</p>
+          <p className="text-[10px] uppercase tracking-[0.25em] text-text-muted font-sans font-bold">Key Accomplishments</p>
           <ul className="space-y-3">
             {achievements.map((item) => (
-              <li key={item} className="flex items-start gap-3 text-sm sm:text-base text-text-muted/90 leading-relaxed font-sans">
+              <li key={item} className="flex items-start gap-3 text-sm sm:text-base text-text-primary/90 leading-relaxed font-sans">
                 <span className="text-accent-cyan mt-1.5 flex-shrink-0 text-xs">▹</span>
                 <span>{item}</span>
               </li>
@@ -224,7 +224,7 @@ export default function ExperienceSection() {
           <div className="lg:w-1/3">
             <div className="lg:sticky lg:top-40 lg:h-fit space-y-4 sm:space-y-6">
               <motion.p 
-                className="text-xs sm:text-sm uppercase tracking-[0.6em] text-accent-cyan font-sans font-semibold"
+                className="text-xs sm:text-sm uppercase tracking-[0.3em] sm:tracking-[0.5em] text-accent-cyan font-sans font-semibold"
                 initial={{ opacity: 0, x: -20 }}
                 whileInView={{ opacity: 1, x: 0 }}
                 viewport={{ once: true }}
@@ -248,7 +248,7 @@ export default function ExperienceSection() {
                 viewport={{ once: true }}
                 transition={{ duration: 0.6, delay: 0.2 }}
               >
-                A chronological overview of my professional journey, highlighting key achievements, responsibilities, and technical expertise gained at each position.
+                A reverse-chronological overview of my professional journey, highlighting key achievements, responsibilities, and technical expertise gained at each position.
               </motion.p>
               <div className="pt-8 hidden lg:block">
                 <div className="h-px w-24 bg-accent-cyan/30" />

@@ -169,6 +169,31 @@ body::-webkit-scrollbar {
   animation: ping 1s cubic-bezier(0, 0, 0.2, 1) infinite;
 }
 
+/* 0ms Hardware-Accelerated Ambient Wave Keyframes (Runs on GPU Compositor) */
+@keyframes hero-wave-drift {
+  0% {
+    transform: translate3d(0, 0, 0) rotate(0deg) scale(1);
+  }
+  50% {
+    transform: translate3d(4%, 3%, 0) rotate(6deg) scale(1.05);
+  }
+  100% {
+    transform: translate3d(-3%, -2%, 0) rotate(-4deg) scale(0.98);
+  }
+}
+
+@keyframes hero-wave-drift-reverse {
+  0% {
+    transform: translate3d(0, 0, 0) rotate(0deg) scale(1);
+  }
+  50% {
+    transform: translate3d(-5%, -4%, 0) rotate(-8deg) scale(1.06);
+  }
+  100% {
+    transform: translate3d(3%, 4%, 0) rotate(5deg) scale(0.96);
+  }
+}
+
 /* Transitions */
 .transition-all {
   transition-property: all;
@@ -823,6 +848,7 @@ body::-webkit-scrollbar {
   --small-text: 0.875rem;
   /* 14px */
   --tracking-tight: -0.02em;
+  --ring: #27CBCE;
 }
 
 .dark {
@@ -840,13 +866,14 @@ body::-webkit-scrollbar {
   --text-primary: #F4FBFF;
   --text-muted: #93A1C3;
   --text-subtle: rgba(244, 251, 255, 0.65);
-  --border-color: rgba(39, 203, 206, 0.1);
-  --border-hover: rgba(39, 203, 206, 0.2);
-  --border-glow: rgba(39, 203, 206, 0.35);
+  --border-color: rgba(39, 203, 206, 0.15);
+  --border-hover: rgba(39, 203, 206, 0.3);
+  --border-glow: rgba(39, 203, 206, 0.45);
   --card: rgba(39, 203, 206, 0.04);
   --card-foreground: #F4FBFF;
   --overlay-soft: rgba(5, 8, 16, 0.7);
   --overlay-strong: rgba(5, 8, 16, 0.92);
+  --ring: #27CBCE;
 }
 
 @layer base {

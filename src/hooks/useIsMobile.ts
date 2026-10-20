@@ -1,3 +1,5 @@
+'use client';
+
 import { useState, useEffect } from 'react';
 
 /**
@@ -16,29 +18,33 @@ export function isTouchDevice(): boolean {
   if (typeof window === 'undefined') return false;
   return (
     'ontouchstart' in window ||
-    navigator.maxTouchPoints > 0 ||
     (typeof window.matchMedia === 'function' && window.matchMedia('(pointer: coarse)').matches)
   );
 }
 
-export function useIsMobile() {
-  const [isMobile, setIsMobile] = useState<boolean | null>(null);
+export function useIsTouchDevice(): boolean {
+  const [isTouch, setIsTouch] = useState(false);
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const checkTouch = () => {
+      setIsTouch(window.matchMedia('(hover: none) and (pointer: coarse)').matches);
+    };
+    checkTouch();
+    const mql = window.matchMedia('(hover: none) and (pointer: coarse)');
+    mql.addEventListener('change', checkTouch);
+    return () => mql.removeEventListener('change', checkTouch);
+  }, []);
+  return isTouch;
+}
+
+export function useIsMobile(): boolean {
+  const [isMobile, setIsMobile] = useState<boolean>(false);
 
   useEffect(() => {
     const checkIsMobile = () => {
       if (typeof window === 'undefined') return;
-
-      const width = window.innerWidth;
-      const isNarrowScreen = width <= 768;
-      const isMediumTouch = width <= 1024 && isTouchDevice();
-      const iOS = isIOS();
-
-      // Check user agent for common mobile devices
-      const userAgent = navigator.userAgent || navigator.vendor || (window as any).opera || '';
-      const isMobileAgent = /android|webos|iphone|ipad|ipod|blackberry|iemobile|opera mini/i.test(userAgent.toLowerCase());
-
-      // If it's iOS, any touch tablet/phone, narrow screen, or mobile user agent, treat as mobile
-      setIsMobile(isNarrowScreen || isMediumTouch || iOS || isMobileAgent);
+      // Screen-width driven layout check (<= 768px is mobile view)
+      setIsMobile(window.innerWidth <= 768);
     };
 
     checkIsMobile();
@@ -52,4 +58,3 @@ export function useIsMobile() {
 
   return isMobile;
 }
-
