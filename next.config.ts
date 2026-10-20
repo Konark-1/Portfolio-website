@@ -24,8 +24,20 @@ const nextConfig: NextConfig = {
   
   // HTTP headers for caching and security
   async headers() {
+    if (process.env.NODE_ENV !== 'production') {
+      return [
+        {
+          source: '/:path*',
+          headers: [
+            {
+              key: 'Cache-Control',
+              value: 'no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0',
+            },
+          ],
+        },
+      ];
+    }
     return [
-
       {
         // Cache images for 1 year
         source: '/images/:path*',
@@ -77,12 +89,12 @@ const nextConfig: NextConfig = {
         ],
       },
       {
-        // HTML pages - stale-while-revalidate strategy
-        source: '/:path*',
+        // HTML pages only (exclude _next internal static assets)
+        source: '/((?!_next|api).*)',
         headers: [
           {
             key: 'Cache-Control',
-            value: 'public, max-age=3600, stale-while-revalidate=86400',
+            value: 'public, max-age=0, must-revalidate',
           },
         ],
       },
