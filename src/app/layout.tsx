@@ -94,6 +94,18 @@ export default function RootLayout({
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
+        {/* Automatic Cache/ServiceWorker Cleanup for Fresh Builds */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              if (typeof window !== 'undefined' && 'serviceWorker' in navigator) {
+                navigator.serviceWorker.getRegistrations().then(function(regs) {
+                  for (var i = 0; i < regs.length; i++) regs[i].unregister();
+                });
+              }
+            `,
+          }}
+        />
       </head>
       <body className={`${inter.variable} ${playfair.variable} ${inter.className} dark`} suppressHydrationWarning>
         <CursorMount />

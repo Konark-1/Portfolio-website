@@ -1,30 +1,28 @@
-import React, { forwardRef, useRef, useMemo, useLayoutEffect, useEffect, useState } from 'react';
-import { Canvas, useFrame, useThree } from '@react-three/fiber';
-import { Color } from 'three';
+'use client';
 
-const hexToNormalizedRGB = hex => {
+import React, { useRef, useEffect } from 'react';
+
+const hexToNormalizedRGB = (hex) => {
   hex = hex.replace('#', '');
   return [
     parseInt(hex.slice(0, 2), 16) / 255,
     parseInt(hex.slice(2, 4), 16) / 255,
-    parseInt(hex.slice(4, 6), 16) / 255
+    parseInt(hex.slice(4, 6), 16) / 255,
   ];
 };
 
-const vertexShader = `
+const vertexShaderSource = `
+attribute vec2 position;
 varying vec2 vUv;
-varying vec3 vPosition;
-
 void main() {
-  vPosition = position;
-  vUv = uv;
-  gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+  vUv = (position + 1.0) * 0.5;
+  gl_Position = vec4(position, 0.0, 1.0);
 }
 `;
 
-const fragmentShader = `
+const fragmentShaderSource = `
+precision highp float;
 varying vec2 vUv;
-varying vec3 vPosition;
 
 uniform float uTime;
 uniform vec3  uColor;
@@ -49,10 +47,10 @@ vec2 rotateUvs(vec2 uv, float angle) {
 }
 
 void main() {
-  float rnd        = noise(gl_FragCoord.xy);
-  vec2  uv         = rotateUvs(vUv * uScale, uRotation);
-  vec2  tex        = uv * uScale;
-  float tOffset    = uSpeed * uTime;
+  float rnd     = noise(gl_FragCoord.xy);
+  vec2  uv      = rotateUvs(vUv * uScale, uRotation);
+  vec2  tex     = uv * uScale;
+  float tOffset = uSpeed * uTime;
 
   tex.y += 0.03 * sin(8.0 * tex.x - tOffset);
 
@@ -68,7 +66,8 @@ void main() {
 }
 `;
 
-const mobileFragmentShader = `
+const mobileFragmentShaderSource = `
+precision mediump float;
 varying vec2 vUv;
 uniform float uTime;
 uniform vec3  uColor;
@@ -78,174 +77,159 @@ uniform float uScale;
 void main() {
   vec2 uv = vUv * uScale;
   float tOffset = uSpeed * uTime * 0.5;
-  
-  // Dramatically simplified pattern for mobile (minimal sin calls, no procedural noise)
   float wave1 = sin(uv.x * 3.0 + uv.y * 2.0 + tOffset);
   float wave2 = sin(uv.y * 3.0 - uv.x * 2.0 - tOffset * 0.8);
   float pattern = 0.75 + 0.25 * wave1 * wave2;
-  
   gl_FragColor = vec4(uColor * pattern, 1.0);
 }
 `;
 
-const SilkPlane = forwardRef(function SilkPlane({ uniforms, isInViewport, isDocumentVisible, isLowPower }, ref) {
-  const { viewport } = useThree();
-
-  useLayoutEffect(() => {
-    if (ref.current) {
-      ref.current.scale.set(viewport.width, viewport.height, 1);
-    }
-  }, [ref, viewport]);
+const Silk = ({ speed = 7.5, scale = 1, color = '#27CBCE', noiseIntensity = 5.9, rotation = 0 }) => {
+  const canvasRef = useRef(null);
 
   useEffect(() => {
-    const mesh = ref.current;
-    return () => {
-      if (mesh) {
-        if (mesh.geometry) mesh.geometry.dispose();
-        if (mesh.material) mesh.material.dispose();
-      }
-    };
-  }, [ref]);
+    const canvas = canvasRef.current;
+    if (!canvas) return;
 
-  useFrame((state, delta) => {
-    // Skip updates when not in viewport OR document is hidden (tab in background)
-    // This saves significant GPU resources especially on mobile
-    if (!isInViewport.current || !isDocumentVisible.current) return;
-
-    if (ref.current && ref.current.material && ref.current.material.uniforms) {
-      // Smooth delta clamping to prevent jumps when tab becomes visible
-      const clampedDelta = Math.min(delta, 0.1);
-      ref.current.material.uniforms.uTime.value += 0.1 * clampedDelta;
-    }
-  });
-
-  return (
-    <mesh ref={ref} frustumCulled={true}>
-      <planeGeometry args={[1, 1, 1, 1]} />
-      <shaderMaterial
-        uniforms={uniforms}
-        vertexShader={vertexShader}
-        fragmentShader={isLowPower ? mobileFragmentShader : fragmentShader}
-        transparent={false}
-        depthWrite={false}
-        depthTest={false}
-      />
-    </mesh>
-  );
-});
-SilkPlane.displayName = 'SilkPlane';
-
-class SilkErrorBoundary extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = { hasError: false };
-  }
-
-  static getDerivedStateFromError() {
-    return { hasError: true };
-  }
-
-  componentDidCatch(error, errorInfo) {
-    console.error("Silk Canvas render error caught:", error, errorInfo);
-  }
-
-  render() {
-    if (this.state.hasError) {
-      return (
-        <div style={{
-          width: '100%',
-          height: '100%',
-          background: 'radial-gradient(circle at 50% 50%, rgba(39, 203, 206, 0.15), rgba(10, 14, 26, 1))',
-          position: 'absolute',
-          top: 0,
-          left: 0,
-          zIndex: 0
-        }} />
-      );
-    }
-    return this.props.children;
-  }
-}
-
-const Silk = ({ speed = 5, scale = 1, color = '#7B7481', noiseIntensity = 1.5, rotation = 0 }) => {
-  const meshRef = useRef();
-  const canvasRef = useRef();
-  const containerRef = useRef();
-  const isInViewportRef = useRef(true); // Assume in viewport initially (hero section)
-  const isDocumentVisibleRef = useRef(true);
-  const [isReady, setIsReady] = useState(false);
-
-  // Synchronous client-side detection (safe because component is loaded with ssr: false)
-  const isLowPower = useMemo(() => {
-    if (typeof window === 'undefined' || typeof navigator === 'undefined') return false;
-    return (
+    const isLowPower =
       /Mobi|Android|iPhone|iPad|iPod|Windows Phone/i.test(navigator.userAgent) ||
       (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1) ||
-      (window.innerWidth <= 1024)
-    );
-  }, []);
+      window.innerWidth <= 1024;
 
-  const uniforms = useMemo(
-    () => ({
-      uSpeed: { value: speed },
-      uScale: { value: scale },
-      uNoiseIntensity: { value: noiseIntensity },
-      uColor: { value: new Color(...hexToNormalizedRGB(color)) },
-      uRotation: { value: rotation },
-      uTime: { value: 0 }
-    }),
-    [speed, scale, noiseIntensity, color, rotation]
-  );
+    const gl = canvas.getContext('webgl', {
+      alpha: false,
+      depth: false,
+      stencil: false,
+      antialias: false,
+      powerPreference: 'default',
+      failIfMajorPerformanceCaveat: false,
+    });
 
-  // Handle visibility and viewport intersection - optimized for performance
-  useEffect(() => {
-    isDocumentVisibleRef.current = !document.hidden;
+    if (!gl) return;
 
-    const handleVisibilityChange = () => {
-      isDocumentVisibleRef.current = !document.hidden;
+    const compileShader = (type, source) => {
+      const shader = gl.createShader(type);
+      gl.shaderSource(shader, source);
+      gl.compileShader(shader);
+      if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
+        console.warn('Shader error:', gl.getShaderInfoLog(shader));
+        gl.deleteShader(shader);
+        return null;
+      }
+      return shader;
     };
 
-    // Intersection Observer to detect when component is in viewport
-    let observer = null;
+    const vert = compileShader(gl.VERTEX_SHADER, vertexShaderSource);
+    const frag = compileShader(
+      gl.FRAGMENT_SHADER,
+      isLowPower ? mobileFragmentShaderSource : fragmentShaderSource
+    );
 
-    const setupObserver = () => {
-      if (!containerRef.current) return;
+    if (!vert || !frag) return;
 
-      // Guard IntersectionObserver against older browsers/devices
-      if (typeof window !== 'undefined' && 'IntersectionObserver' in window) {
-        observer = new IntersectionObserver(
-          (entries) => {
-            const entry = entries[0];
-            isInViewportRef.current = entry.isIntersecting;
-          },
-          {
-            threshold: [0, 0.1], // Trigger at 0% and 10% visibility
-            rootMargin: '100px' // Larger margin for earlier detection
-          }
-        );
-        observer.observe(containerRef.current);
-      } else {
-        isInViewportRef.current = true;
+    const program = gl.createProgram();
+    gl.attachShader(program, vert);
+    gl.attachShader(program, frag);
+    gl.linkProgram(program);
+
+    if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
+      console.warn('Program link error:', gl.getProgramInfoLog(program));
+      return;
+    }
+
+    gl.useProgram(program);
+
+    // Full-screen quad (2 triangles)
+    const vertices = new Float32Array([
+      -1, -1,
+       1, -1,
+      -1,  1,
+      -1,  1,
+       1, -1,
+       1,  1,
+    ]);
+
+    const buffer = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
+    gl.bufferData(gl.ARRAY_BUFFER, vertices, gl.STATIC_DRAW);
+
+    const posAttr = gl.getAttribLocation(program, 'position');
+    gl.enableVertexAttribArray(posAttr);
+    gl.vertexAttribPointer(posAttr, 2, gl.FLOAT, false, 0, 0);
+
+    // Uniforms
+    const uTimeLoc = gl.getUniformLocation(program, 'uTime');
+    const uColorLoc = gl.getUniformLocation(program, 'uColor');
+    const uSpeedLoc = gl.getUniformLocation(program, 'uSpeed');
+    const uScaleLoc = gl.getUniformLocation(program, 'uScale');
+    const uRotationLoc = gl.getUniformLocation(program, 'uRotation');
+    const uNoiseLoc = gl.getUniformLocation(program, 'uNoiseIntensity');
+
+    const rgb = hexToNormalizedRGB(color);
+    if (uColorLoc) gl.uniform3f(uColorLoc, rgb[0], rgb[1], rgb[2]);
+    if (uSpeedLoc) gl.uniform1f(uSpeedLoc, speed);
+    if (uScaleLoc) gl.uniform1f(uScaleLoc, scale);
+    if (uRotationLoc) gl.uniform1f(uRotationLoc, rotation);
+    if (uNoiseLoc) gl.uniform1f(uNoiseLoc, noiseIntensity);
+
+    // Resize handler
+    const resize = () => {
+      if (!canvas) return;
+      const dpr = isLowPower ? 0.75 : Math.min(window.devicePixelRatio || 1, 1.5);
+      const width = canvas.clientWidth;
+      const height = canvas.clientHeight;
+      if (width === 0 || height === 0) return;
+      const dw = Math.floor(width * dpr);
+      const dh = Math.floor(height * dpr);
+      if (canvas.width !== dw || canvas.height !== dh) {
+        canvas.width = dw;
+        canvas.height = dh;
+        gl.viewport(0, 0, dw, dh);
       }
     };
 
-    // Setup observer immediately
-    setupObserver();
+    resize();
+    window.addEventListener('resize', resize, { passive: true });
 
-    // Add event listeners
-    document.addEventListener('visibilitychange', handleVisibilityChange);
+    let animId = null;
+    let isVisible = !document.hidden;
+
+    const handleVisibility = () => {
+      isVisible = !document.hidden;
+    };
+    document.addEventListener('visibilitychange', handleVisibility);
+
+    let elapsedTime = 0;
+    let lastTime = performance.now();
+
+    const loop = (currentTime) => {
+      animId = requestAnimationFrame(loop);
+      if (!isVisible) return;
+
+      const delta = Math.min((currentTime - lastTime) / 1000, 0.1);
+      lastTime = currentTime;
+      elapsedTime += delta * 0.1;
+
+      if (uTimeLoc) gl.uniform1f(uTimeLoc, elapsedTime);
+      gl.drawArrays(gl.TRIANGLES, 0, 6);
+    };
+
+    animId = requestAnimationFrame(loop);
 
     return () => {
-      document.removeEventListener('visibilitychange', handleVisibilityChange);
-      if (observer) {
-        observer.disconnect();
-      }
+      if (animId) cancelAnimationFrame(animId);
+      window.removeEventListener('resize', resize);
+      document.removeEventListener('visibilitychange', handleVisibility);
+      gl.deleteBuffer(buffer);
+      gl.deleteProgram(program);
+      gl.deleteShader(vert);
+      gl.deleteShader(frag);
     };
-  }, []);
+  }, [speed, scale, color, noiseIntensity, rotation]);
 
   return (
-    <div
-      ref={containerRef}
+    <canvas
+      ref={canvasRef}
       style={{
         width: '100%',
         height: '100%',
@@ -253,86 +237,9 @@ const Silk = ({ speed = 5, scale = 1, color = '#7B7481', noiseIntensity = 1.5, r
         top: 0,
         left: 0,
         pointerEvents: 'none',
-        transition: 'opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1)',
-        opacity: isReady ? 1 : 0,
       }}
-    >
-      <Canvas
-        ref={canvasRef}
-        dpr={isLowPower ? 0.75 : Math.min(typeof window !== 'undefined' ? window.devicePixelRatio : 1, 1.5)}
-        frameloop="always"
-        gl={{
-          preserveDrawingBuffer: false,
-          powerPreference: 'default',
-          antialias: false,
-          alpha: false, // Critical for iOS memory: opaque canvas prevents compositor crash
-          // Disable stencil and depth buffers for better performance when not needed
-          stencil: false,
-          depth: false,
-          failIfMajorPerformanceCaveat: true,
-        }}
-        onCreated={({ gl }) => {
-          setIsReady(true);
-          gl.domElement.addEventListener('webglcontextlost', (event) => {
-            event.preventDefault();
-            console.warn('Silk Canvas: WebGL context lost.');
-          }, false);
-        }}
-        style={{
-          width: '100%',
-          height: '100%',
-          pointerEvents: 'none',
-        }}
-      >
-        <color attach="background" args={['#0A0E1A']} />
-        <SilkPlane ref={meshRef} uniforms={uniforms} isInViewport={isInViewportRef} isDocumentVisible={isDocumentVisibleRef} isLowPower={isLowPower} />
-      </Canvas>
-    </div>
+    />
   );
 };
 
-const SafeSilk = (props) => {
-  const shouldSkipWebGL = useMemo(() => {
-    if (typeof window === 'undefined' || typeof document === 'undefined') return true;
-
-    // Aggressively skip on any iOS/iPadOS device to prevent WebKit memory crashes
-    const isIOSDevice =
-      /iPad|iPhone|iPod/.test(navigator.userAgent) ||
-      (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
-    if (isIOSDevice) return true;
-
-    // Skip on touch mobile devices
-    const isMobileDevice = /Android|webOS|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-    if (isMobileDevice) return true;
-
-    // Skip on devices without WebGL support
-    try {
-      const canvas = document.createElement('canvas');
-      return !(window.WebGLRenderingContext && (canvas.getContext('webgl') || canvas.getContext('experimental-webgl')));
-    } catch (e) {
-      return true;
-    }
-  }, []);
-
-  if (shouldSkipWebGL) {
-    return (
-      <div style={{
-        width: '100%',
-        height: '100%',
-        background: 'radial-gradient(ellipse at 50% 40%, rgba(39, 203, 206, 0.18), rgba(15, 20, 30, 0.8) 60%, rgba(10, 14, 26, 1))',
-        position: 'absolute',
-        top: 0,
-        left: 0,
-        zIndex: 0
-      }} />
-    );
-  }
-
-  return (
-    <SilkErrorBoundary>
-      <Silk {...props} />
-    </SilkErrorBoundary>
-  );
-};
-
-export default SafeSilk;
+export default Silk;

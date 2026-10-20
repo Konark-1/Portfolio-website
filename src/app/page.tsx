@@ -62,12 +62,12 @@ export default function HomePage() {
           }}
         >
           {/* Instant Background Engine: 0ms perceived load time */}
-          <div className="absolute inset-0 z-0 pointer-events-none">
+          <div className="absolute inset-0 z-0 pointer-events-none" suppressHydrationWarning>
             {/* Immediate ambient glow base: renders at frame 0, eliminating black screen */}
             <HeroBackgroundMobile />
 
-            {/* Desktop WebGL Silk waves: loads immediately upon mount without artificial delay */}
-            {mounted && isMobile === false && !isIOS() && (
+            {/* Ultra-lightweight WebGL Silk waves: loads on frame 1 without heavy 3D framework */}
+            {mounted && !isIOS() && (
               <Silk
                 speed={shouldReduceMotion ? 0 : 7.5}
                 scale={1}
