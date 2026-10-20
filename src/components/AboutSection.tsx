@@ -32,7 +32,7 @@ export default function AboutSection(): React.JSX.Element {
         },
     ];
 
-    const skills = ["Power BI", "SQL", "DAX", "Python", "Excel", "VBA", "AI Workflow", "Logistics & D2C Analytics", "Healthcare Analytics"];
+    const skills = ["Power BI", "SQL", "DAX", "Python", "Excel", "VBA", "AI Workflow", "Logistics & RTO Analytics", "Healthcare Analytics"];
 
     return (
         <section

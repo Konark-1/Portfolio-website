@@ -7,52 +7,25 @@ import { Star, Lightbulb, ExternalLink, Github, Maximize2, Play } from "lucide-r
 export const dashboards = [
   {
     featured: true,
-    badge: "Flagship Data App",
-    title: "D2C Ops Intelligence & RTO Recovery Engine",
-    subtitle: "Autonomous Logistics & Returns Optimization Platform",
+    badge: "In Active Development",
+    title: "RescueShip: Autonomous RTO Recovery Platform",
+    subtitle: "D2C Logistics & NDR Automation Engine (Alpha)",
     description:
-      "Production-grade operational intelligence dashboard analyzing 28,450 shipped orders and ₹4.12 Cr GMV. Features automated NDR anomaly detection, multi-courier SLA benchmarking (Delhivery, Bluedart, Shadowfax, Xpressbees), and predictive RTO prevention that reduced return rates by 17.2% and rescued ₹52.92 Lakhs in lost margins.",
-    embedUrl: "https://konark-1.github.io/d2c-analytics/",
-    liveUrl: "https://konark-1.github.io/d2c-analytics/",
-    githubUrl: "https://github.com/Konark-1/d2c-analytics",
-    isExternalWebApp: true,
-    tech: ["React 19", "TypeScript", "Tailwind CSS", "Recharts", "Lucide", "Vite", "D2C Logistics Analytics"],
-    metrics: [
-      { label: "GMV Analyzed", value: "₹4.12 Cr" },
-      { label: "Orders Processed", value: "28,450" },
-      { label: "Net RTO Drop", value: "17.2%" },
-      { label: "Margin Rescued", value: "₹52.9L" },
-    ],
-    insights: [
-      "Automated NDR & RTO Recovery: Real-time non-delivery report processing identifies high-risk orders and triggers immediate courier escalation",
-      "Courier SLA & Cost Arbitrage: Side-by-side performance benchmarking across Delhivery, Bluedart, and Shadowfax to route shipments via the lowest-cost, highest-reliability carrier",
-      "State & Pin-Code Risk Heatmaps: Granular tier-2/tier-3 geography profiling isolating systemic delivery bottlenecks and fraud patterns",
-      "Customer Behavioral Clustering: High-risk COD profiling and automated customer confirmation logic preventing speculative ordering",
-    ],
-    gradient: "from-cyan-500/20 via-blue-500/10 to-indigo-500/0",
-    previewImage: "/images/dashboard-previews/d2c-analytics-preview.webp",
-  },
-  {
-    featured: true,
-    badge: "Production SaaS",
-    title: "RescueShip: Autonomous RTO Recovery SaaS",
-    subtitle: "Enterprise Full-Stack Logistics Prevention System",
-    description:
-      "End-to-end full-stack D2C operations platform deployed in production. Features automated address hygiene verification, fake delivery attempt detection, smart WhatsApp re-attempt workflows, and unified courier webhook ingest pipelines.",
+      "Full-stack product engineering build addressing Indian D2C's critical margin loss: 30%+ Cash-on-Delivery (COD) failure rates and courier fake delivery attempts. Architected with resilient webhook ingestion, AI-augmented address verification, automated customer WhatsApp recovery workflows, and live courier SLA telemetry.",
     liveUrl: "https://rescueship.netlify.app",
     isDirectLaunchOnly: true,
-    tech: ["React", "Node.js", "Express", "REST APIs", "Render", "Netlify", "Gmail SMTP Automation"],
+    tech: ["React 19", "Node.js", "Express", "MongoDB", "Redis", "REST APIs", "Render", "Netlify"],
     metrics: [
-      { label: "Architecture", value: "Full-Stack SaaS" },
-      { label: "Frontend", value: "Netlify Live" },
-      { label: "Backend API", value: "Render (Active)" },
-      { label: "Keepalive", value: "99.9% Uptime" },
+      { label: "Architecture", value: "Full-Stack MERN" },
+      { label: "Backend API", value: "Render (Live)" },
+      { label: "Frontend", value: "Netlify (Live)" },
+      { label: "Status", value: "Alpha / Active" },
     ],
     insights: [
-      "Zero-Drop Webhook Pipeline: Resilient backend architecture ingesting courier transit updates and status pings in real-time",
-      "Automated Retailer Onboarding: Self-service portal with instant transactional confirmation email delivery via Gmail SMTP integration",
-      "Fake Attempt Detection: Audits courier delivery exceptions against GPS and time-of-day telemetry to counter false rejection claims",
-      "High-Availability Infrastructure: Production deployment on Netlify and Render with automated health check keepalives",
+      "Zero-Drop Courier Webhook Pipeline: Resilient backend architecture ingesting courier transit updates and status pings in real-time",
+      "Fake Attempt & SLA Exception Detection: Audits courier delivery exceptions against GPS and time-of-day telemetry to counter false rejection claims",
+      "Interactive WhatsApp Recovery Workflows: Pre-dispatch address hygiene and automated customer re-attempt workflows for high-risk COD orders",
+      "High-Availability Cloud Infrastructure: Production deployment on Netlify and Render with automated health check keepalives",
     ],
     gradient: "from-emerald-500/20 via-teal-500/10 to-cyan-500/0",
     previewImage: "/images/dashboard-previews/rescueship-preview.webp",
@@ -150,12 +123,12 @@ export const techHighlights = [
   {
     icon: "⚡",
     title: "Full-Stack Logistics & APIs",
-    description: "Production web applications in React 19, Node.js, Express, and webhook-driven courier automation.",
+    description: "Autonomous engineering builds in React, Node.js, Express, MongoDB, and webhook-driven courier automation.",
   },
   {
-    icon: "🔄",
-    title: "Predictive Analytics & RTO Prevention",
-    description: "Multi-courier SLA arbitrage, non-delivery anomaly detection, and automated customer recovery workflows.",
+    icon: "📊",
+    title: "Commercial & Financial BI",
+    description: "Executive and operational intelligence dashboards connecting granular SKU data to macro profitability.",
   },
 ];
 
@@ -313,7 +286,7 @@ function DashboardCard({
                 }}
               >
                 <ExternalLink className="h-4 w-4 text-accent-cyan group-hover/btn:translate-x-0.5 group-hover/btn:-translate-y-0.5 transition-transform" />
-                <span>Launch Live Application</span>
+                <span>{isDirectLaunchOnly ? "Explore Live Prototype" : "Launch Live Application"}</span>
               </a>
             )}
 
@@ -396,7 +369,7 @@ function DashboardCard({
                       )}
                       <span className="text-sm sm:text-base font-semibold font-sans tracking-wide">
                         {isDirectLaunchOnly
-                          ? "Launch Live Application ↗"
+                          ? "Explore Live Prototype ↗"
                           : isExternalWebApp
                           ? "Load Interactive Analytics App"
                           : "Load Interactive Dashboard"}
@@ -404,7 +377,7 @@ function DashboardCard({
                     </div>
                     <span className="text-xs sm:text-sm text-white/80 font-sans px-4 text-center">
                       {isDirectLaunchOnly
-                        ? "Opens live cloud-deployed system (rescueship.netlify.app)"
+                        ? "Opens live platform prototype (rescueship.netlify.app)"
                         : isExternalWebApp
                         ? "Embedded live React 19 app with real-time drill-downs"
                         : "Opens interactive Power BI report"}
