@@ -8,24 +8,24 @@ export const dashboards = [
   {
     featured: true,
     badge: "In Active Development",
-    title: "RescueShip: Autonomous RTO Recovery Platform",
-    subtitle: "D2C Logistics & NDR Automation Engine (Alpha)",
+    title: "RescueShip: Autonomous RTO Reduction & Logistics Engine",
+    subtitle: "D2C Shipping Intelligence, NDR Interception & Courier Fraud Defense",
     description:
-      "Full-stack product engineering build addressing Indian D2C's critical margin loss: 30%+ Cash-on-Delivery (COD) failure rates and courier fake delivery attempts. Architected with resilient webhook ingestion, AI-augmented address verification, automated customer WhatsApp recovery workflows, and live courier SLA telemetry.",
-    liveUrl: "https://rescueship.netlify.app",
+      "Full-stack M.E.R.N. logistics intelligence engine architected to arrest Indian D2C's #1 profit bleed: 30%+ Cash-on-Delivery (COD) failure rates and fraudulent courier non-delivery reports (NDRs). Features high-throughput courier webhook pipelines, algorithmic fake-attempt detection, automated address hygiene, and 1-tap WhatsApp customer re-attempt recovery workflows.",
+    liveUrl: "https://rescueship-frontend.onrender.com/",
     isDirectLaunchOnly: true,
-    tech: ["React 19", "Node.js", "Express", "MongoDB", "Redis", "REST APIs", "Render", "Netlify"],
+    tech: ["MongoDB", "Express.js", "React 19", "Node.js", "Redis", "REST APIs", "Courier Webhooks", "WhatsApp Cloud API"],
     metrics: [
-      { label: "Architecture", value: "Full-Stack MERN" },
-      { label: "Backend API", value: "Render (Live)" },
-      { label: "Frontend", value: "Netlify (Live)" },
-      { label: "Status", value: "Alpha / Active" },
+      { label: "Core Architecture", value: "M.E.R.N. Stack" },
+      { label: "Data Pipeline", value: "Courier Webhooks" },
+      { label: "Fraud Defense", value: "Fake-Attempt Audit" },
+      { label: "Status", value: "Active Build (Alpha)" },
     ],
     insights: [
-      "Zero-Drop Courier Webhook Pipeline: Resilient backend architecture ingesting courier transit updates and status pings in real-time",
-      "Fake Attempt & SLA Exception Detection: Audits courier delivery exceptions against GPS and time-of-day telemetry to counter false rejection claims",
-      "Interactive WhatsApp Recovery Workflows: Pre-dispatch address hygiene and automated customer re-attempt workflows for high-risk COD orders",
-      "High-Availability Cloud Infrastructure: Production deployment on Netlify and Render with automated health check keepalives",
+      "High-Throughput Courier Webhooks: Event-driven ingestion processing live transit status updates across Indian 3PL couriers (Delhivery, BlueDart, Shadowfax, Xpressbees)",
+      "Courier Fake-Attempt Detection: Audits carrier non-delivery claims against driver geolocation, timestamp telemetry, and call logs to contest false 'Customer Unavailable' rejections",
+      "Pre-Dispatch Address Hygiene: Automated parsing and correction of ambiguous street addresses and high-risk pincodes before shipping labels are generated",
+      "WhatsApp NDR Recovery Automation: Interactive 1-tap customer workflows for real-time location re-pinning, delivery rescheduling, and COD-to-prepaid conversion",
     ],
     gradient: "from-emerald-500/20 via-teal-500/10 to-cyan-500/0",
     previewImage: "/images/dashboard-previews/rescueship-preview.webp",
@@ -123,7 +123,7 @@ export const techHighlights = [
   {
     icon: "⚡",
     title: "Full-Stack Logistics & APIs",
-    description: "Autonomous engineering builds in React, Node.js, Express, MongoDB, and webhook-driven courier automation.",
+    description: "Autonomous engineering builds in MongoDB, Express.js, React, Node.js, and webhook-driven courier automation.",
   },
   {
     icon: "📊",
@@ -286,7 +286,7 @@ function DashboardCard({
                 }}
               >
                 <ExternalLink className="h-4 w-4 text-accent-cyan group-hover/btn:translate-x-0.5 group-hover/btn:-translate-y-0.5 transition-transform" />
-                <span>{isDirectLaunchOnly ? "Explore Live Prototype" : "Launch Live Application"}</span>
+                <span>{isDirectLaunchOnly ? "Launch Live Platform" : "Launch Live Application"}</span>
               </a>
             )}
 
@@ -369,7 +369,7 @@ function DashboardCard({
                       )}
                       <span className="text-sm sm:text-base font-semibold font-sans tracking-wide">
                         {isDirectLaunchOnly
-                          ? "Explore Live Prototype ↗"
+                          ? "Explore Live Platform ↗"
                           : isExternalWebApp
                           ? "Load Interactive Analytics App"
                           : "Load Interactive Dashboard"}
@@ -377,7 +377,7 @@ function DashboardCard({
                     </div>
                     <span className="text-xs sm:text-sm text-white/80 font-sans px-4 text-center">
                       {isDirectLaunchOnly
-                        ? "Opens live platform prototype (rescueship.netlify.app)"
+                        ? "Opens interactive platform interface in a new window"
                         : isExternalWebApp
                         ? "Embedded live React 19 app with real-time drill-downs"
                         : "Opens interactive Power BI report"}
