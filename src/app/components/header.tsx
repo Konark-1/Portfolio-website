@@ -272,6 +272,11 @@ function Header() {
     <header
       className={`fixed top-0 left-0 right-0 z-50 transition-transform duration-300 ease-in-out ${isScrolled && !isVisible ? '-translate-y-full' : 'translate-y-0'
         }`}
+      style={{
+        WebkitBackfaceVisibility: 'hidden',
+        backfaceVisibility: 'hidden',
+        WebkitTransform: isScrolled && !isVisible ? 'translate3d(0, -100%, 0)' : 'translate3d(0, 0, 0)',
+      }}
       suppressHydrationWarning
       onMouseEnter={() => {
         setIsHovered(true);

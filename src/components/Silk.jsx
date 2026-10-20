@@ -81,7 +81,7 @@ const Silk = ({ speed = 7.5, scale = 1, color = '#27CBCE', noiseIntensity = 5.9,
       stencil: false,
       antialias: false,
       powerPreference: 'high-performance',
-      preserveDrawingBuffer: false,
+      preserveDrawingBuffer: true, // Prevents iOS Safari from clearing buffer to black on frame drops
     });
 
     if (!gl) return;
@@ -142,7 +142,10 @@ const Silk = ({ speed = 7.5, scale = 1, color = '#27CBCE', noiseIntensity = 5.9,
     if (uRotationLoc) gl.uniform1f(uRotationLoc, rotation);
     if (uNoiseLoc) gl.uniform1f(uNoiseLoc, noiseIntensity);
 
-    // Responsive resize handler with DPR clamp to eliminate GPU lag
+    // Responsive resize handler with DPR clamp and mobile scroll URL-bar protection
+    let lastWidth = 0;
+    let lastHeight = 0;
+
     const resize = () => {
       if (!canvas) return;
       const isMobile = window.innerWidth <= 768;
@@ -150,6 +153,14 @@ const Silk = ({ speed = 7.5, scale = 1, color = '#27CBCE', noiseIntensity = 5.9,
       const width = canvas.clientWidth;
       const height = canvas.clientHeight;
       if (width === 0 || height === 0) return;
+
+      // On mobile / iOS, ignore minor height fluctuations caused by address bar collapse during scroll.
+      // Reallocating canvas buffer during scroll destroys the drawing buffer and causes screen flicker!
+      if (isMobile && lastWidth === width && Math.abs(height - lastHeight) < 120) {
+        return;
+      }
+      lastWidth = width;
+      lastHeight = height;
 
       const dw = Math.floor(width * dpr);
       const dh = Math.floor(height * dpr);
@@ -164,6 +175,7 @@ const Silk = ({ speed = 7.5, scale = 1, color = '#27CBCE', noiseIntensity = 5.9,
     window.addEventListener('resize', resize, { passive: true });
 
     // Viewport intersection observer: pauses render when scrolled away to save 100% GPU
+    // rootMargin: '200px' ensures smooth continuous buffer coverage without edge flickering
     let isIntersecting = true;
     let isTabVisible = !document.hidden;
     let animId = null;
@@ -172,7 +184,7 @@ const Silk = ({ speed = 7.5, scale = 1, color = '#27CBCE', noiseIntensity = 5.9,
       ([entry]) => {
         isIntersecting = entry.isIntersecting;
       },
-      { threshold: 0.02 }
+      { rootMargin: '200px', threshold: 0 }
     );
     observer.observe(canvas);
 
@@ -225,6 +237,10 @@ const Silk = ({ speed = 7.5, scale = 1, color = '#27CBCE', noiseIntensity = 5.9,
         top: 0,
         left: 0,
         pointerEvents: 'none',
+        transform: 'translate3d(0, 0, 0)',
+        WebkitTransform: 'translate3d(0, 0, 0)',
+        backfaceVisibility: 'hidden',
+        WebkitBackfaceVisibility: 'hidden',
       }}
     />
   );

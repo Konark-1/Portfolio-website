@@ -1,8 +1,10 @@
 "use client";
 
-import React, { useRef, useState } from "react";
-import { motion, useInView } from "framer-motion";
-import { Star, Lightbulb, ExternalLink, Github, Maximize2, Play } from "lucide-react";
+import React, { useRef, useState, useEffect } from "react";
+import { createPortal } from "react-dom";
+import { motion, useInView, AnimatePresence } from "framer-motion";
+import { Star, Lightbulb, ExternalLink, Github, Maximize2, Play, X } from "lucide-react";
+import { useIsMobile } from "@/hooks/useIsMobile";
 
 export const dashboards = [
   {
@@ -169,11 +171,37 @@ function DashboardCard({
 }: DashboardCardProps): React.JSX.Element {
   const cardRef = useRef<HTMLElement>(null);
   const dashboardRef = useRef<HTMLDivElement>(null);
+  const isMobile = useIsMobile();
   const [showIframe, setShowIframe] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [loadTimeout, setLoadTimeout] = useState(false);
+  const [isFullScreenImageOpen, setIsFullScreenImageOpen] = useState(false);
+  const [mounted, setMounted] = useState(false);
 
-  React.useEffect(() => {
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  // Lock body scroll and register Escape key listener when full-screen image overlay is open
+  useEffect(() => {
+    if (isFullScreenImageOpen) {
+      document.body.style.overflow = "hidden";
+      const handleKeyDown = (e: KeyboardEvent) => {
+        if (e.key === "Escape") {
+          setIsFullScreenImageOpen(false);
+        }
+      };
+      window.addEventListener("keydown", handleKeyDown);
+      return () => {
+        document.body.style.overflow = "";
+        window.removeEventListener("keydown", handleKeyDown);
+      };
+    } else {
+      document.body.style.overflow = "";
+    }
+  }, [isFullScreenImageOpen]);
+
+  useEffect(() => {
     if (showIframe && isLoading) {
       const timer = setTimeout(() => {
         setLoadTimeout(true);
@@ -313,10 +341,17 @@ function DashboardCard({
             )}
           </div>
 
-          {!isDirectLaunchOnly && embedUrl && (
+          {/* Full Screen Action: Available across all platforms and dashboards */}
+          {((!isDirectLaunchOnly && embedUrl) || isDirectLaunchOnly || previewImage) && (
             <button
-              onClick={handleFullScreen}
-              className="flex items-center gap-2 px-4 py-2 rounded-xl border backdrop-blur-md transition-all duration-300 hover:scale-105 active:scale-95 touch-manipulation group/fs"
+              onClick={() => {
+                if (isMobile || isDirectLaunchOnly) {
+                  setIsFullScreenImageOpen(true);
+                } else {
+                  handleFullScreen();
+                }
+              }}
+              className="flex items-center gap-2 px-4 py-2 rounded-xl border backdrop-blur-md transition-all duration-300 hover:scale-105 active:scale-95 touch-manipulation group/fs cursor-pointer"
               style={{
                 backgroundColor: "rgba(10, 14, 26, 0.95)",
                 borderColor: "rgba(39, 203, 206, 0.4)",
@@ -355,44 +390,48 @@ function DashboardCard({
               {!showIframe ? (
                 <div
                   className="absolute inset-0 cursor-pointer"
-                  onClick={loadIframe}
+                  onClick={() => {
+                    // On mobile phones, clicking the image ALWAYS opens the full-screen overlay for inspection!
+                    // For direct-launch apps like RescueShip, clicking the image opens the full-screen overlay!
+                    if (isMobile || isDirectLaunchOnly) {
+                      setIsFullScreenImageOpen(true);
+                    } else {
+                      loadIframe();
+                    }
+                  }}
                 >
                   <img
                     src={previewImage}
                     alt={`${title} preview`}
-                    className="absolute inset-0 w-full h-full object-contain object-center transition-transform duration-700 group-hover/preview:scale-105"
+                    className="absolute inset-0 w-full h-full object-contain object-center transition-transform duration-700 group-hover/preview:scale-[1.02]"
                     loading="lazy"
                   />
-                  <div className="absolute inset-0 bg-black/40 group-hover/preview:bg-black/20 transition-colors duration-500" />
-                  <div className="absolute inset-0 flex flex-col items-center justify-center gap-4 transition-transform duration-300 active:scale-95 touch-manipulation">
-                    <div
-                      className="flex items-center gap-3 px-6 sm:px-8 py-3 sm:py-4 rounded-2xl border backdrop-blur-md bg-background/80 hover:bg-background transition-all group-hover/preview:shadow-[0_0_30px_rgba(39,203,206,0.3)]"
-                      style={{
-                        borderColor: "rgba(39, 203, 206, 0.5)",
-                        color: "rgba(39, 203, 206, 1)",
-                      }}
-                    >
-                      {isDirectLaunchOnly ? (
-                        <ExternalLink className="h-5 w-5 sm:h-6 sm:w-6 opacity-90" />
-                      ) : (
-                        <Play className="h-5 w-5 sm:h-6 sm:w-6 opacity-90 fill-accent-cyan/20" />
-                      )}
-                      <span className="text-sm sm:text-base font-semibold font-sans tracking-wide">
-                        {isDirectLaunchOnly
-                          ? "Explore Live Platform ↗"
-                          : isExternalWebApp
-                          ? "Load Interactive Analytics App"
-                          : "Load Interactive Dashboard"}
-                      </span>
-                    </div>
-                    <span className="text-xs sm:text-sm text-white/80 font-sans px-4 text-center">
-                      {isDirectLaunchOnly
-                        ? "Opens interactive platform interface in a new window"
-                        : isExternalWebApp
-                        ? "Embedded live React 19 app with real-time drill-downs"
-                        : "Opens interactive Power BI report"}
-                    </span>
-                  </div>
+                  {!isDirectLaunchOnly && !isMobile && (
+                    <>
+                      <div className="absolute inset-0 bg-black/40 group-hover/preview:bg-black/20 transition-colors duration-500" />
+                      <div className="absolute inset-0 flex flex-col items-center justify-center gap-4 transition-transform duration-300 active:scale-95 touch-manipulation">
+                        <div
+                          className="flex items-center gap-3 px-6 sm:px-8 py-3 sm:py-4 rounded-2xl border backdrop-blur-md bg-background/80 hover:bg-background transition-all group-hover/preview:shadow-[0_0_30px_rgba(39,203,206,0.3)]"
+                          style={{
+                            borderColor: "rgba(39, 203, 206, 0.5)",
+                            color: "rgba(39, 203, 206, 1)",
+                          }}
+                        >
+                          <Play className="h-5 w-5 sm:h-6 sm:w-6 opacity-90 fill-accent-cyan/20" />
+                          <span className="text-sm sm:text-base font-semibold font-sans tracking-wide">
+                            {isExternalWebApp
+                              ? "Load Interactive Analytics App"
+                              : "Load Interactive Dashboard"}
+                          </span>
+                        </div>
+                        <span className="text-xs sm:text-sm text-white/80 font-sans px-4 text-center">
+                          {isExternalWebApp
+                            ? "Embedded live React 19 app with real-time drill-downs"
+                            : "Opens interactive Power BI report"}
+                        </span>
+                      </div>
+                    </>
+                  )}
                 </div>
               ) : (
                 <>
@@ -530,6 +569,94 @@ function DashboardCard({
           ))}
         </div>
       </div>
+
+      {/* Full-Screen Image Overlay Modal (Portaled directly to document.body for true edge-to-edge coverage above all headers) */}
+      {mounted && typeof document !== "undefined" && isFullScreenImageOpen && createPortal(
+        <AnimatePresence>
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.2 }}
+            className="fixed inset-0 z-[9999] flex flex-col justify-between bg-black/95 backdrop-blur-2xl p-3 sm:p-6"
+            onClick={() => setIsFullScreenImageOpen(false)}
+          >
+            {/* Top Bar: Title, Badge & Close Button */}
+            <div 
+              className="flex items-center justify-between gap-4 w-full max-w-7xl mx-auto z-10 pt-2"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="min-w-0 pr-2">
+                <div className="flex items-center gap-2 mb-1">
+                  {badge && (
+                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full border border-accent-cyan/30 bg-accent-cyan/10 text-[10px] sm:text-xs text-accent-cyan font-sans font-medium">
+                      {badge}
+                    </span>
+                  )}
+                  <span className="text-xs text-white/50 font-sans">Fullscreen View</span>
+                </div>
+                <h4 className="text-base sm:text-xl font-serif font-bold text-white truncate">
+                  {title}
+                </h4>
+              </div>
+
+              <button
+                onClick={() => setIsFullScreenImageOpen(false)}
+                className="min-w-[44px] min-h-[44px] w-11 h-11 flex items-center justify-center rounded-full bg-white/10 hover:bg-white/20 active:scale-95 text-white transition-all focus:outline-none focus:ring-2 focus:ring-accent-cyan cursor-pointer"
+                aria-label="Close fullscreen overlay"
+                title="Close (Esc)"
+              >
+                <X className="h-6 w-6" />
+              </button>
+            </div>
+
+            {/* Center Stage: Fullscreen Image with touch pinch-zoom support */}
+            <div 
+              className="flex-1 flex items-center justify-center my-3 sm:my-4 overflow-auto max-w-7xl mx-auto w-full touch-pinch-zoom"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <img
+                src={previewImage}
+                alt={`${title} fullscreen preview`}
+                className="max-w-full max-h-[72vh] sm:max-h-[78vh] object-contain rounded-xl border border-white/10 shadow-2xl"
+              />
+            </div>
+
+            {/* Bottom Bar: Action Buttons */}
+            <div 
+              className="flex flex-wrap items-center justify-center gap-3 w-full max-w-7xl mx-auto z-10 pb-2"
+              onClick={(e) => e.stopPropagation()}
+            >
+              {liveUrl && (
+                <a
+                  href={liveUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl font-sans text-xs sm:text-sm font-semibold transition-all duration-300 hover:scale-105 active:scale-95 group/btn"
+                  style={{
+                    background:
+                      "linear-gradient(135deg, rgba(39, 203, 206, 0.4) 0%, rgba(32, 178, 170, 0.25) 100%)",
+                    borderColor: "rgba(39, 203, 206, 0.8)",
+                    borderWidth: "1px",
+                    color: "#ffffff",
+                    boxShadow: "0 4px 20px rgba(39, 203, 206, 0.35)",
+                  }}
+                >
+                  <ExternalLink className="h-4 w-4 text-accent-cyan group-hover/btn:translate-x-0.5 group-hover/btn:-translate-y-0.5 transition-transform" />
+                  <span>{isDirectLaunchOnly ? "Launch Live Platform" : "Open Live Application"}</span>
+                </a>
+              )}
+              <button
+                onClick={() => setIsFullScreenImageOpen(false)}
+                className="px-4 py-2.5 rounded-xl border border-white/20 bg-white/5 hover:bg-white/10 text-white font-sans text-xs sm:text-sm font-medium transition-all active:scale-95 cursor-pointer"
+              >
+                Close Fullscreen
+              </button>
+            </div>
+          </motion.div>
+        </AnimatePresence>,
+        document.body
+      )}
     </motion.article>
   );
 }

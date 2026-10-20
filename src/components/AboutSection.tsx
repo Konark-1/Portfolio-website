@@ -38,7 +38,7 @@ export default function AboutSection(): React.JSX.Element {
         <section
             ref={sectionRef}
             id="about"
-            className="relative z-10 min-h-[100dvh] flex items-center justify-center px-4 sm:px-6 lg:px-8 py-24 sm:py-32 lg:py-40"
+            className="relative z-10 min-h-[100svh] flex items-center justify-center px-4 sm:px-6 lg:px-8 py-24 sm:py-32 lg:py-40"
             style={{
                 backgroundColor: 'var(--background-about)',
             }}
@@ -53,12 +53,11 @@ export default function AboutSection(): React.JSX.Element {
             {/* Solid background to cover hero section */}
             <div className="absolute inset-0" style={{ backgroundColor: 'var(--background-about)' }} />
 
-            {/* Top shadow for smooth overlay transition effect */}
+            {/* Top gradient for smooth overlay transition without heavy box-shadow raster stalls */}
             <div
                 className="absolute top-0 left-0 right-0 h-32 sm:h-24 pointer-events-none z-[1]"
                 style={{
-                    background: 'linear-gradient(to bottom, rgba(0,0,0,0.4) 0%, rgba(0,0,0,0.15) 40%, transparent 100%)',
-                    boxShadow: '0 -20px 60px 20px rgba(0,0,0,0.5)'
+                    background: 'linear-gradient(to bottom, rgba(5,8,16,0.8) 0%, rgba(5,8,16,0.3) 50%, transparent 100%)',
                 }}
             />
 
@@ -93,10 +92,10 @@ export default function AboutSection(): React.JSX.Element {
                     <motion.h2
                         ref={nameRef as any}
                         className="font-serif text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-bold text-white leading-[1.1] mb-6 sm:mb-8 origin-center px-2"
-                        initial={{ opacity: 0, y: 30, scale: 0.95 }}
-                        whileInView={{ opacity: 1, y: 0, scale: 1 }}
-                        viewport={{ once: true, margin: "-100px" }}
-                        transition={{ duration: 0.8, ease: "easeOut" }}
+                        initial={{ opacity: 0, y: 15 }}
+                        whileInView={{ opacity: 1, y: 0 }}
+                        viewport={{ once: true }}
+                        transition={{ duration: 0.5, ease: "easeOut" }}
                     >
                         KONARK PARIHAR
                     </motion.h2>
@@ -104,10 +103,10 @@ export default function AboutSection(): React.JSX.Element {
                     {/* Parallax Description */}
                     <motion.p
                         className="text-base sm:text-lg md:text-xl text-text-muted font-sans max-w-2xl mx-auto leading-relaxed px-2"
-                        initial={{ opacity: 0, y: 20 }}
+                        initial={{ opacity: 0, y: 15 }}
                         whileInView={{ opacity: 1, y: 0 }}
                         viewport={{ once: true }}
-                        transition={{ duration: 0.8, delay: 0.15, ease: "easeOut" }}
+                        transition={{ duration: 0.5, delay: 0.1, ease: "easeOut" }}
                     >
                         Data Analyst specializing in{" "}
                         <span className="text-accent-cyan">Power BI</span>,{" "}

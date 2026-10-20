@@ -49,27 +49,17 @@
 body {
   margin: 0;
   padding: 0;
-  overflow-x: clip;
-  /* Smooth momentum scrolling for iOS */
-  -webkit-overflow-scrolling: touch;
-  /* Use clip instead of hidden to preserve sticky positioning */
+  overflow-x: hidden;
   -ms-overflow-style: none;
   /* IE & Edge */
 }
 
+/* Use native, linear, 1:1 mouse wheel scrolling on all devices to ensure even scroll speed across all sections */
 html {
-  overflow-x: clip;
-  /* Use clip instead of hidden to preserve sticky positioning */
-  /* Smooth scroll is now applied only on desktop devices with fine pointer (mouse) */
+  overflow-x: hidden;
   scrollbar-width: none;
   /* Firefox */
-}
-
-/* Enable smooth scroll only on desktop devices */
-@media (min-width: 768px) and (pointer: fine) {
-  html {
-    scroll-behavior: smooth;
-  }
+  scroll-behavior: auto;
 }
 
 /* Performance optimizations for low-end devices */
@@ -686,7 +676,7 @@ body::-webkit-scrollbar {
   /* Ensure About section is fully visible on mobile */
   #about {
     min-height: 100vh; /* Fallback for older browsers */
-    min-height: 100dvh;
+    min-height: 100svh;
     height: auto;
     display: flex;
     align-items: center;

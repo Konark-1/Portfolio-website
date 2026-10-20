@@ -2,30 +2,16 @@
 
 import { useReducedMotion } from "framer-motion";
 import { Download } from "lucide-react";
-import dynamic from "next/dynamic";
 import { MagneticButton } from "@/components/ui/magnetic-button";
 import GlassButton from "@/components/ui/GlassButton";
 import HeroBackgroundMobile from "@/components/HeroBackgroundMobile";
 import Silk from "@/components/Silk";
-import LazyLoader from "@/components/ui/LazyLoader";
-
-const StackedCardCertificates = dynamic(
-  () => import("@/components/ui/stacked-card-certificates").then(mod => ({ default: mod.StackedCardCertificates })),
-  {
-    ssr: false,
-    loading: () => (
-      <div className="flex items-center justify-center min-h-[400px]">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-accent-cyan"></div>
-      </div>
-    ),
-  }
-);
-
-const AboutSection = dynamic(() => import("@/components/AboutSection"), { ssr: false });
-const SkillsSection = dynamic(() => import("@/components/sections/SkillsSection"), { ssr: false });
-const ExperienceSection = dynamic(() => import("@/components/sections/ExperienceSection"), { ssr: false });
-const ProjectsSection = dynamic(() => import("@/components/sections/ProjectsSection"), { ssr: false });
-const ContactSection = dynamic(() => import("@/components/sections/ContactSection"), { ssr: false });
+import AboutSection from "@/components/AboutSection";
+import SkillsSection from "@/components/sections/SkillsSection";
+import ExperienceSection from "@/components/sections/ExperienceSection";
+import ProjectsSection from "@/components/sections/ProjectsSection";
+import ContactSection from "@/components/sections/ContactSection";
+import { StackedCardCertificates } from "@/components/ui/stacked-card-certificates";
 
 export default function HomePage() {
   const shouldReduceMotion = useReducedMotion();
@@ -64,7 +50,7 @@ export default function HomePage() {
           <div className="absolute inset-0 z-[1] bg-[radial-gradient(circle_at_50%_50%,rgba(39,203,206,0.08),transparent_70%)] pointer-events-none" />
 
           {/* Content container with proper spacing from header */}
-          <div className="relative z-10 flex flex-col items-center justify-center min-h-[100dvh] pt-24 sm:pt-28 lg:pt-32 pb-8 px-4 sm:px-6" suppressHydrationWarning>
+          <div className="relative z-10 flex flex-col items-center justify-center min-h-[100svh] pt-24 sm:pt-28 lg:pt-32 pb-8 px-4 sm:px-6" suppressHydrationWarning>
             {/* Main heading */}
             <div className="text-center max-w-6xl mx-auto space-y-4 sm:space-y-6" suppressHydrationWarning>
               <h1 className="font-serif text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl 2xl:text-8xl font-bold tracking-tight leading-[1.1] text-white px-2" suppressHydrationWarning>
@@ -137,20 +123,16 @@ export default function HomePage() {
         </div>
 
         {/* About Section */}
-        <LazyLoader 
-          minHeight="100svh" 
-          render={() => <AboutSection />} 
-        />
+        <AboutSection />
       </div>
 
-      <LazyLoader minHeight="100vh" render={() => <SkillsSection />} />
+      <SkillsSection />
       
-      <LazyLoader minHeight="150vh" render={() => <ExperienceSection />} />
+      <ExperienceSection />
       
-      <LazyLoader minHeight="200vh" render={() => <ProjectsSection />} />
+      <ProjectsSection />
       
-      <LazyLoader minHeight="100vh" render={() => (
-        <StackedCardCertificates
+      <StackedCardCertificates
         certificates={[
           {
             title: "Professional Training Certificate",
@@ -225,10 +207,9 @@ export default function HomePage() {
             skills: ["Data Workflow", "ETL", "Visualization", "Insights"],
           },
         ]}
-        />
-      )} />
+      />
 
-      <LazyLoader minHeight="80vh" render={() => <ContactSection />} />
+      <ContactSection />
     </main>
   );
 }
