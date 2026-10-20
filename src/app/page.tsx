@@ -7,7 +7,7 @@ import { Download } from "lucide-react";
 import dynamic from "next/dynamic";
 import { MagneticButton } from "@/components/ui/magnetic-button";
 
-import { useIsMobile } from '@/hooks/useIsMobile';
+import { useIsMobile, isIOS } from '@/hooks/useIsMobile';
 import HeroBackgroundMobile from '@/components/HeroBackgroundMobile';
 
 // Dynamically import Silk background
@@ -72,7 +72,7 @@ export default function HomePage() {
           {/* Background - Deferred until idle to prevent main thread blocking */}
           <div className="absolute inset-0 z-0 pointer-events-none">
             {isIdle && (
-              isMobile === true ? (
+              (isMobile === true || isIOS()) ? (
                 <HeroBackgroundMobile />
               ) : isMobile === false ? (
                 <Silk

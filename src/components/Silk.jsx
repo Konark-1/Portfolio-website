@@ -97,6 +97,16 @@ const SilkPlane = forwardRef(function SilkPlane({ uniforms, isInViewport, isDocu
     }
   }, [ref, viewport]);
 
+  useEffect(() => {
+    const mesh = ref.current;
+    return () => {
+      if (mesh) {
+        if (mesh.geometry) mesh.geometry.dispose();
+        if (mesh.material) mesh.material.dispose();
+      }
+    };
+  }, [ref]);
+
   useFrame((state, delta) => {
     // Skip updates when not in viewport OR document is hidden (tab in background)
     // This saves significant GPU resources especially on mobile
@@ -167,7 +177,11 @@ const Silk = ({ speed = 5, scale = 1, color = '#7B7481', noiseIntensity = 1.5, r
   // Synchronous client-side detection (safe because component is loaded with ssr: false)
   const isLowPower = useMemo(() => {
     if (typeof window === 'undefined' || typeof navigator === 'undefined') return false;
-    return /Mobi|Android|iPhone|iPad|iPod|Windows Phone/i.test(navigator.userAgent);
+    return (
+      /Mobi|Android|iPhone|iPad|iPod|Windows Phone/i.test(navigator.userAgent) ||
+      (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1) ||
+      (window.innerWidth <= 1024)
+    );
   }, []);
 
   const uniforms = useMemo(
@@ -232,16 +246,23 @@ const Silk = ({ speed = 5, scale = 1, color = '#7B7481', noiseIntensity = 1.5, r
     <div ref={containerRef} style={{ width: '100%', height: '100%', position: 'absolute', top: 0, left: 0, pointerEvents: 'none' }}>
       <Canvas
         ref={canvasRef}
-        dpr={isLowPower ? 0.75 : [1, 2]}
+        dpr={isLowPower ? 0.75 : Math.min(typeof window !== 'undefined' ? window.devicePixelRatio : 1, 1.5)}
         frameloop="always"
         gl={{
           preserveDrawingBuffer: false,
-          powerPreference: 'high-performance',
+          powerPreference: 'default',
           antialias: false,
           alpha: false, // Critical for iOS memory: opaque canvas prevents compositor crash
           // Disable stencil and depth buffers for better performance when not needed
           stencil: false,
           depth: false,
+          failIfMajorPerformanceCaveat: true,
+        }}
+        onCreated={({ gl }) => {
+          gl.domElement.addEventListener('webglcontextlost', (event) => {
+            event.preventDefault();
+            console.warn('Silk Canvas: WebGL context lost.');
+          }, false);
         }}
         style={{
           width: '100%',
@@ -259,6 +280,16 @@ const Silk = ({ speed = 5, scale = 1, color = '#7B7481', noiseIntensity = 1.5, r
 const SafeSilk = (props) => {
   const shouldSkipWebGL = useMemo(() => {
     if (typeof window === 'undefined' || typeof document === 'undefined') return true;
+
+    // Aggressively skip on any iOS/iPadOS device to prevent WebKit memory crashes
+    const isIOSDevice =
+      /iPad|iPhone|iPod/.test(navigator.userAgent) ||
+      (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+    if (isIOSDevice) return true;
+
+    // Skip on touch mobile devices
+    const isMobileDevice = /Android|webOS|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+    if (isMobileDevice) return true;
 
     // Skip on devices without WebGL support
     try {

@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import dynamic from "next/dynamic";
+import { isIOS } from "@/hooks/useIsMobile";
 
 const SmoothCursor = dynamic(() => import("@/components/ui/smooth-cursor").then(m => m.SmoothCursor), {
   ssr: false,
@@ -11,17 +12,18 @@ export default function CursorMount() {
   const [shouldMount, setShouldMount] = useState(false);
 
   useEffect(() => {
-    // Check if device is mobile/touch device
+    // Check if device is mobile/touch device or iOS
     const isMobileDevice = () => {
       if (typeof window === "undefined") return true;
+      if (isIOS()) return true;
       
       // Check user agent for mobile devices
-      const userAgent = navigator.userAgent || navigator.vendor || (window as any).opera;
+      const userAgent = navigator.userAgent || navigator.vendor || (window as any).opera || "";
       const mobileRegex = /android|webos|iphone|ipad|ipod|blackberry|iemobile|opera mini/i;
       const isMobileUA = mobileRegex.test(userAgent.toLowerCase());
       
       // Check screen size (mobile typically < 768px)
-      const isSmallScreen = window.innerWidth < 768;
+      const isSmallScreen = window.innerWidth < 1024;
       
       // Check for touch capability
       const hasTouchScreen = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
@@ -30,13 +32,14 @@ export default function CursorMount() {
       const hasFinePointer = window.matchMedia && window.matchMedia("(pointer: fine)").matches;
       const hasHover = window.matchMedia && window.matchMedia("(hover: hover)").matches;
       
-      // Disable if mobile UA, small screen, or touch device without fine pointer/hover
-      return isMobileUA || (isSmallScreen && hasTouchScreen) || !(hasFinePointer && hasHover);
+      // Disable if mobile UA, small/medium touch screen, or touch device without fine pointer/hover
+      return isMobileUA || (hasTouchScreen && isSmallScreen) || !(hasFinePointer && hasHover);
     };
 
-    // Only mount on devices with fine pointer and hover capability (not mobile)
+    // Only mount on devices with fine pointer and hover capability (not mobile / not iOS)
     const canUseCustomCursor =
       typeof window !== "undefined" &&
+      !isIOS() &&
       window.matchMedia &&
       window.matchMedia("(hover: hover) and (pointer: fine)").matches &&
       !isMobileDevice();

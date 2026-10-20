@@ -44,7 +44,12 @@ export default function AboutSection(): React.JSX.Element {
             }}
         >
             {/* Ambient Transition Glow */}
-            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-4xl h-32 bg-accent-cyan/10 blur-[100px] pointer-events-none" />
+            <div
+                className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-4xl h-32 pointer-events-none"
+                style={{
+                    background: 'radial-gradient(ellipse at 50% 0%, rgba(39, 203, 206, 0.12) 0%, transparent 70%)'
+                }}
+            />
             {/* Solid background to cover hero section */}
             <div className="absolute inset-0" style={{ backgroundColor: 'var(--background-about)' }} />
 
@@ -66,8 +71,7 @@ export default function AboutSection(): React.JSX.Element {
                     viewport={{ once: true }}
                     transition={{ duration: 1 }}
                     style={{
-                        background: 'radial-gradient(circle, rgba(39,203,206,0.15) 0%, transparent 70%)',
-                        filter: 'blur(200px)'
+                        background: 'radial-gradient(circle, rgba(39, 203, 206, 0.16) 0%, rgba(39, 203, 206, 0.04) 45%, transparent 70%)',
                     }}
                 />
             </div>
@@ -119,7 +123,7 @@ export default function AboutSection(): React.JSX.Element {
                         {capabilities.map(({ num, title, subtitle, desc }, index) => (
                             <motion.div
                                 key={index}
-                                className="relative group p-6 sm:p-8 bg-[rgba(10,14,26,0.95)] backdrop-blur-md overflow-hidden hover:bg-[rgba(39,203,206,0.05)] transition-colors duration-500"
+                                className="relative group p-6 sm:p-8 bg-[rgba(10,14,26,0.95)] overflow-hidden hover:bg-[rgba(39,203,206,0.05)] transition-colors duration-500"
                                 initial={{ opacity: 0, y: 30 }}
                                 animate={cardsInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
                                 transition={{

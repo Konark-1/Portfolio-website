@@ -50,6 +50,8 @@ body {
   margin: 0;
   padding: 0;
   overflow-x: clip;
+  /* Smooth momentum scrolling for iOS */
+  -webkit-overflow-scrolling: touch;
   /* Use clip instead of hidden to preserve sticky positioning */
   -ms-overflow-style: none;
   /* IE & Edge */
@@ -96,11 +98,27 @@ html {
   /* Force GPU acceleration */
 }
 
-/* Reduce backdrop-filter usage on low-end devices and mobile devices */
-@media (prefers-reduced-motion: reduce), (max-width: 768px) {
+/* Reduce backdrop-filter usage on low-end, tablet, mobile, and iOS WebKit devices to eliminate GPU memory exhaustion */
+@media (prefers-reduced-motion: reduce), (max-width: 1024px) {
   * {
     backdrop-filter: none !important;
     -webkit-backdrop-filter: none !important;
+  }
+}
+
+@supports (-webkit-touch-callout: none) {
+  /* iOS WebKit hardware limits: cap backdrop blurs and prevent composite stalls */
+  * {
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+  }
+
+  /* Fallback semi-opaque background for glass navigation and cards on iOS */
+  .backdrop-blur-md,
+  .backdrop-blur-lg,
+  .backdrop-blur-xl,
+  .backdrop-blur-sm {
+    background-color: rgba(10, 14, 26, 0.92) !important;
   }
 }
 
@@ -351,9 +369,6 @@ body::-webkit-scrollbar {
   /* Speed: 0.3 - Controls animation speed (converted to 3.33s duration) */
   animation: metallic-paint-flow 3.33s ease-in-out infinite;
 
-  /* Pattern Blur: 0.011 - Subtle blur effect */
-  filter: blur(0.011px);
-
   /* Refraction: 0.02 - Subtle displacement effect */
   text-shadow:
     0.02px 0.02px 0px rgba(255, 255, 255, 0.2),
@@ -387,7 +402,12 @@ body::-webkit-scrollbar {
   /* Clip to text shape only */
   background-clip: text;
   -webkit-background-clip: text;
-  mix-blend-mode: multiply;
+}
+
+@media (min-width: 1025px) and (pointer: fine) {
+  .metallic-paint-text::before {
+    mix-blend-mode: multiply;
+  }
 }
 
 @keyframes metallic-paint-flow {
@@ -395,19 +415,15 @@ body::-webkit-scrollbar {
   0%,
   100% {
     background-position: 0% 50%;
-    /* Pattern Blur: 0.011 - Subtle blur effect only */
-    filter: blur(0.011px);
   }
 
   33% {
     /* Pattern Scale: 2 - Creates the flowing pattern movement */
     background-position: 100% 0%;
-    filter: blur(0.011px);
   }
 
   66% {
     background-position: 0% 100%;
-    filter: blur(0.011px);
   }
 }
 

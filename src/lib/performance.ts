@@ -37,9 +37,9 @@ export function detectDeviceCapabilities(): DeviceCapabilities {
     return cachedCapabilities;
   }
 
-  const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
-    navigator.userAgent
-  );
+  const isMobile =
+    /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ||
+    (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
 
   // Check WebGL support
   let supportsWebGL = false;
@@ -78,26 +78,26 @@ export function detectDeviceCapabilities(): DeviceCapabilities {
     memoryInfo.hardwareConcurrency = navigator.hardwareConcurrency;
   }
 
-  // Detect iOS Safari specifically - it has stricter GPU memory limits even on powerful devices
-  const isIOSSafari = /iPad|iPhone|iPod/.test(navigator.userAgent) &&
-    /WebKit/.test(navigator.userAgent) &&
-    !/CriOS/.test(navigator.userAgent); // Not Chrome on iOS
+  // Detect iOS WebKit specifically (all browsers on iOS use WebKit with strict ~250MB memory caps)
+  const isIOS =
+    /iPad|iPhone|iPod/.test(navigator.userAgent) ||
+    (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+  const isIOSSafari = isIOS;
 
-  // Determine if ACTUALLY low-end device based on hardware capabilities
-  // IMPORTANT: Being mobile does NOT automatically mean low-end
-  // iPhone 13 (4GB RAM, 6 cores, A15 GPU) should NOT be classified as low-end
+  // Determine if low-end device or constrained environment
+  // iOS devices are constrained by WebKit jetsam memory caps (~250MB) and cannot sustain heavy WebGL
   const isActuallyLowEnd =
     !hasGPU ||
+    isIOS ||
     (memoryInfo.deviceMemory !== undefined && memoryInfo.deviceMemory < 4) ||
     (memoryInfo.hardwareConcurrency !== undefined && memoryInfo.hardwareConcurrency < 4);
 
-  // For backwards compatibility, expose combined low-end OR iOS Safari limits
-  // This is used for features that are specifically problematic on iOS Safari (like WebGL)
-  const isLowEndDevice = isActuallyLowEnd;
+  // For backwards compatibility, expose combined low-end OR iOS limits
+  const isLowEndDevice = isActuallyLowEnd || isIOS;
 
   // Estimate FPS based on device capabilities
   let estimatedFPS = 60;
-  if (isActuallyLowEnd) {
+  if (isActuallyLowEnd || isIOS) {
     estimatedFPS = hasGPU ? 30 : 15;
   } else if (isMobile) {
     estimatedFPS = 45; // Mobile devices with good specs can handle 45fps
@@ -120,11 +120,16 @@ export function detectDeviceCapabilities(): DeviceCapabilities {
 
 /**
  * Check if heavy animations should be disabled
- * Now aggressively returns true for ALL mobile devices to prevent iOS Safari crashes
+ * Aggressively returns true for ALL mobile & iOS devices to prevent WebKit memory crashes
  */
 export function shouldDisableHeavyAnimations(): boolean {
+  if (typeof window === 'undefined') return true;
   const caps = detectDeviceCapabilities();
-  return caps.isMobile || (caps as any).isActuallyLowEnd || !caps.hasGPU || !caps.supportsWebGL;
+  const isIOS = typeof navigator !== 'undefined' && (
+    /iPad|iPhone|iPod/.test(navigator.userAgent) ||
+    (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1)
+  );
+  return caps.isMobile || isIOS || caps.isLowEndDevice || !caps.hasGPU || !caps.supportsWebGL;
 }
 
 /**

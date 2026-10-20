@@ -555,7 +555,7 @@ export default function ProjectsSection() {
       }}
     >
       {/* Enhanced turquoise radial gradient */}
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(39,203,206,0.12),transparent_45%)] blur-3xl pointer-events-none" />
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(39,203,206,0.12),transparent_60%)] pointer-events-none" />
       <div className="absolute inset-0 bg-gradient-to-b from-transparent via-[rgba(10,14,26,0.8)] to-[var(--background-projects)] pointer-events-none" />
 
       <div className="max-w-7xl mx-auto relative z-10 space-y-8">

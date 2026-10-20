@@ -1,7 +1,7 @@
 "use client";
 
 import { motion, useSpring } from "framer-motion";
-import { FC, useEffect, useRef } from "react";
+import { FC, useEffect, useRef, useState } from "react";
 import { shouldDisableHeavyAnimations } from "@/lib/performance";
 
 interface Position {
@@ -114,6 +114,7 @@ export function SmoothCursor({
     restDelta: 0.01,
   });
   
+  const [mounted, setMounted] = useState(false);
   const scaleTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const cursorRef = useRef<HTMLDivElement | null>(null);
 
@@ -136,6 +137,8 @@ export function SmoothCursor({
     if (prefersReducedMotion || isTouchLike) {
       return;
     }
+
+    setMounted(true);
 
     // Inject high-specificity CSS to hide native cursor on interactive elements
     const styleEl = document.createElement('style');
@@ -264,6 +267,10 @@ export function SmoothCursor({
       }
     };
   }, [cursorX, cursorY, rotation, scale]);
+
+  if (!mounted) {
+    return null;
+  }
 
   return (
     <motion.div
