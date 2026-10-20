@@ -64,10 +64,10 @@ export default function HomePage() {
           <div className="absolute inset-0 z-[1] bg-[radial-gradient(circle_at_50%_50%,rgba(39,203,206,0.08),transparent_70%)] pointer-events-none" />
 
           {/* Content container with proper spacing from header */}
-          <div className="relative z-10 flex flex-col items-center justify-center min-h-[100svh] pt-24 sm:pt-28 lg:pt-32 pb-12 px-4 sm:px-6" suppressHydrationWarning>
+          <div className="relative z-10 flex flex-col items-center justify-center min-h-[100dvh] pt-24 sm:pt-28 lg:pt-32 pb-8 px-4 sm:px-6" suppressHydrationWarning>
             {/* Main heading */}
             <div className="text-center max-w-6xl mx-auto space-y-4 sm:space-y-6" suppressHydrationWarning>
-              <h1 className="font-serif text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl 2xl:text-8xl font-bold tracking-tight leading-[1.1] text-white px-2 [text-wrap:balance]" suppressHydrationWarning>
+              <h1 className="font-serif text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl 2xl:text-8xl font-bold tracking-tight leading-[1.1] text-white px-2" suppressHydrationWarning>
                 Data Analyst & Business Intelligence Specialist
               </h1>
               <p className="max-w-3xl mx-auto text-sm sm:text-base md:text-lg lg:text-xl leading-relaxed text-white/80 font-sans px-2" suppressHydrationWarning>
@@ -76,37 +76,44 @@ export default function HomePage() {
             </div>
 
             {/* Action buttons */}
-            <div className="mt-8 sm:mt-12 lg:mt-16 flex flex-col sm:flex-row justify-center items-center gap-4 w-full max-w-xl mx-auto px-4" suppressHydrationWarning>
-              {/* Primary CTA: Resume Download */}
+            <div className="mt-8 sm:mt-12 lg:mt-16 flex flex-col sm:flex-row justify-center items-center gap-0 w-full max-w-xl mx-auto px-4" suppressHydrationWarning>
               <MagneticButton
-                intensity={0.4}
-                className="cursor-pointer pointer-events-auto group w-full sm:w-auto flex justify-center"
+                intensity={0.6}
+                className="cursor-pointer pointer-events-auto group"
+                onClick={() => {
+                  const a = document.createElement('a');
+                  a.href = '/KONARK_PARIHAR.pdf';
+                  a.download = 'KONARK_PARIHAR.pdf';
+                  a.click();
+                }}
               >
-                <a
-                  href="/KONARK_PARIHAR.pdf"
-                  download="KONARK_PARIHAR.pdf"
-                  className="relative flex items-center justify-center w-full sm:w-[220px] h-[54px] rounded-full bg-accent-cyan text-[#050810] font-sans font-bold text-sm sm:text-base tracking-wider uppercase transition-all duration-300 shadow-[0_0_20px_rgba(39,203,206,0.35)] hover:shadow-[0_0_35px_rgba(39,203,206,0.6)] hover:scale-[1.02] active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-[#050810] select-none"
+                <GlassButton
+                  width={220}
+                  height={55}
+                  borderRadius={50}
+                  backgroundOpacity={0.1}
+                  blur={12}
                 >
-                  <span className="flex items-center justify-center gap-2">
+                  <span className="px-6 py-3 text-text-primary font-semibold w-full h-full text-sm sm:text-base tracking-wide flex items-center justify-center gap-2 font-sans uppercase">
                     <Download className="h-4 w-4 sm:h-5 sm:w-5" />
                     Resume
                   </span>
-                </a>
+                </GlassButton>
               </MagneticButton>
-
-              {/* Secondary CTA: Portfolio Navigation */}
               <MagneticButton
-                intensity={0.4}
-                className="cursor-pointer pointer-events-auto group w-full sm:w-auto flex justify-center"
+                intensity={0.6}
+                className="cursor-pointer pointer-events-auto group"
                 onClick={(e) => {
                   e.preventDefault();
                   const element = document.getElementById('projects');
                   if (element) {
-                    const headerHeight = 90;
+                    const headerHeight = 115;
                     const elementPosition = element.offsetTop - headerHeight;
-                    window.scrollTo({
-                      top: elementPosition,
-                      behavior: 'smooth'
+                    requestAnimationFrame(() => {
+                      window.scrollTo({
+                        top: elementPosition,
+                        behavior: 'smooth'
+                      });
                     });
                   } else {
                     window.location.href = '/portfolio';
@@ -114,12 +121,11 @@ export default function HomePage() {
                 }}
               >
                 <GlassButton
-                  width="100%"
-                  height={54}
+                  width={220}
+                  height={55}
                   borderRadius={50}
-                  backgroundOpacity={0.12}
+                  backgroundOpacity={0.1}
                   blur={12}
-                  className="sm:w-[220px]"
                 >
                   <span className="px-6 py-3 text-text-primary font-semibold w-full h-full text-sm sm:text-base tracking-wide flex items-center justify-center gap-2 font-sans uppercase">
                     My Portfolio
