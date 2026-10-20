@@ -173,6 +173,7 @@ const Silk = ({ speed = 5, scale = 1, color = '#7B7481', noiseIntensity = 1.5, r
   const containerRef = useRef();
   const isInViewportRef = useRef(true); // Assume in viewport initially (hero section)
   const isDocumentVisibleRef = useRef(true);
+  const [isReady, setIsReady] = useState(false);
 
   // Synchronous client-side detection (safe because component is loaded with ssr: false)
   const isLowPower = useMemo(() => {
@@ -243,7 +244,19 @@ const Silk = ({ speed = 5, scale = 1, color = '#7B7481', noiseIntensity = 1.5, r
   }, []);
 
   return (
-    <div ref={containerRef} style={{ width: '100%', height: '100%', position: 'absolute', top: 0, left: 0, pointerEvents: 'none' }}>
+    <div
+      ref={containerRef}
+      style={{
+        width: '100%',
+        height: '100%',
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        pointerEvents: 'none',
+        transition: 'opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1)',
+        opacity: isReady ? 1 : 0,
+      }}
+    >
       <Canvas
         ref={canvasRef}
         dpr={isLowPower ? 0.75 : Math.min(typeof window !== 'undefined' ? window.devicePixelRatio : 1, 1.5)}
@@ -259,6 +272,7 @@ const Silk = ({ speed = 5, scale = 1, color = '#7B7481', noiseIntensity = 1.5, r
           failIfMajorPerformanceCaveat: true,
         }}
         onCreated={({ gl }) => {
+          setIsReady(true);
           gl.domElement.addEventListener('webglcontextlost', (event) => {
             event.preventDefault();
             console.warn('Silk Canvas: WebGL context lost.');

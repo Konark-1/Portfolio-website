@@ -42,19 +42,11 @@ const ContactSection = dynamic(() => import("@/components/sections/ContactSectio
 
 export default function HomePage() {
   const shouldReduceMotion = useReducedMotion();
-  const [isIdle, setIsIdle] = useState(false);
+  const [mounted, setMounted] = useState(false);
   const isMobile = useIsMobile();
 
   useEffect(() => {
-    // Defer heavy components (like WebGL) until the main thread is idle
-    const idle = (cb: () => void) => {
-      if (typeof window !== "undefined" && "requestIdleCallback" in window) {
-        (window as Window & { requestIdleCallback: Function }).requestIdleCallback(() => cb(), { timeout: 1500 });
-      } else {
-        setTimeout(cb, 500);
-      }
-    };
-    idle(() => setIsIdle(true));
+    setMounted(true);
   }, []);
 
   return (
@@ -69,20 +61,20 @@ export default function HomePage() {
             backgroundColor: 'var(--background-hero)',
           }}
         >
-          {/* Background - Deferred until idle to prevent main thread blocking */}
+          {/* Instant Background Engine: 0ms perceived load time */}
           <div className="absolute inset-0 z-0 pointer-events-none">
-            {isIdle && (
-              (isMobile === true || isIOS()) ? (
-                <HeroBackgroundMobile />
-              ) : isMobile === false ? (
-                <Silk
-                  speed={shouldReduceMotion ? 0 : 7.5}
-                  scale={1}
-                  color="#27CBCE"
-                  noiseIntensity={5.9}
-                  rotation={0}
-                />
-              ) : null
+            {/* Immediate ambient glow base: renders at frame 0, eliminating black screen */}
+            <HeroBackgroundMobile />
+
+            {/* Desktop WebGL Silk waves: loads immediately upon mount without artificial delay */}
+            {mounted && isMobile === false && !isIOS() && (
+              <Silk
+                speed={shouldReduceMotion ? 0 : 7.5}
+                scale={1}
+                color="#27CBCE"
+                noiseIntensity={5.9}
+                rotation={0}
+              />
             )}
           </div>
 
