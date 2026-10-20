@@ -167,10 +167,10 @@ function ExperienceEntry({
   );
 }
 
-function DesktopSpark({ targetRef }: { targetRef: React.RefObject<HTMLElement | null> }) {
+function DesktopSpark({ targetRef }: { targetRef: React.RefObject<HTMLDivElement | null> }) {
   const { scrollYProgress } = useScroll({
     target: targetRef,
-    offset: ["start center", "end center"]
+    offset: ["start 65%", "end 65%"]
   });
 
   const smoothProgress = useSpring(scrollYProgress, {
@@ -204,12 +204,11 @@ function DesktopSpark({ targetRef }: { targetRef: React.RefObject<HTMLElement | 
 
 export default function ExperienceSection() {
   const isMobile = useIsMobile();
-  const experienceRef = useRef<HTMLElement>(null);
+  const timelineRef = useRef<HTMLDivElement>(null);
 
   return (
     <section 
       id="experience" 
-      ref={experienceRef}
       className="relative z-20 text-foreground border-t" 
       style={{
         backgroundColor: 'var(--background-experience)',
@@ -258,10 +257,10 @@ export default function ExperienceSection() {
           
           {/* Right Column - Timeline */}
           <div className="lg:w-2/3">
-            <div className="relative space-y-12 sm:space-y-16">
+            <div ref={timelineRef} className="relative space-y-12 sm:space-y-16">
               {/* Timeline line - aligned with dots */}
               <div className="absolute left-[21px] sm:left-[31px] top-8 bottom-0 w-px bg-gradient-to-b from-accent-cyan/40 via-accent-cyan/15 to-transparent hidden sm:block">
-                {isMobile === false && <DesktopSpark targetRef={experienceRef} />}
+                {isMobile === false && <DesktopSpark targetRef={timelineRef} />}
               </div>
               {experienceTimeline.map((item, index) => (
                 <ExperienceEntry
