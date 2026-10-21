@@ -5,6 +5,7 @@ import Image from "next/image";
 import { Award, ExternalLink, ChevronLeft, ChevronRight } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { MagneticButton } from "./magnetic-button";
+import { useIsMobile } from "@/hooks/useIsMobile";
 
 interface Certificate {
     title: string;
@@ -21,32 +22,27 @@ interface StackedCardCertificatesProps {
 }
 
 export function StackedCardCertificates({ certificates }: StackedCardCertificatesProps) {
+    const isMobile = useIsMobile();
     const [activeIndex, setActiveIndex] = useState(0);
     const [direction, setDirection] = useState(0); // -1 for left, 1 for right
     const [isHovered, setIsHovered] = useState(false);
     const [isInView, setIsInView] = useState(false);
-    const [isPageLoaded, setIsPageLoaded] = useState(false);
     const containerRef = useRef<HTMLDivElement>(null);
     const touchStartX = useRef<number | null>(null);
+    const touchStartY = useRef<number | null>(null);
     const touchEndX = useRef<number | null>(null);
+    const touchEndY = useRef<number | null>(null);
 
-    // Preload trigger on page load
+    // Fast, off-thread background preloading of all certificate WebP images directly into browser cache
     useEffect(() => {
-        if (typeof document !== 'undefined') {
-            if (document.readyState === "complete") {
-                setIsPageLoaded(true);
-            } else {
-                const handleLoad = () => setIsPageLoaded(true);
-                window.addEventListener("load", handleLoad);
-                // Fallback timeout just in case load event was missed
-                const fallback = setTimeout(handleLoad, 3000);
-                return () => {
-                    window.removeEventListener("load", handleLoad);
-                    clearTimeout(fallback);
-                };
+        if (typeof window === "undefined") return;
+        certificates.forEach((c) => {
+            if (c.imagePath) {
+                const img = new window.Image();
+                img.src = c.imagePath;
             }
-        }
-    }, []);
+        });
+    }, [certificates]);
 
     // Visibility detection
     useEffect(() => {
@@ -93,55 +89,74 @@ export function StackedCardCertificates({ certificates }: StackedCardCertificate
         return () => window.removeEventListener("keydown", handleKeyDown);
     }, [goToNext, goToPrev]);
 
-    // Touch swipe navigation for mobile
+    // Touch swipe navigation for mobile with strict axis disambiguation
     const handleTouchStart = (e: React.TouchEvent) => {
         touchStartX.current = e.targetTouches[0].clientX;
+        touchStartY.current = e.targetTouches[0].clientY;
+        touchEndX.current = e.targetTouches[0].clientX;
+        touchEndY.current = e.targetTouches[0].clientY;
         setIsHovered(true);
     };
 
     const handleTouchMove = (e: React.TouchEvent) => {
         touchEndX.current = e.targetTouches[0].clientX;
+        touchEndY.current = e.targetTouches[0].clientY;
     };
 
     const handleTouchEnd = () => {
         setIsHovered(false);
-        if (touchStartX.current === null || touchEndX.current === null) return;
-        const distance = touchStartX.current - touchEndX.current;
-        if (distance > 45) {
-            goToNext();
-        } else if (distance < -45) {
-            goToPrev();
+        if (
+            touchStartX.current === null ||
+            touchEndX.current === null ||
+            touchStartY.current === null ||
+            touchEndY.current === null
+        ) {
+            return;
         }
+
+        const deltaX = touchStartX.current - touchEndX.current;
+        const deltaY = touchStartY.current - touchEndY.current;
+
+        // Disambiguate swipe:
+        // Must exceed 40px horizontal AND be at least 1.3x more horizontal than vertical.
+        // This guarantees vertical page scrolling is NEVER hijacked as a carousel flip!
+        if (Math.abs(deltaX) > 40 && Math.abs(deltaX) > Math.abs(deltaY) * 1.3) {
+            if (deltaX > 0) {
+                goToNext();
+            } else {
+                goToPrev();
+            }
+        }
+
         touchStartX.current = null;
+        touchStartY.current = null;
         touchEndX.current = null;
+        touchEndY.current = null;
     };
 
-    // Auto-scroll logic: only when in view and not hovered / touched (5000ms comfortable cadence)
+    // Auto-scroll logic: only when in view, on desktop (disabled on mobile), and not hovered
     useEffect(() => {
-        if (!isInView || isHovered) return;
+        if (isMobile || !isInView || isHovered) return;
         const interval = setInterval(() => {
             goToNext();
-        }, 5000);
+        }, 6000);
         return () => clearInterval(interval);
-    }, [isInView, isHovered, goToNext]);
+    }, [isMobile, isInView, isHovered, goToNext]);
 
     const activeCert = certificates[activeIndex];
 
     const slideVariants = {
         enter: (dir: number) => ({
-            x: dir > 0 ? 300 : -300,
+            x: dir > 0 ? 50 : -50,
             opacity: 0,
-            scale: 0.95,
         }),
         center: {
             x: 0,
             opacity: 1,
-            scale: 1,
         },
         exit: (dir: number) => ({
-            x: dir > 0 ? -300 : 300,
+            x: dir > 0 ? -50 : 50,
             opacity: 0,
-            scale: 0.95,
         }),
     };
 
@@ -161,25 +176,6 @@ export function StackedCardCertificates({ certificates }: StackedCardCertificate
                 <div className="absolute top-0 left-0 right-0 h-24 bg-gradient-to-b from-[rgba(39,203,206,0.04)] to-transparent" />
                 <div className="absolute top-1/3 left-1/2 -translate-x-1/2 h-[300px] w-[60%] bg-[radial-gradient(ellipse_at_center,rgba(39,203,206,0.04),transparent_70%)]" />
             </div>
-
-            {/* Background preloading of all images once page is fully loaded */}
-            {isPageLoaded && (
-                <div className="hidden" aria-hidden="true">
-                    {certificates.map((cert) => (
-                        cert.imagePath && /\.(png|jpg|jpeg|webp)$/i.test(cert.imagePath) ? (
-                            <Image
-                                key={`preload-${cert.imagePath}`}
-                                src={cert.imagePath}
-                                alt="preload"
-                                width={800}
-                                height={600}
-                                quality={85}
-                                loading="eager"
-                            />
-                        ) : null
-                    ))}
-                </div>
-            )}
 
             <div className="relative z-10 mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 py-16 sm:py-20 lg:py-28">
                 {/* Section Header — always visible */}
@@ -260,14 +256,13 @@ export function StackedCardCertificates({ certificates }: StackedCardCertificate
                         onTouchStart={handleTouchStart}
                         onTouchMove={handleTouchMove}
                         onTouchEnd={handleTouchEnd}
-                        className="relative w-full overflow-hidden rounded-3xl border touch-pan-y"
+                        className="relative w-full overflow-hidden rounded-3xl border touch-pan-y min-h-[520px] sm:min-h-[460px] md:min-h-[420px]"
                         style={{
                             borderColor: 'var(--border-color)',
                             backgroundColor: 'var(--surface-elevated)',
-                            minHeight: '420px',
                         }}
                     >
-                        <AnimatePresence mode="wait" custom={direction}>
+                        <AnimatePresence mode="popLayout" custom={direction} initial={false}>
                             <motion.div
                                 key={activeIndex}
                                 custom={direction}
@@ -276,8 +271,8 @@ export function StackedCardCertificates({ certificates }: StackedCardCertificate
                                 animate="center"
                                 exit="exit"
                                 transition={{
-                                    duration: 0.35,
-                                    ease: [0.25, 0.46, 0.45, 0.94],
+                                    duration: 0.25,
+                                    ease: "easeOut",
                                 }}
                             >
                                 <CertificateCard certificate={activeCert} />
@@ -376,11 +371,10 @@ function CertificateCard({ certificate }: { certificate: Certificate }) {
                         alt={certificate.title}
                         fill
                         sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                        quality={85}
                         className="object-contain p-4 sm:p-6 transition-transform duration-500 group-hover:scale-105"
                         onError={() => setImageError(true)}
                         priority
-                        loading="eager"
+                        unoptimized
                     />
                 ) : (
                     <div className="w-full h-full flex items-center justify-center p-6 min-h-[280px]">

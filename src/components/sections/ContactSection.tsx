@@ -101,15 +101,10 @@ export default function ContactSection() {
   });
   const [formStatus, setFormStatus] = useState<"idle" | "submitting" | "success" | "error">("idle");
   const [formErrors, setFormErrors] = useState<{ name?: string; email?: string; message?: string }>({});
-  const [isMounted, setIsMounted] = useState(false);
   const [isPending, startTransition] = useTransition();
 
   const deferredFormData = useDeferredValue(formData);
   const errorClearTimeoutRef = useRef<NodeJS.Timeout | null>(null);
-
-  useEffect(() => {
-    setIsMounted(true);
-  }, []);
 
   const handleInputChange = useCallback((e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { id, value } = e.target;
@@ -257,98 +252,92 @@ export default function ContactSection() {
           <div className="relative">
             <Card className="border-border bg-card/80 shadow-glass-soft backdrop-blur-sm sticky top-32">
               <CardContent className="space-y-4 pt-6 p-6 sm:p-8">
-                {isMounted ? (
-                  <form className="space-y-5" onSubmit={handleSubmit} suppressHydrationWarning>
-                    <div>
-                      <label htmlFor="contact-name" className="block text-sm font-semibold text-text-primary mb-2 font-sans">
-                        Name *
-                      </label>
-                      <input
-                        id="contact-name"
-                        type="text"
-                        autoComplete="name"
-                        aria-invalid={!!formErrors.name}
-                        aria-describedby={formErrors.name ? "contact-name-error" : undefined}
-                        value={formData.name}
-                        onChange={handleInputChange}
-                        placeholder="Your name"
-                        suppressHydrationWarning
-                        className={`w-full rounded-2xl border ${formErrors.name ? "border-red-500/50" : "border-border"
-                          } bg-white/5 px-4 py-3 text-base md:text-sm text-text-primary focus:outline-none focus:ring-2 focus:ring-accent-cyan/60 font-sans`}
-                      />
-                      {formErrors.name && (
-                        <p id="contact-name-error" role="alert" className="mt-1 text-xs text-red-400 font-sans">{formErrors.name}</p>
-                      )}
-                    </div>
-                    <div>
-                      <label htmlFor="contact-email" className="block text-sm font-semibold text-text-primary mb-2 font-sans">
-                        Email *
-                      </label>
-                      <input
-                        id="contact-email"
-                        type="email"
-                        autoComplete="email"
-                        aria-invalid={!!formErrors.email}
-                        aria-describedby={formErrors.email ? "contact-email-error" : undefined}
-                        value={formData.email}
-                        onChange={handleInputChange}
-                        placeholder="your@email.com"
-                        suppressHydrationWarning
-                        className={`w-full rounded-2xl border ${formErrors.email ? "border-red-500/50" : "border-border"
-                          } bg-white/5 px-4 py-3 text-base md:text-sm text-text-primary focus:outline-none focus:ring-2 focus:ring-accent-cyan/60 font-sans`}
-                      />
-                      {formErrors.email && (
-                        <p id="contact-email-error" role="alert" className="mt-1 text-xs text-red-400 font-sans">{formErrors.email}</p>
-                      )}
-                    </div>
-                    <div>
-                      <label htmlFor="contact-message" className="block text-sm font-semibold text-text-primary mb-2 font-sans">
-                        Message *
-                      </label>
-                      <textarea
-                        id="contact-message"
-                        rows={5}
-                        aria-invalid={!!formErrors.message}
-                        aria-describedby={formErrors.message ? "contact-message-error" : undefined}
-                        value={formData.message}
-                        onChange={handleInputChange}
-                        placeholder="Tell me about your project or opportunity..."
-                        suppressHydrationWarning
-                        className={`w-full rounded-2xl border ${formErrors.message ? "border-red-500/50" : "border-border"
-                          } bg-white/5 px-4 py-3 text-base md:text-sm text-text-primary focus:outline-none focus:ring-2 focus:ring-accent-cyan/60 resize-none font-sans`}
-                      />
-                      {formErrors.message && (
-                        <p id="contact-message-error" role="alert" className="mt-1 text-xs text-red-400 font-sans">{formErrors.message}</p>
-                      )}
-                    </div>
-                    {formStatus === "success" && (
-                      <div role="status" className="rounded-2xl bg-emerald-500/10 border border-emerald-500/30 px-4 py-3 text-sm text-emerald-300 font-sans">
-                        Message sent successfully! I&apos;ll get back to you soon.
-                      </div>
+                <form className="space-y-5" onSubmit={handleSubmit} suppressHydrationWarning>
+                  <div>
+                    <label htmlFor="contact-name" className="block text-sm font-semibold text-text-primary mb-2 font-sans">
+                      Name *
+                    </label>
+                    <input
+                      id="contact-name"
+                      type="text"
+                      autoComplete="name"
+                      aria-invalid={!!formErrors.name}
+                      aria-describedby={formErrors.name ? "contact-name-error" : undefined}
+                      value={formData.name}
+                      onChange={handleInputChange}
+                      placeholder="Your name"
+                      suppressHydrationWarning
+                      className={`w-full rounded-2xl border ${formErrors.name ? "border-red-500/50" : "border-border"
+                        } bg-white/5 px-4 py-3 text-base md:text-sm text-text-primary focus:outline-none focus:ring-2 focus:ring-accent-cyan/60 font-sans`}
+                    />
+                    {formErrors.name && (
+                      <p id="contact-name-error" role="alert" className="mt-1 text-xs text-red-400 font-sans">{formErrors.name}</p>
                     )}
-                    {formStatus === "error" && (
-                      <div role="alert" className="rounded-2xl bg-red-500/10 border border-red-500/30 px-4 py-3 text-sm text-red-300 font-sans">
-                        Something went wrong. Please try again or use direct channels.
-                      </div>
-                    )}
-                    <MagneticButton
-                      intensity={0.5}
-                      className="w-full"
-                    >
-                      <button 
-                        type="submit"
-                        disabled={formStatus === "submitting"}
-                        className="w-full rounded-2xl bg-accent-cyan/90 px-6 py-3 text-sm font-semibold text-background transition hover:bg-accent-cyan focus:outline-none focus:ring-2 focus:ring-accent-bright/60 disabled:opacity-50 disabled:cursor-not-allowed font-sans flex items-center justify-center"
-                      >
-                        {formStatus === "submitting" ? "Sending..." : "Send Message"}
-                      </button>
-                    </MagneticButton>
-                  </form>
-                ) : (
-                  <div className="h-[400px] flex items-center justify-center">
-                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-accent-cyan"></div>
                   </div>
-                )}
+                  <div>
+                    <label htmlFor="contact-email" className="block text-sm font-semibold text-text-primary mb-2 font-sans">
+                      Email *
+                    </label>
+                    <input
+                      id="contact-email"
+                      type="email"
+                      autoComplete="email"
+                      aria-invalid={!!formErrors.email}
+                      aria-describedby={formErrors.email ? "contact-email-error" : undefined}
+                      value={formData.email}
+                      onChange={handleInputChange}
+                      placeholder="your@email.com"
+                      suppressHydrationWarning
+                      className={`w-full rounded-2xl border ${formErrors.email ? "border-red-500/50" : "border-border"
+                        } bg-white/5 px-4 py-3 text-base md:text-sm text-text-primary focus:outline-none focus:ring-2 focus:ring-accent-cyan/60 font-sans`}
+                    />
+                    {formErrors.email && (
+                      <p id="contact-email-error" role="alert" className="mt-1 text-xs text-red-400 font-sans">{formErrors.email}</p>
+                    )}
+                  </div>
+                  <div>
+                    <label htmlFor="contact-message" className="block text-sm font-semibold text-text-primary mb-2 font-sans">
+                      Message *
+                    </label>
+                    <textarea
+                      id="contact-message"
+                      rows={5}
+                      aria-invalid={!!formErrors.message}
+                      aria-describedby={formErrors.message ? "contact-message-error" : undefined}
+                      value={formData.message}
+                      onChange={handleInputChange}
+                      placeholder="Tell me about your project or opportunity..."
+                      suppressHydrationWarning
+                      className={`w-full rounded-2xl border ${formErrors.message ? "border-red-500/50" : "border-border"
+                        } bg-white/5 px-4 py-3 text-base md:text-sm text-text-primary focus:outline-none focus:ring-2 focus:ring-accent-cyan/60 resize-none font-sans`}
+                    />
+                    {formErrors.message && (
+                      <p id="contact-message-error" role="alert" className="mt-1 text-xs text-red-400 font-sans">{formErrors.message}</p>
+                    )}
+                  </div>
+                  {formStatus === "success" && (
+                    <div role="status" className="rounded-2xl bg-emerald-500/10 border border-emerald-500/30 px-4 py-3 text-sm text-emerald-300 font-sans">
+                      Message sent successfully! I&apos;ll get back to you soon.
+                    </div>
+                  )}
+                  {formStatus === "error" && (
+                    <div role="alert" className="rounded-2xl bg-red-500/10 border border-red-500/30 px-4 py-3 text-sm text-red-300 font-sans">
+                      Something went wrong. Please try again or use direct channels.
+                    </div>
+                  )}
+                  <MagneticButton
+                    intensity={0.5}
+                    className="w-full"
+                  >
+                    <button 
+                      type="submit"
+                      disabled={formStatus === "submitting"}
+                      className="w-full rounded-2xl bg-accent-cyan/90 px-6 py-3 text-sm font-semibold text-background transition hover:bg-accent-cyan focus:outline-none focus:ring-2 focus:ring-accent-bright/60 disabled:opacity-50 disabled:cursor-not-allowed font-sans flex items-center justify-center"
+                    >
+                      {formStatus === "submitting" ? "Sending..." : "Send Message"}
+                    </button>
+                  </MagneticButton>
+                </form>
               </CardContent>
             </Card>
           </div>
