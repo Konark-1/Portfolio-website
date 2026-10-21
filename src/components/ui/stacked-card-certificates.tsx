@@ -3,7 +3,7 @@
 import { useState, useRef, useCallback, useEffect } from "react";
 import Image from "next/image";
 import { Award, ExternalLink, ChevronLeft, ChevronRight } from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import { MagneticButton } from "./magnetic-button";
 import { useIsMobile } from "@/hooks/useIsMobile";
 
@@ -24,30 +24,19 @@ interface StackedCardCertificatesProps {
 export function StackedCardCertificates({ certificates }: StackedCardCertificatesProps) {
     const isMobile = useIsMobile();
     const [activeIndex, setActiveIndex] = useState(0);
-    const [direction, setDirection] = useState(0); // -1 for left, 1 for right
     const [isHovered, setIsHovered] = useState(false);
     const [isInView, setIsInView] = useState(false);
     const containerRef = useRef<HTMLDivElement>(null);
+    const isSwipingRef = useRef(false);
     const touchStartX = useRef<number | null>(null);
     const touchStartY = useRef<number | null>(null);
     const touchEndX = useRef<number | null>(null);
     const touchEndY = useRef<number | null>(null);
 
-    // Fast, off-thread background preloading of all certificate WebP images directly into browser cache
-    useEffect(() => {
-        if (typeof window === "undefined") return;
-        certificates.forEach((c) => {
-            if (c.imagePath) {
-                const img = new window.Image();
-                img.src = c.imagePath;
-            }
-        });
-    }, [certificates]);
-
     // Visibility detection
     useEffect(() => {
         if (typeof window === 'undefined' || !('IntersectionObserver' in window)) {
-            setIsInView(true); // Fallback: assume component is in view so certificates show
+            setIsInView(true);
             return;
         }
 
@@ -70,12 +59,10 @@ export function StackedCardCertificates({ certificates }: StackedCardCertificate
     }, []);
 
     const goToNext = useCallback(() => {
-        setDirection(1);
         setActiveIndex((prev) => (prev + 1) % certificates.length);
     }, [certificates.length]);
 
     const goToPrev = useCallback(() => {
-        setDirection(-1);
         setActiveIndex((prev) => (prev - 1 + certificates.length) % certificates.length);
     }, [certificates.length]);
 
@@ -91,36 +78,50 @@ export function StackedCardCertificates({ certificates }: StackedCardCertificate
 
     // Touch swipe navigation for mobile with strict axis disambiguation
     const handleTouchStart = (e: React.TouchEvent) => {
+        isSwipingRef.current = false;
         touchStartX.current = e.targetTouches[0].clientX;
         touchStartY.current = e.targetTouches[0].clientY;
         touchEndX.current = e.targetTouches[0].clientX;
         touchEndY.current = e.targetTouches[0].clientY;
-        setIsHovered(true);
     };
 
     const handleTouchMove = (e: React.TouchEvent) => {
         touchEndX.current = e.targetTouches[0].clientX;
         touchEndY.current = e.targetTouches[0].clientY;
+        if (touchStartX.current !== null) {
+            const deltaX = Math.abs(touchStartX.current - e.targetTouches[0].clientX);
+            if (deltaX > 10) {
+                isSwipingRef.current = true;
+            }
+        }
     };
 
-    const handleTouchEnd = () => {
-        setIsHovered(false);
+    const handleTouchEnd = (e: React.TouchEvent) => {
+        let finalX = touchEndX.current;
+        let finalY = touchEndY.current;
+
+        if (e.changedTouches && e.changedTouches.length > 0) {
+            finalX = e.changedTouches[0].clientX;
+            finalY = e.changedTouches[0].clientY;
+        }
+
         if (
             touchStartX.current === null ||
-            touchEndX.current === null ||
+            finalX === null ||
             touchStartY.current === null ||
-            touchEndY.current === null
+            finalY === null
         ) {
+            isSwipingRef.current = false;
             return;
         }
 
-        const deltaX = touchStartX.current - touchEndX.current;
-        const deltaY = touchStartY.current - touchEndY.current;
+        const deltaX = touchStartX.current - finalX;
+        const deltaY = touchStartY.current - finalY;
 
         // Disambiguate swipe:
-        // Must exceed 40px horizontal AND be at least 1.3x more horizontal than vertical.
+        // Must exceed 35px horizontal AND be at least 1.3x more horizontal than vertical.
         // This guarantees vertical page scrolling is NEVER hijacked as a carousel flip!
-        if (Math.abs(deltaX) > 40 && Math.abs(deltaX) > Math.abs(deltaY) * 1.3) {
+        if (Math.abs(deltaX) > 35 && Math.abs(deltaX) > Math.abs(deltaY) * 1.3) {
             if (deltaX > 0) {
                 goToNext();
             } else {
@@ -132,6 +133,9 @@ export function StackedCardCertificates({ certificates }: StackedCardCertificate
         touchStartY.current = null;
         touchEndX.current = null;
         touchEndY.current = null;
+        setTimeout(() => {
+            isSwipingRef.current = false;
+        }, 120);
     };
 
     // Auto-scroll logic: only when in view, on desktop (disabled on mobile), and not hovered
@@ -142,23 +146,6 @@ export function StackedCardCertificates({ certificates }: StackedCardCertificate
         }, 6000);
         return () => clearInterval(interval);
     }, [isMobile, isInView, isHovered, goToNext]);
-
-    const activeCert = certificates[activeIndex];
-
-    const slideVariants = {
-        enter: (dir: number) => ({
-            x: dir > 0 ? 50 : -50,
-            opacity: 0,
-        }),
-        center: {
-            x: 0,
-            opacity: 1,
-        },
-        exit: (dir: number) => ({
-            x: dir > 0 ? -50 : 50,
-            opacity: 0,
-        }),
-    };
 
     return (
         <section
@@ -262,22 +249,23 @@ export function StackedCardCertificates({ certificates }: StackedCardCertificate
                             backgroundColor: 'var(--surface-elevated)',
                         }}
                     >
-                        <AnimatePresence mode="popLayout" custom={direction} initial={false}>
-                            <motion.div
-                                key={activeIndex}
-                                custom={direction}
-                                variants={slideVariants}
-                                initial="enter"
-                                animate="center"
-                                exit="exit"
-                                transition={{
-                                    duration: 0.25,
-                                    ease: "easeOut",
-                                }}
-                            >
-                                <CertificateCard certificate={activeCert} />
-                            </motion.div>
-                        </AnimatePresence>
+                        <div
+                            className="flex w-full will-change-transform"
+                            style={{
+                                transform: `translate3d(-${activeIndex * 100}%, 0, 0)`,
+                                transition: 'transform 450ms cubic-bezier(0.16, 1, 0.3, 1)',
+                            }}
+                        >
+                            {certificates.map((cert, index) => (
+                                <div key={index} className="w-full flex-shrink-0 select-none">
+                                    <CertificateCard
+                                        certificate={cert}
+                                        priority={index < 2}
+                                        isSwipingRef={isSwipingRef}
+                                    />
+                                </div>
+                            ))}
+                        </div>
                     </div>
 
                     {/* Dots indicator + counter */}
@@ -290,7 +278,6 @@ export function StackedCardCertificates({ certificates }: StackedCardCertificate
                                 <button
                                     key={idx}
                                     onClick={() => {
-                                        setDirection(idx > activeIndex ? 1 : -1);
                                         setActiveIndex(idx);
                                     }}
                                     className="p-2 sm:p-1.5 min-w-[36px] min-h-[36px] flex items-center justify-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-cyan rounded-full transition-transform active:scale-90"
@@ -346,7 +333,15 @@ export function StackedCardCertificates({ certificates }: StackedCardCertificate
     );
 }
 
-function CertificateCard({ certificate }: { certificate: Certificate }) {
+function CertificateCard({
+    certificate,
+    priority = false,
+    isSwipingRef,
+}: {
+    certificate: Certificate;
+    priority?: boolean;
+    isSwipingRef?: React.RefObject<boolean>;
+}) {
     const [imageError, setImageError] = useState(false);
 
     const hasImage = certificate.imagePath &&
@@ -355,11 +350,12 @@ function CertificateCard({ certificate }: { certificate: Certificate }) {
     const showImage = hasImage && !imageError;
 
     const handleClick = () => {
+        if (isSwipingRef?.current) return;
         window.open(certificate.filePath, '_blank');
     };
 
     return (
-        <div className="flex flex-col md:flex-row cursor-pointer group" onClick={handleClick}>
+        <div className="flex flex-col md:flex-row cursor-pointer group h-full w-full" onClick={handleClick}>
             {/* Certificate Image — left side on desktop, top on mobile */}
             <div
                 className="relative w-full md:w-1/2 aspect-[4/3] md:aspect-auto md:min-h-[420px] overflow-hidden"
@@ -373,7 +369,7 @@ function CertificateCard({ certificate }: { certificate: Certificate }) {
                         sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                         className="object-contain p-4 sm:p-6 transition-transform duration-500 group-hover:scale-105"
                         onError={() => setImageError(true)}
-                        priority
+                        priority={priority}
                         unoptimized
                     />
                 ) : (
