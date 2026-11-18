@@ -69,13 +69,19 @@ const GlassButton: React.FC<GlassButtonProps> = ({
         }
     };
 
+    const isInteractiveButton = Component === 'button' || Boolean(onClick) || Boolean(href);
+
     const elementProps: Record<string, any> = {
-        className: `relative flex items-center justify-center overflow-hidden cursor-pointer hover:scale-[1.02] hover:border-white/30 hover:bg-white/15 active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-[#050810] select-none ${className}`,
+        className: `relative flex items-center justify-center overflow-hidden ${
+            isInteractiveButton
+                ? 'cursor-pointer hover:scale-[1.02] hover:border-white/30 hover:bg-white/15 active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-[#050810] select-none'
+                : ''
+        } ${className}`,
         style: containerStyles,
         onClick,
-        onKeyDown: handleKeyDown,
-        role: Component === 'div' ? role : undefined,
-        tabIndex: Component === 'div' ? tabIndex : undefined,
+        onKeyDown: isInteractiveButton ? handleKeyDown : undefined,
+        role: isInteractiveButton ? (Component === 'div' ? role : undefined) : undefined,
+        tabIndex: isInteractiveButton ? (Component === 'div' ? tabIndex : undefined) : undefined,
     };
 
     if (Component === 'a' && href) {
@@ -87,7 +93,7 @@ const GlassButton: React.FC<GlassButtonProps> = ({
 
     return (
         <Component {...elementProps}>
-            <div className="w-full h-full flex items-center justify-center relative z-10 pointer-events-none">
+            <div className="w-full h-full flex items-center justify-center relative z-10 pointer-events-auto">
                 {children}
             </div>
         </Component>

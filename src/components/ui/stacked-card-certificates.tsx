@@ -164,7 +164,7 @@ export function StackedCardCertificates({ certificates }: StackedCardCertificate
                 <div className="absolute top-1/3 left-1/2 -translate-x-1/2 h-[300px] w-[60%] bg-[radial-gradient(ellipse_at_center,rgba(39,203,206,0.04),transparent_70%)]" />
             </div>
 
-            <div className="relative z-10 mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 py-16 sm:py-20 lg:py-28">
+            <div className="relative z-10 mx-auto max-w-7xl 2xl:max-w-[1440px] px-4 sm:px-6 lg:px-8 py-16 sm:py-20 lg:py-28">
                 {/* Section Header — always visible */}
                 <div className="text-center space-y-4 max-w-4xl mx-auto px-4 mb-12 sm:mb-16">
                     <motion.p
@@ -172,7 +172,7 @@ export function StackedCardCertificates({ certificates }: StackedCardCertificate
                         whileInView={{ opacity: 1, y: 0 }}
                         viewport={{ once: true }}
                         transition={{ duration: 0.5 }}
-                        className="text-xs sm:text-sm uppercase tracking-[0.6em] text-accent-cyan font-sans font-semibold"
+                        className="text-xs sm:text-sm uppercase tracking-[0.4em] sm:tracking-[0.6em] text-accent-cyan font-sans font-semibold"
                     >
                         Validation & Excellence
                     </motion.p>
@@ -181,7 +181,7 @@ export function StackedCardCertificates({ certificates }: StackedCardCertificate
                         whileInView={{ opacity: 1, y: 0 }}
                         viewport={{ once: true }}
                         transition={{ duration: 0.6, delay: 0.1 }}
-                        className="font-serif text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-text-primary tracking-tight leading-tight"
+                        className="font-serif text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold text-text-primary tracking-tight leading-[1.15]"
                     >
                         Professional Certificates
                     </motion.h2>
@@ -190,7 +190,7 @@ export function StackedCardCertificates({ certificates }: StackedCardCertificate
                         whileInView={{ opacity: 1 }}
                         viewport={{ once: true }}
                         transition={{ duration: 0.6, delay: 0.2 }}
-                        className="max-w-2xl mx-auto text-base sm:text-lg text-text-muted leading-relaxed font-sans"
+                        className="max-w-2xl mx-auto text-base sm:text-lg md:text-xl text-text-muted leading-relaxed font-sans"
                     >
                         Validated expertise in data analytics, business intelligence, and advanced Power BI techniques through industry-recognized certifications.
                     </motion.p>

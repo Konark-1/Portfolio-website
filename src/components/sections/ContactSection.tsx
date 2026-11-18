@@ -201,7 +201,7 @@ export default function ContactSection() {
       {/* Subtle turquoise ambient glow */}
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_50%,rgba(39,203,206,0.06),transparent_60%)] pointer-events-none" />
 
-      <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 py-12 sm:py-16 lg:py-24 relative z-10">
+      <div className="mx-auto max-w-7xl 2xl:max-w-[1440px] px-4 sm:px-6 lg:px-8 py-16 sm:py-20 lg:py-28 relative z-10">
         <div className="grid gap-12 lg:grid-cols-2">
           {/* Left Column: Context & Direct Channels */}
           <div className="space-y-10 sm:space-y-12">
@@ -216,7 +216,7 @@ export default function ContactSection() {
                 Get in touch
               </motion.p>
               <motion.h2
-                className="font-serif text-4xl sm:text-5xl md:text-6xl font-bold text-text-primary tracking-tight leading-tight"
+                className="font-serif text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold text-text-primary tracking-tight leading-[1.12]"
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
@@ -225,7 +225,7 @@ export default function ContactSection() {
                 Let&rsquo;s work together
               </motion.h2>
               <motion.p 
-                className="text-sm sm:text-base md:text-lg text-text-muted leading-relaxed font-sans max-w-lg"
+                className="text-base sm:text-lg md:text-xl text-text-muted leading-relaxed font-sans max-w-lg"
                 initial={{ opacity: 0 }}
                 whileInView={{ opacity: 1 }}
                 viewport={{ once: true }}

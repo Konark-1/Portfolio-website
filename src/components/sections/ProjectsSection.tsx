@@ -1,621 +1,890 @@
-"use client";
+'use client';
 
-import React, { useRef, useState, useEffect } from "react";
-import { motion, useInView } from "framer-motion";
-import { Star, Lightbulb, ExternalLink, Github, Maximize2, Play } from "lucide-react";
-import { useIsMobile } from "@/hooks/useIsMobile";
+import React, { useState, useEffect, useCallback, useRef } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import {
+  BarChart3,
+  CloudLightning,
+  TrendingUp,
+  ShieldAlert,
+  Maximize2,
+  Minimize2,
+  ExternalLink,
+  ArrowUpRight,
+  CheckCircle2,
+  Layers,
+  Activity,
+  Sparkles,
+  Database,
+  Webhook,
+  MessageSquare,
+  Cpu,
+  MonitorPlay,
+  Play,
+  GitBranch,
+  X,
+} from 'lucide-react';
+import { useIsMobile } from '@/hooks/useIsMobile';
 
-export const dashboards = [
+export interface ProjectMetric {
+  label: string;
+  value: string;
+  context: string;
+}
+
+export interface PipelineNode {
+  step: string;
+  title: string;
+  detail: string;
+  icon: 'webhook' | 'cpu' | 'database' | 'message';
+}
+
+export interface ProjectSpec {
+  id: string;
+  index: string;
+  title: string;
+  shortTitle: string;
+  domain: string;
+  type: 'powerbi' | 'fullstack';
+  isCapstone?: boolean;
+  badgeText: string;
+  headlineMetric: ProjectMetric;
+  problem: string;
+  solution: string;
+  impactBullets: string[];
+  stack: string[];
+  previewImage: string;
+  embedUrl?: string;
+  liveUrl: string;
+  liveCtaLabel: string;
+  pipelineNodes?: PipelineNode[];
+}
+
+export const PROJECTS: ProjectSpec[] = [
   {
-    featured: true,
-    badge: "In Active Development",
-    title: "RescueShip: Autonomous RTO Reduction & Logistics Engine",
-    subtitle: "D2C Shipping Intelligence, NDR Interception & Courier Fraud Defense",
-    description:
-      "Full-stack M.E.R.N. logistics intelligence engine architected to arrest Indian D2C's #1 profit bleed: 30%+ Cash-on-Delivery (COD) failure rates and fraudulent courier non-delivery reports (NDRs). Features high-throughput courier webhook pipelines, algorithmic fake-attempt detection, automated address hygiene, and 1-tap WhatsApp customer re-attempt recovery workflows.",
-    liveUrl: "https://rescueship-frontend.onrender.com/",
-    isDirectLaunchOnly: true,
-    tech: ["MongoDB", "Express.js", "React 19", "Node.js", "Redis", "REST APIs", "Courier Webhooks", "WhatsApp Cloud API"],
-    metrics: [
-      { label: "Core Architecture", value: "M.E.R.N. Stack" },
-      { label: "Data Pipeline", value: "Courier Webhooks" },
-      { label: "Fraud Defense", value: "Fake-Attempt Audit" },
-      { label: "Status", value: "Active Build (Alpha)" },
+    id: 'macro-micro-analysis',
+    index: '01',
+    title: 'Macro & Micro Level Analysis',
+    shortTitle: 'Macro & Micro BI',
+    domain: 'Commercial Intelligence & Executive P&L Analytics',
+    type: 'powerbi',
+    badgeText: 'Operational BI',
+    headlineMetric: {
+      value: 'SKU-Level',
+      label: 'Margin & Volume Drilldown',
+      context: 'Executive P&L to micro-unit profitability',
+    },
+    problem:
+      'High-volume sales reporting masked negative-margin SKUs and regional discounting leaks behind aggregated revenue totals.',
+    solution:
+      'Engineered a star-schema dimensional model in Power BI paired with custom DAX margin-attribution measures and synchronized geographic drill-throughs.',
+    impactBullets: [
+      'Isolates profit-vs-volume divergence across product categories in <2 clicks',
+      'Surfaces underperforming regional cohorts dragging aggregate gross margin',
+      'Unifies executive P&L summaries with granular SKU profitability diagnostics',
     ],
-    insights: [
-      "High-Throughput Courier Webhooks: Event-driven ingestion processing live transit status updates across Indian 3PL couriers (Delhivery, BlueDart, Shadowfax, Xpressbees)",
-      "Courier Fake-Attempt Detection: Audits carrier non-delivery claims against driver geolocation, timestamp telemetry, and call logs to contest false 'Customer Unavailable' rejections",
-      "Pre-Dispatch Address Hygiene: Automated parsing and correction of ambiguous street addresses and high-risk pincodes before shipping labels are generated",
-      "WhatsApp NDR Recovery Automation: Interactive 1-tap customer workflows for real-time location re-pinning, delivery rescheduling, and COD-to-prepaid conversion",
-    ],
-    gradient: "from-emerald-500/20 via-teal-500/10 to-cyan-500/0",
-    previewImage: "/images/dashboard-previews/rescueship-preview.webp",
+    stack: ['Power BI', 'DAX Measures', 'Dimensional Modeling', 'Geographic Viz'],
+    previewImage: '/images/dashboard-previews/Macro & Micro Level Analysis.webp',
+    embedUrl:
+      'https://app.powerbi.com/view?r=eyJrIjoiNTg1OTYwMWYtNTdiZi00YjU2LWI3ZWMtMjkxZGZlMGYwZTVkIiwidCI6IjE4YjExOTE3LTU2NGQtNDJhYi05M2M4LWMxY2JhZDlhNjRiMiJ9&pageName=ReportSection',
+    liveUrl:
+      'https://app.powerbi.com/view?r=eyJrIjoiNTg1OTYwMWYtNTdiZi00YjU2LWI3ZWMtMjkxZGZlMGYwZTVkIiwidCI6IjE4YjExOTE3LTU2NGQtNDJhYi05M2M4LWMxY2JhZDlhNjRiMiJ9',
+    liveCtaLabel: 'Open Full BI Report',
   },
   {
-    featured: false,
-    badge: "Executive Power BI",
-    title: "Adaptive Weather Visuals",
-    subtitle: "Real-Time Environmental Intelligence System",
-    description:
-      "Dynamic weather monitoring dashboard featuring adaptive visualizations that respond to environmental conditions. Tracks temperature forecasts, air quality indices, visibility metrics, and sunrise/sunset data across multiple Indian cities with contextual alerts.",
+    id: 'adaptive-weather-visuals',
+    index: '02',
+    title: 'Adaptive Weather Visuals',
+    shortTitle: 'Adaptive Weather',
+    domain: 'Real-Time Environmental & Operational Intelligence',
+    type: 'powerbi',
+    badgeText: 'Real-Time APIs',
+    headlineMetric: {
+      value: 'Live API',
+      label: 'Threshold-Driven UI Telemetry',
+      context: 'Dynamic DAX styling across multi-city feeds',
+    },
+    problem:
+      'Static operational dashboards fail to trigger immediate visual escalation when environmental thresholds breach safe logistics or retail conditions.',
+    solution:
+      'Built an API-ingested Power BI telemetry layer utilizing context-aware DAX conditional formatting that mutates card geometry and alert states in real time.',
+    impactBullets: [
+      'Tracks multi-city environmental indices via automated API ingestion pipelines',
+      'Triggers adaptive visual state shifts automatically on severity threshold breaches',
+      'Eliminates manual monitoring overhead for weather-sensitive dispatch teams',
+    ],
+    stack: ['Power BI', 'Dynamic DAX', 'Weather APIs', 'Context-Aware Alerts'],
+    previewImage: '/images/dashboard-previews/Adaptive Weather Visuals.webp',
     embedUrl:
-      "https://app.fabric.microsoft.com/view?r=eyJrIjoiNGQ0MzFkY2UtN2M1ZS00Mzg4LTk0YzAtZjc4MmVjMDhjY2ZhIiwidCI6IjE4YjExOTE3LTU2NGQtNDJhYi05M2M4LWMxY2JhZDlhNjRiMiJ9&config=eyJjbHVzdGVyVXJsIjoiaHR0cHM6Ly93YWJpLXVzLWVhc3QyLXJlZGlyZWN0LmFuYWx5c2lzLndpbmRvd3MubmV0LyIsImVtYmVkRmVhdHVyZXMiOnsibW9kZXJuRW1iZWQiOnRydWUsImhpZGVBbmdsZVBhbmVsIjpmYWxzZSwiaGlkZUZvb3RlciI6ZmFsc2UsImRpc2FibGVGaWx0ZXJQYW5lbCI6ZmFsc2UsImRpc2FibGVWaXN1YWxQYW5lbCI6ZmFsc2UsImRpc2FibGVXZWJDb250ZXh0TWVudSI6ZmFsc2UsImRpc2FibGVBbmFseXppbmdQYW5lbCI6ZmFsc2UsImRpc2FibGVGb2N1c01vZGUiOmZhbHNlLCJkaXNhYmxlU2VhcmNoUGFuZWwiOmZhbHNlLCJkaXNhYmxlUGFnZU5hdmlnYXRvciI6ZmFsc2UsImRpc2FibGVTbGljZXJzUGFuZWwiOmZhbHNlLCJkaXNhYmxlU2VsZWN0aW9uUGFuZWwiOmZhbHNlLCJkaXNhYmxlQm9va21hcmtzUGFuZWwiOmZhbHNlLCJkaXNhYmxlU2V0dGluZ3NQYW5lbCI6ZmFsc2UsImRpc2FibGVJbnNpZ2h0c1BhbmVsIjpmYWxzZX19",
+      'https://app.fabric.microsoft.com/view?r=eyJrIjoiNGQ0MzFkY2UtN2M1ZS00Mzg4LTk0YzAtZjc4MmVjMDhjY2ZhIiwidCI6IjE4YjExOTE3LTU2NGQtNDJhYi05M2M4LWMxY2JhZDlhNjRiMiJ9',
     liveUrl:
-      "https://app.fabric.microsoft.com/view?r=eyJrIjoiNGQ0MzFkY2UtN2M1ZS00Mzg4LTk0YzAtZjc4MmVjMDhjY2ZhIiwidCI6IjE4YjExOTE3LTU2NGQtNDJhYi05M2M4LWMxY2JhZDlhNjRiMiJ9",
-    tech: ["Power BI", "DAX", "Weather API", "Real-Time Data", "Advanced Visuals"],
-    metrics: [
-      { label: "Cities Tracked", value: "10+" },
-      { label: "Weather Indices", value: "15+" },
-      { label: "Visualization", value: "Adaptive" },
-      { label: "Alert Engine", value: "Real-Time" },
-    ],
-    insights: [
-      "Adaptive visualizations that dynamically change color and formatting based on environmental data severity (e.g., AQI levels, visibility warnings)",
-      "Actionable safety insights: Context-aware alerts convert raw metrics into practical guidance (e.g., 'Visibility reduced—drive slowly, use fog lights')",
-      "Multi-city comparative analysis across 10+ Indian cities with synchronized environmental metrics for strategic planning",
-      "Comprehensive environmental intelligence: 15+ metrics including air quality (PM10, PM2.5, O3), visibility, humidity, wind speed, and UV index",
-    ],
-    gradient: "from-teal-500/20 via-cyan-500/10 to-cyan-400/0",
-    previewImage: "/images/dashboard-previews/Adaptive Weather Visuals.webp",
+      'https://app.fabric.microsoft.com/view?r=eyJrIjoiNGQ0MzFkY2UtN2M1ZS00Mzg4LTk0YzAtZjc4MmVjMDhjY2ZhIiwidCI6IjE4YjExOTE3LTU2NGQtNDJhYi05M2M4LWMxY2JhZDlhNjRiMiJ9',
+    liveCtaLabel: 'Open Live Telemetry',
   },
   {
-    featured: false,
-    badge: "Commercial Intelligence",
-    title: "Macro & Micro Level Analysis",
-    subtitle: "Executive & Operational Intelligence Platform",
-    description:
-      "Comprehensive dual-layer business analytics dashboard providing executive overview (macro) and granular operational insights (micro). Features geographic sales distribution, category profitability analysis, and segment-wise revenue breakdown with drill-through capabilities.",
+    id: 'distribution-trend-analysis',
+    index: '03',
+    title: 'Distribution & Trend Analysis',
+    shortTitle: 'Distribution & PnL',
+    domain: 'Financial Operations, Cost Efficiency & Trend Forecasting',
+    type: 'powerbi',
+    badgeText: 'Financial Governance',
+    headlineMetric: {
+      value: '0.99x',
+      label: 'Cost-to-Revenue Ratio Governance',
+      context: 'Monthly PnL anomaly & seasonal forecasting',
+    },
+    problem:
+      'Unmonitored seasonal inventory swings and state-level fulfillment costs silently eroded operating margins before monthly books closed.',
+    solution:
+      'Developed statistical time-series forecasting models and state-mapped expense ratio diagnostics to detect monthly PnL loss vectors ahead of replenishment cycles.',
+    impactBullets: [
+      'Enforces strict 0.99x cost-ratio governance with instant anomaly flagging',
+      'Pinpoints state-level distribution inefficiencies across seasonal demand curves',
+      'Supports proactive inventory allocation using rolling time-series baselines',
+    ],
+    stack: ['Power BI', 'Statistical Time-Series', 'Expense Ratio Analysis', 'State Mapping'],
+    previewImage: '/images/dashboard-previews/Distribution & Trend Analysis.webp',
     embedUrl:
-      "https://app.powerbi.com/view?r=eyJrIjoiNTg1OTYwMWYtNTdiZi00YjU2LWI3ZWMtMjkxZGZlMGYwZTVkIiwidCI6IjE4YjExOTE3LTU2NGQtNDJhYi05M2M4LWMxY2JhZDlhNjRiMiJ9&pageName=ReportSection&config=eyJjbHVzdGVyVXJsIjoiaHR0cHM6Ly93YWJpLXVzLWVhc3QyLXJlZGlyZWN0LmFuYWx5c2lzLndpbmRvd3MubmV0LyIsImVtYmVkRmVhdHVyZXMiOnsibW9kZXJuRW1iZWQiOnRydWUsImhpZGVBbmdsZVBhbmVsIjpmYWxzZSwiaGlkZUZvb3RlciI6ZmFsc2UsImRpc2FibGVGaWx0ZXJQYW5lbCI6ZmFsc2UsImRpc2FibGVWaXN1YWxQYW5lbCI6ZmFsc2UsImRpc2FibGVXZWJDb250ZXh0TWVudSI6ZmFsc2UsImRpc2FibGVBbmFseXppbmdQYW5lbCI6ZmFsc2UsImRpc2FibGVGb2N1c01vZGUiOmZhbHNlLCJkaXNhYmxlU2VhcmNoUGFuZWwiOmZhbHNlLCJkaXNhYmxlUGFnZU5hdmlnYXRvciI6ZmFsc2UsImRpc2FibGVTbGljZXJzUGFuZWwiOmZhbHNlLCJkaXNhYmxlU2VsZWN0aW9uUGFuZWwiOmZhbHNlLCJkaXNhYmxlQm9va21hcmtzUGFuZWwiOmZhbHNlLCJkaXNhYmxlU2V0dGluZ3NQYW5lbCI6ZmFsc2UsImRpc2FibGVJbnNpZ2h0c1BhbmVsIjpmYWxzZX19",
+      'https://app.powerbi.com/view?r=eyJrIjoiNmE4MmRhMmItNTFlNC00MzMzLTkwZjQtNjc1NjEyZDI2ZTczIiwidCI6IjE4YjExOTE3LTU2NGQtNDJhYi05M2M4LWMxY2JhZDlhNjRiMiJ9&pageName=ReportSection',
     liveUrl:
-      "https://app.powerbi.com/view?r=eyJrIjoiNTg1OTYwMWYtNTdiZi00YjU2LWI3ZWMtMjkxZGZlMGYwZTVkIiwidCI6IjE4YjExOTE3LTU2NGQtNDJhYi05M2M4LWMxY2JhZDlhNjRiMiJ9",
-    tech: ["Power BI", "DAX", "Data Modeling", "Geographic Viz", "KPI Design"],
-    metrics: [
-      { label: "Architecture", value: "Dual-Layer" },
-      { label: "Target Metric", value: "Profit %" },
-      { label: "Analysis Level", value: "Product/SKU" },
-      { label: "Correlation", value: "Multivariate" },
-    ],
-    insights: [
-      "Dual-layer intelligence architecture: Executive overview for strategic decisions and granular product-level analysis for operational managers",
-      "Profit-driven decision making: Prioritizes profitability metrics (Total Profit by Category, Profit Margin %) over revenue to guide bottom-line optimization",
-      "Product-level performance analysis: Drill-down from categories to individual products to identify winning products and underperformers",
-      "Multi-variate correlation analysis: Advanced scatter plots and combo charts correlate Profit, Sales, and Quantity to uncover hidden patterns",
-    ],
-    gradient: "from-blue-500/20 via-indigo-500/10 to-indigo-400/0",
-    previewImage: "/images/dashboard-previews/Macro & Micro Level Analysis.webp",
+      'https://app.powerbi.com/view?r=eyJrIjoiNmE4MmRhMmItNTFlNC00MzMzLTkwZjQtNjc1NjEyZDI2ZTczIiwidCI6IjE4YjExOTE3LTU2NGQtNDJhYi05M2M4LWMxY2JhZDlhNjRiMiJ9',
+    liveCtaLabel: 'Open Financial Model',
   },
   {
-    featured: false,
-    badge: "Financial Operations",
-    title: "Distribution & Trend Analysis",
-    subtitle: "Profit Health Monitoring & Operational Control Platform",
-    description:
-      "Multi-dimensional business analysis dashboard examining quarterly performance, category distribution, expense ratios, and state-wise profit patterns. Features time-series profit trends, income categorization, and geographic bubble visualizations for India-specific insights.",
-    embedUrl:
-      "https://app.powerbi.com/view?r=eyJrIjoiNmE4MmRhMmItNTFlNC00MzMzLTkwZjQtNjc1NjEyZDI2ZTczIiwidCI6IjE4YjExOTE3LTU2NGQtNDJhYi05M2M4LWMxY2JhZDlhNjRiMiJ9&pageName=ReportSection&config=eyJjbHVzdGVyVXJsIjoiaHR0cHM6Ly93YWJpLXVzLWVhc3QyLXJlZGlyZWN0LmFuYWx5c2lzLndpbmRvd3MubmV0LyIsImVtYmVkRmVhdHVyZXMiOnsibW9kZXJuRW1iZWQiOnRydWUsImhpZGVBbmdsZVBhbmVsIjpmYWxzZSwiaGlkZUZvb3RlciI6ZmFsc2UsImRpc2FibGVGaWx0ZXJQYW5lbCI6ZmFsc2UsImRpc2FibGVWaXN1YWxQYW5lbCI6ZmFsc2UsImRpc2FibGVXZWJDb250ZXh0TWVudSI6ZmFsc2UsImRpc2FibGVBbmFseXppbmdQYW5lbCI6ZmFsc2UsImRpc2FibGVGb2N1c01vZGUiOmZhbHNlLCJkaXNhYmxlU2VhcmNoUGFuZWwiOmZhbHNlLCJkaXNhYmxlUGFnZU5hdmlnYXRvciI6ZmFsc2UsImRpc2FibGVTbGljZXJzUGFuZWwiOmZhbHNlLCJkaXNhYmxlU2VsZWN0aW9uUGFuZWwiOmZhbHNlLCJkaXNhYmxlQm9va21hcmtzUGFuZWwiOmZhbHNlLCJkaXNhYmxlU2V0dGluZ3NQYW5lbCI6ZmFsc2UsImRpc2FibGVJbnNpZ2h0c1BhbmVsIjpmYWxzZX19",
-    liveUrl:
-      "https://app.powerbi.com/view?r=eyJrIjoiNmE4MmRhMmItNTFlNC00MzMzLTkwZjQtNjc1NjEyZDI2ZTczIiwidCI6IjE4YjExOTE3LTU2NGQtNDJhYi05M2M4LWMxY2JhZDlhNjRiMiJ9",
-    tech: ["Power BI", "Time Series", "Statistical Analysis", "Map Visuals", "DAX Measures"],
-    metrics: [
-      { label: "PnL Tracking", value: "Monthly" },
-      { label: "Cost Ratio", value: "0.99x" },
-      { label: "Drill-Down", value: "Quarterly" },
-      { label: "Map Visuals", value: "State-Level" },
+    id: 'rescueship-capstone',
+    index: '04',
+    title: 'RescueShip: Autonomous RTO Reduction & Logistics Engine',
+    shortTitle: 'RescueShip Engine',
+    domain: 'D2C Shipping Intelligence & Courier NDR Fraud Defense',
+    type: 'fullstack',
+    isCapstone: true,
+    badgeText: 'CAPSTONE • FULL-STACK',
+    headlineMetric: {
+      value: '30%+',
+      label: 'COD RTO Failure Defense',
+      context: 'Autonomous NDR audit + WhatsApp recovery',
+    },
+    problem:
+      'D2C brands lose 25–35% of Cash-on-Delivery revenue to Return-to-Origin (RTO) shipments driven by fake courier "customer unavailable" NDR logs.',
+    solution:
+      'Architected an event-driven MERN + Redis autonomous defense platform that ingests live courier webhooks, audits delivery telemetry for fraud anomalies, and triggers 1-tap WhatsApp location recovery.',
+    impactBullets: [
+      'Intercepts 30%+ COD failure exposure via automated NDR verification loops',
+      'Audits Delhivery & BlueDart webhook telemetry to flag fake non-delivery claims',
+      'Recovers failed delivery attempts through 1-tap WhatsApp Cloud API workflows',
     ],
-    insights: [
-      "Profit & Loss monthly tracking: Color-coded bar chart (Green/Red) instantly identifies loss months (May, July, Sept) for proactive health monitoring",
-      "Cost efficiency ratio analytics: Expense ratio of 0.99 indicates tight margins, enabling operational control to prevent expenses from overtaking revenue",
-      "Volume vs. Value category dynamics: Reveals high-effort vs. high-value product lines (e.g., Clothing: 62% volume but only 37% income share)",
-      "Trend spotting seasonal patterns: Timeline analysis identifies seasonal dips and peaks to optimize inventory and marketing strategies",
-      "State-level profitability mapping: Geographic bubble visualization pinpoints high-performing regions for strategic expansion",
+    stack: [
+      'MongoDB',
+      'Express.js',
+      'React 19',
+      'Node.js',
+      'Redis',
+      'REST APIs',
+      'Courier Webhooks',
+      'WhatsApp Cloud API',
     ],
-    gradient: "from-purple-500/20 via-pink-500/10 to-pink-400/0",
-    previewImage: "/images/dashboard-previews/Distribution & Trend Analysis.webp",
+    previewImage: '/images/dashboard-previews/rescueship-preview.webp',
+    liveUrl: 'https://rescueship.netlify.app',
+    liveCtaLabel: 'Launch Live Production App',
+    pipelineNodes: [
+      {
+        step: 'STAGE 01',
+        title: 'Courier Webhook Ingestion',
+        detail: 'Real-time NDR & scan telemetry from Delhivery / BlueDart webhooks',
+        icon: 'webhook',
+      },
+      {
+        step: 'STAGE 02',
+        title: 'Fake-NDR Fraud Telemetry Audit',
+        detail: 'Detects anomalous scan timestamps, geo-mismatch & unattempted dropoffs',
+        icon: 'cpu',
+      },
+      {
+        step: 'STAGE 03',
+        title: 'Redis Priority Recovery Queue',
+        detail: 'Sub-second deduplication & rate-limited dispatch orchestration',
+        icon: 'database',
+      },
+      {
+        step: 'STAGE 04',
+        title: '1-Tap WhatsApp Cloud Recovery',
+        detail: 'Automated buyer re-verification, pin drop & re-attempt scheduling',
+        icon: 'message',
+      },
+    ],
   },
 ];
 
 export const techHighlights = [
   {
-    icon: "🎯",
-    title: "Advanced DAX & Star Schema",
-    description: "Complex business logic measures, dynamic time intelligence, and optimized dimensional data models.",
+    icon: '🎯',
+    title: 'Advanced DAX & Star Schema',
+    description:
+      'Complex business logic measures, dynamic time intelligence, and optimized dimensional data models.',
   },
   {
-    icon: "⚡",
-    title: "Full-Stack Logistics & APIs",
-    description: "Autonomous engineering builds in MongoDB, Express.js, React, Node.js, and webhook-driven courier automation.",
+    icon: '⚡',
+    title: 'Full-Stack Logistics & APIs',
+    description:
+      'Autonomous engineering builds in MongoDB, Express.js, React, Node.js, and webhook-driven courier automation.',
   },
   {
-    icon: "📊",
-    title: "Commercial & Financial BI",
-    description: "Executive and operational intelligence dashboards connecting granular SKU data to macro profitability.",
+    icon: '📊',
+    title: 'Commercial & Financial BI',
+    description:
+      'Executive and operational intelligence dashboards connecting granular SKU data to macro profitability.',
   },
 ];
 
-type DashboardCardProps = {
-  featured?: boolean;
-  badge?: string;
-  title: string;
-  subtitle: string;
-  description: string;
-  embedUrl?: string;
-  liveUrl?: string;
-  githubUrl?: string;
-  isExternalWebApp?: boolean;
-  isDirectLaunchOnly?: boolean;
-  previewImage: string;
-  tech: string[];
-  metrics: { label: string; value: string }[];
-  insights: string[];
-  gradient: string;
-};
-
-function DashboardCard({
-  featured,
-  badge,
-  title,
-  subtitle,
-  description,
-  embedUrl,
-  liveUrl,
-  githubUrl,
-  isExternalWebApp,
-  isDirectLaunchOnly,
-  previewImage,
-  tech,
-  metrics,
-  insights,
-  gradient,
-}: DashboardCardProps): React.JSX.Element {
-  const cardRef = useRef<HTMLElement>(null);
-  const dashboardRef = useRef<HTMLDivElement>(null);
-  const isMobile = useIsMobile();
-  const [showIframe, setShowIframe] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
-  const [loadTimeout, setLoadTimeout] = useState(false);
-
-  useEffect(() => {
-    if (showIframe && isLoading) {
-      const timer = setTimeout(() => {
-        setLoadTimeout(true);
-      }, 12000);
-      return () => clearTimeout(timer);
-    }
-  }, [showIframe, isLoading]);
-
-  const handleImageClick = () => {
-    // Check if user is on a mobile phone
-    const isPhoneDevice =
-      isMobile ||
-      (typeof window !== "undefined" &&
-        (window.innerWidth <= 768 ||
-          /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent)));
-
-    if (isPhoneDevice) {
-      // ON PHONE: Redirect to new page where dashboard opens in full screen (Power BI link or live platform)
-      const targetUrl = liveUrl || embedUrl;
-      if (targetUrl) {
-        window.open(targetUrl, "_blank", "noopener,noreferrer");
-      }
-      return;
-    }
-
-    // ON PC:
-    if (isDirectLaunchOnly && liveUrl) {
-      window.open(liveUrl, "_blank", "noopener,noreferrer");
-      return;
-    }
-
-    // ON PC for Power BI: Load live dashboard in-place right where the picture was!
-    setShowIframe(true);
-  };
-
-  const handleFullScreen = () => {
-    // If mobile phone, open the dashboard in a new tab for true native full-screen mobile viewing
-    const isPhoneDevice =
-      isMobile ||
-      (typeof window !== "undefined" &&
-        (window.innerWidth <= 768 ||
-          /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent)));
-
-    if (isPhoneDevice && (liveUrl || embedUrl)) {
-      window.open(liveUrl || embedUrl, "_blank", "noopener,noreferrer");
-      return;
-    }
-
-    const container = dashboardRef.current;
-    if (container) {
-      const fullscreenSupported =
-        document.fullscreenEnabled || (document as any).webkitFullscreenEnabled;
-
-      if (fullscreenSupported) {
-        if (document.fullscreenElement || (document as any).webkitFullscreenElement) {
-          if (document.exitFullscreen) {
-            document.exitFullscreen();
-          } else if ((document as any).webkitExitFullscreen) {
-            (document as any).webkitExitFullscreen();
-          }
-        } else {
-          if (!showIframe) {
-            setShowIframe(true);
-          }
-          const requestFS =
-            container.requestFullscreen || (container as any).webkitRequestFullscreen;
-          if (requestFS) {
-            requestFS.call(container).catch(() => {
-              if (liveUrl || embedUrl) {
-                window.open(liveUrl || embedUrl, "_blank", "noopener,noreferrer");
-              }
-            });
-          }
-        }
-      } else if (liveUrl || embedUrl) {
-        window.open(liveUrl || embedUrl, "_blank", "noopener,noreferrer");
-      }
-    }
-  };
-
-  const iframeSrc = embedUrl
-    ? isExternalWebApp
-      ? embedUrl
-      : `${embedUrl}&navContentPaneEnabled=false&transparent=1`
-    : "";
-
-  return (
-    <motion.article
-      ref={cardRef}
-      initial={{ opacity: 0, y: 20 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true }}
-      transition={{ duration: 0.5 }}
-      className="group relative rounded-3xl border overflow-hidden backdrop-blur-xl"
-      style={{
-        borderColor: "var(--border-color)",
-        background:
-          "linear-gradient(135deg, rgba(10, 14, 26, 0.7) 0%, rgba(15, 20, 25, 0.4) 100%)",
-      }}
-    >
-      <div
-        className={`absolute inset-0 bg-gradient-to-br ${gradient} opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none`}
-      />
-      <div className="relative z-10 p-8 sm:p-10 lg:p-12 space-y-8 sm:space-y-10">
-        <div className="space-y-4 sm:space-y-5">
-          <div className="flex flex-wrap items-center gap-2.5">
-            {featured && (
-              <span
-                className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full border text-xs sm:text-sm font-semibold font-sans tracking-wide"
-                style={{
-                  backgroundColor: "rgba(39, 203, 206, 0.15)",
-                  borderColor: "rgba(39, 203, 206, 0.4)",
-                  color: "rgba(39, 203, 206, 1)",
-                }}
-              >
-                <Star className="h-3.5 w-3.5 fill-accent-cyan/30 text-accent-cyan" />
-                Featured Project
-              </span>
-            )}
-            {badge && (
-              <span className="inline-flex items-center px-3 py-1 rounded-full border border-white/10 bg-white/5 text-xs text-accent-cyan/90 font-sans font-medium">
-                {badge}
-              </span>
-            )}
-          </div>
-
-          <h3 className="font-serif text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-text-primary mb-3 sm:mb-4 group-hover:text-accent-cyan transition-colors tracking-tight leading-[1.15]">
-            {title}
-          </h3>
-          <p className="text-lg sm:text-xl md:text-2xl text-accent-cyan/90 font-medium mb-4 sm:mb-5 font-sans leading-relaxed">
-            {subtitle}
-          </p>
-          <p className="text-sm sm:text-base md:text-lg text-text-muted leading-relaxed font-sans">
-            {description}
-          </p>
-        </div>
-
-        {/* Full Screen Action: Available when interactive dashboard is loaded in-place */}
-        {showIframe && !isDirectLaunchOnly && embedUrl && (
-          <div className="flex items-center justify-end gap-3 mb-4">
-            <button
-              onClick={handleFullScreen}
-              className="flex items-center gap-2 px-4 py-2 rounded-xl border backdrop-blur-md transition-all duration-300 hover:scale-105 active:scale-95 touch-manipulation group/fs cursor-pointer"
-              style={{
-                backgroundColor: "rgba(10, 14, 26, 0.95)",
-                borderColor: "rgba(39, 203, 206, 0.4)",
-                color: "rgba(39, 203, 206, 1)",
-                boxShadow: "0 2px 8px rgba(39, 203, 206, 0.15)",
-              }}
-              aria-label="View in full screen"
-              title="View in Full Screen"
-            >
-              <Maximize2 className="h-4 w-4 group-hover/fs:rotate-12 transition-transform" />
-              <span className="text-xs sm:text-sm font-semibold font-sans tracking-wide">
-                Full Screen
-              </span>
-            </button>
-          </div>
-        )}
-
-        {/* Dashboard Preview / Embed Stage */}
-        <div
-          ref={dashboardRef}
-          role="region"
-          aria-label={`${title} Showcase`}
-          className="rounded-2xl overflow-hidden border-2 transition-colors relative group/dashboard"
-          style={{
-            borderColor: "var(--border-color)",
-          }}
-          onMouseEnter={(e) => {
-            e.currentTarget.style.borderColor = "rgba(39, 203, 206, 0.4)";
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.borderColor = "var(--border-color)";
-          }}
-        >
-          <div className="relative w-full" style={{ backgroundColor: "rgba(10, 14, 26, 0.95)" }}>
-            <div className="relative pt-[56.25%] sm:pt-[59.77%] overflow-hidden group/preview">
-              {!showIframe ? (
-                <div
-                  className="absolute inset-0 cursor-pointer"
-                  onClick={handleImageClick}
-                  title={isMobile ? "Tap to view fullscreen" : "Tap to view live dashboard"}
-                >
-                  <img
-                    src={previewImage}
-                    alt={`${title} preview`}
-                    className="absolute inset-0 w-full h-full object-contain object-center transition-transform duration-700 group-hover/preview:scale-[1.02]"
-                    loading="lazy"
-                  />
-                  <div className="absolute inset-0 bg-black/40 group-hover/preview:bg-black/20 transition-colors duration-500" />
-                  <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 sm:gap-4 transition-transform duration-300 active:scale-95 touch-manipulation px-4 text-center pointer-events-none">
-                    <div
-                      className="flex items-center gap-2.5 sm:gap-3 px-5 sm:px-8 py-2.5 sm:py-4 rounded-2xl border backdrop-blur-md bg-background/80 hover:bg-background transition-all group-hover/preview:shadow-[0_0_30px_rgba(39,203,206,0.3)]"
-                      style={{
-                        borderColor: "rgba(39, 203, 206, 0.5)",
-                        color: "rgba(39, 203, 206, 1)",
-                      }}
-                    >
-                      <Maximize2 className="h-4 w-4 sm:h-5 sm:w-5 opacity-90 inline md:hidden" />
-                      <Play className="h-4 w-4 sm:h-5 sm:w-5 opacity-90 fill-accent-cyan/20 hidden md:inline" />
-                      <span className="text-xs sm:text-base font-semibold font-sans tracking-wide">
-                        <span className="inline md:hidden">Tap to view fullscreen</span>
-                        <span className="hidden md:inline">Tap to view live dashboard</span>
-                      </span>
-                    </div>
-                  </div>
-                </div>
-              ) : (
-                <>
-                  {isLoading && (
-                    <div
-                      className="absolute inset-0 flex items-center justify-center transition-opacity duration-500 z-10 p-6 text-center"
-                      style={{
-                        backgroundColor: "rgba(10, 14, 26, 0.95)",
-                      }}
-                    >
-                      <div className="flex flex-col items-center gap-4 max-w-sm">
-                        {!loadTimeout ? (
-                          <>
-                            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-accent-cyan"></div>
-                            <div className="text-accent-cyan text-sm sm:text-base font-sans tracking-wide">
-                              Initializing {isExternalWebApp ? "Analytics Engine" : "Power BI"}...
-                            </div>
-                          </>
-                        ) : (
-                          <>
-                            <p className="text-sm text-text-muted font-sans mb-1">
-                              The interactive report is taking longer than expected to connect.
-                            </p>
-                            <div className="flex flex-wrap gap-3 justify-center mt-2">
-                              {liveUrl && (
-                                <a
-                                  href={liveUrl}
-                                  target="_blank"
-                                  rel="noopener noreferrer"
-                                  className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-accent-cyan text-[#050810] font-sans font-bold text-xs shadow-md hover:scale-105 transition-transform"
-                                >
-                                  <ExternalLink className="h-3.5 w-3.5" />
-                                  Open in New Tab ↗
-                                </a>
-                              )}
-                              <button
-                                onClick={() => {
-                                  setShowIframe(false);
-                                  setIsLoading(true);
-                                  setLoadTimeout(false);
-                                }}
-                                className="px-4 py-2 rounded-xl border border-white/20 text-white text-xs font-sans hover:bg-white/10 transition-colors"
-                              >
-                                Back to Preview
-                              </button>
-                            </div>
-                          </>
-                        )}
-                      </div>
-                    </div>
-                  )}
-                  <iframe
-                    title={title}
-                    src={iframeSrc}
-                    className="absolute inset-0 h-full w-full border-0 z-0"
-                    style={{
-                      border: "none",
-                      margin: 0,
-                      padding: 0,
-                      backgroundColor: "transparent",
-                      display: "block",
-                    }}
-                    allowFullScreen
-                    aria-label={description}
-                    referrerPolicy="no-referrer-when-downgrade"
-                    onLoad={() => setIsLoading(false)}
-                  />
-                  {liveUrl && (
-                    <div className="absolute bottom-2 right-3 z-10 hidden sm:block">
-                      <a
-                        href={liveUrl}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-black/80 hover:bg-black text-[11px] text-accent-cyan/90 border border-accent-cyan/30 backdrop-blur-sm transition-all"
-                      >
-                        <ExternalLink className="h-3 w-3" />
-                        <span>Open in new tab</span>
-                      </a>
-                    </div>
-                  )}
-                </>
-              )}
-            </div>
-          </div>
-        </div>
-
-        {/* Metrics Grid */}
-        <div
-          className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-6 p-4 sm:p-8 rounded-2xl border"
-          style={{
-            backgroundColor: "rgba(39, 203, 206, 0.05)",
-            borderColor: "var(--border-color)",
-          }}
-        >
-          {metrics.map(({ label, value }) => (
-            <div key={label} className="text-center space-y-1.5 px-1 min-w-0">
-              <p className="text-lg sm:text-2xl md:text-3xl lg:text-4xl font-bold text-accent-cyan font-serif leading-tight break-words sm:whitespace-normal">
-                {value}
-              </p>
-              <p className="text-[10px] sm:text-xs uppercase tracking-[0.1em] sm:tracking-[0.2em] text-text-muted font-sans leading-tight">
-                {label}
-              </p>
-            </div>
-          ))}
-        </div>
-
-        {/* Insights & Features */}
-        <div className="space-y-5 sm:space-y-6">
-          <h4 className="text-lg sm:text-xl md:text-2xl font-semibold flex items-center gap-3 text-text-primary font-serif tracking-tight">
-            <Lightbulb className="h-5 w-5 sm:h-6 sm:w-6 text-amber-300 flex-shrink-0" />
-            Key insights &amp; features
-          </h4>
-          <ul className="grid md:grid-cols-2 gap-4 sm:gap-5">
-            {insights.map((insight) => (
-              <li
-                key={insight}
-                className="flex items-start gap-3 text-sm sm:text-base text-text-muted leading-relaxed font-sans"
-              >
-                <span className="text-accent-cyan mt-1.5 flex-shrink-0 text-lg">▹</span>
-                <span>{insight}</span>
-              </li>
-            ))}
-          </ul>
-        </div>
-
-        {/* Tech Badges */}
-        <div className="flex flex-wrap gap-2.5 sm:gap-3">
-          {tech.map((item) => (
-            <span
-              key={item}
-              className="px-4 sm:px-5 py-2 sm:py-2.5 rounded-full border border-accent-cyan/30 bg-accent-cyan/10 text-accent-cyan text-sm sm:text-base font-medium font-sans tracking-wide"
-            >
-              {item}
-            </span>
-          ))}
-        </div>
-      </div>
-    </motion.article>
-  );
+function getProjectIcon(index: string, className = 'w-4 h-4') {
+  switch (index) {
+    case '01':
+      return <BarChart3 className={className} />;
+    case '02':
+      return <CloudLightning className={className} />;
+    case '03':
+      return <TrendingUp className={className} />;
+    case '04':
+    default:
+      return <ShieldAlert className={className} />;
+  }
 }
 
-type TechHighlightProps = {
-  icon: string;
-  title: string;
-  description: string;
-};
-
-function TechHighlight({ icon, title, description }: TechHighlightProps): React.JSX.Element {
-  return (
-    <div
-      className="rounded-2xl border p-6 sm:p-7 backdrop-blur-md"
-      style={{
-        borderColor: "var(--border-color)",
-        backgroundColor: "rgba(39, 203, 206, 0.05)",
-      }}
-    >
-      <div className="text-3xl sm:text-4xl mb-4">{icon}</div>
-      <h4 className="text-lg sm:text-xl md:text-2xl font-semibold text-text-primary mb-3 sm:mb-4 font-serif tracking-tight">
-        {title}
-      </h4>
-      <p className="text-sm sm:text-base text-text-muted leading-relaxed font-sans">
-        {description}
-      </p>
-    </div>
-  );
+function getPipelineIcon(icon: PipelineNode['icon']) {
+  switch (icon) {
+    case 'webhook':
+      return <Webhook className="w-4 h-4 text-[#8CF6F7]" />;
+    case 'cpu':
+      return <Cpu className="w-4 h-4 text-[#8CF6F7]" />;
+    case 'database':
+      return <Database className="w-4 h-4 text-[#8CF6F7]" />;
+    case 'message':
+      return <MessageSquare className="w-4 h-4 text-[#8CF6F7]" />;
+  }
 }
 
 export default function ProjectsSection() {
+  const isMobile = useIsMobile();
+  const [activeId, setActiveId] = useState<string>(PROJECTS[0].id);
+  const [isFullscreen, setIsFullscreen] = useState<boolean>(false);
+  const [showInteractiveIframe, setShowInteractiveIframe] = useState<boolean>(false);
+  const [iframeLoaded, setIframeLoaded] = useState<boolean>(false);
+  const [rescueViewMode, setRescueViewMode] = useState<'architecture' | 'embed'>('architecture');
+
+  const activeIndex = PROJECTS.findIndex((p) => p.id === activeId);
+  const activeProject = PROJECTS[activeIndex] ?? PROJECTS[0];
+
+  const handleSelectProject = useCallback((id: string) => {
+    setActiveId(id);
+    setShowInteractiveIframe(false);
+    setIframeLoaded(false);
+    setRescueViewMode('architecture');
+  }, []);
+
+  // Keyboard navigation across the 4-tab index + Escape key for fullscreen
+  useEffect(() => {
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && isFullscreen) {
+        setIsFullscreen(false);
+      }
+    };
+    window.addEventListener('keydown', onKeyDown);
+    return () => window.removeEventListener('keydown', onKeyDown);
+  }, [isFullscreen]);
+
+  // Prevent background scroll when Fullscreen Sandbox is open
+  useEffect(() => {
+    if (!isFullscreen) return;
+    const prevOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    return () => {
+      document.body.style.overflow = prevOverflow;
+    };
+  }, [isFullscreen]);
+
+  const handleTabKeyDown = (e: React.KeyboardEvent, idx: number) => {
+    if (e.key === 'ArrowRight') {
+      e.preventDefault();
+      const next = PROJECTS[(idx + 1) % PROJECTS.length];
+      handleSelectProject(next.id);
+    } else if (e.key === 'ArrowLeft') {
+      e.preventDefault();
+      const prev = PROJECTS[(idx - 1 + PROJECTS.length) % PROJECTS.length];
+      handleSelectProject(prev.id);
+    }
+  };
+
+  const renderInteractiveStage = (fullscreenMode = false) => {
+    // CASE A: Project 04 — RescueShip Capstone
+    if (activeProject.type === 'fullstack') {
+      return (
+        <div
+          className={`relative flex flex-col bg-[#070B14] border border-[#27CBCE]/30 rounded-2xl overflow-hidden shadow-[0_0_50px_-15px_rgba(39,203,206,0.22)] ${
+            fullscreenMode ? 'h-full w-full' : 'h-[460px] sm:h-[520px] lg:h-full lg:min-h-[540px]'
+          }`}
+        >
+          {/* Chrome Header */}
+          <div className="flex flex-wrap items-center justify-between gap-2 px-4 py-3 bg-[#0B1220]/95 border-b border-white/10">
+            <div className="flex items-center gap-2.5 min-w-0">
+              <span className="inline-flex h-2.5 w-2.5 rounded-full bg-emerald-400 shadow-[0_0_10px_#34d399]" />
+              <span className="text-xs font-mono uppercase tracking-wider text-[#8CF6F7] truncate">
+                Capstone Autonomous Engine • RescueShip
+              </span>
+            </div>
+
+            <div className="flex items-center gap-2">
+              <div className="inline-flex rounded-lg bg-white/5 p-0.5 border border-white/10">
+                <button
+                  type="button"
+                  onClick={() => setRescueViewMode('architecture')}
+                  className={`px-3 py-1 text-xs font-medium rounded-md transition-colors cursor-pointer ${
+                    rescueViewMode === 'architecture'
+                      ? 'bg-[#27CBCE]/20 text-[#8CF6F7] border border-[#27CBCE]/40 font-semibold'
+                      : 'text-slate-400 hover:text-white'
+                  }`}
+                >
+                  System Telemetry
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setIframeLoaded(false);
+                    setRescueViewMode('embed');
+                  }}
+                  className={`px-3 py-1 text-xs font-medium rounded-md transition-colors cursor-pointer ${
+                    rescueViewMode === 'embed'
+                      ? 'bg-[#27CBCE]/20 text-[#8CF6F7] border border-[#27CBCE]/40 font-semibold'
+                      : 'text-slate-400 hover:text-white'
+                  }`}
+                >
+                  Live Web App
+                </button>
+              </div>
+
+              <button
+                type="button"
+                onClick={() => setIsFullscreen((prev) => !prev)}
+                aria-label={fullscreenMode ? 'Exit fullscreen preview' : 'Expand fullscreen preview'}
+                className="p-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-slate-300 hover:text-[#8CF6F7] border border-white/10 transition-colors cursor-pointer"
+              >
+                {fullscreenMode ? <Minimize2 className="w-4 h-4" /> : <Maximize2 className="w-4 h-4" />}
+              </button>
+            </div>
+          </div>
+
+          {/* Stage Body */}
+          {rescueViewMode === 'architecture' ? (
+            <div className="relative flex-1 p-5 sm:p-7 flex flex-col justify-between overflow-y-auto bg-[radial-gradient(ellipse_at_top_right,rgba(39,203,206,0.14),transparent_65%)]">
+              <div className="flex items-center justify-between gap-3 mb-4">
+                <div>
+                  <p className="text-xs font-mono uppercase tracking-widest text-[#27CBCE] font-semibold">
+                    Autonomous NDR Recovery Loop
+                  </p>
+                  <h4 className="text-lg sm:text-xl font-bold text-white mt-1">
+                    Event-Driven RTO Interception Pipeline
+                  </h4>
+                </div>
+                <span className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-mono bg-emerald-500/10 text-emerald-300 border border-emerald-500/25">
+                  <Activity className="w-3.5 h-3.5" />
+                  Production Live
+                </span>
+              </div>
+
+              {/* 4-Stage Pipeline Grid */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5 my-auto">
+                {activeProject.pipelineNodes?.map((node) => (
+                  <div
+                    key={node.step}
+                    className="group relative p-4 rounded-xl bg-[#0C1424]/90 border border-white/10 hover:border-[#27CBCE]/50 transition-all hover:bg-[#0E1729]"
+                  >
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="text-[11px] font-mono tracking-widest text-[#27CBCE] font-semibold">
+                        {node.step}
+                      </span>
+                      <div className="p-1.5 rounded-lg bg-[#27CBCE]/10 border border-[#27CBCE]/25">
+                        {getPipelineIcon(node.icon)}
+                      </div>
+                    </div>
+                    <p className="text-sm font-semibold text-white">{node.title}</p>
+                    <p className="text-xs text-slate-300/85 mt-1 leading-relaxed">{node.detail}</p>
+                  </div>
+                ))}
+              </div>
+
+              {/* Direct Production Launch Footer */}
+              <div className="mt-6 pt-4 border-t border-white/10 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                <div className="flex items-center gap-2 text-xs text-slate-400">
+                  <GitBranch className="w-4 h-4 text-[#27CBCE] shrink-0" />
+                  <span className="truncate font-mono text-xs text-slate-300">
+                    rescueship.netlify.app
+                  </span>
+                </div>
+                <a
+                  href={activeProject.liveUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl text-xs sm:text-sm font-bold bg-gradient-to-r from-[#27CBCE] to-[#8CF6F7] text-[#050810] hover:brightness-110 shadow-[0_0_25px_-5px_rgba(39,203,206,0.65)] transition-all cursor-pointer"
+                >
+                  Launch RescueShip Live
+                  <ArrowUpRight className="w-4 h-4" />
+                </a>
+              </div>
+            </div>
+          ) : (
+            <div className="relative flex-1 bg-[#050810]">
+              {!iframeLoaded && (
+                <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 bg-[#070B14] z-10 p-6 text-center">
+                  <div className="w-8 h-8 rounded-full border-2 border-[#27CBCE]/30 border-t-[#8CF6F7] animate-spin" />
+                  <p className="text-xs font-mono text-slate-300">
+                    Connecting to RescueShip production instance...
+                  </p>
+                  <a
+                    href={activeProject.liveUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="mt-1 inline-flex items-center gap-1.5 text-xs font-medium text-[#8CF6F7] hover:underline"
+                  >
+                    Open in new tab <ExternalLink className="w-3.5 h-3.5" />
+                  </a>
+                </div>
+              )}
+              <iframe
+                src={activeProject.liveUrl}
+                title={activeProject.title}
+                onLoad={() => setIframeLoaded(true)}
+                className="w-full h-full border-0"
+                loading="lazy"
+                allowFullScreen
+              />
+            </div>
+          )}
+        </div>
+      );
+    }
+
+    // CASE B: Projects 01-03 — Power BI Sandbox Stage
+    return (
+      <div
+        className={`relative flex flex-col bg-[#070B14] border border-white/10 rounded-2xl overflow-hidden shadow-[0_20px_60px_-20px_rgba(0,0,0,0.8)] ${
+          fullscreenMode ? 'h-full w-full' : 'h-[460px] sm:h-[520px] lg:h-full lg:min-h-[540px]'
+        }`}
+      >
+        {/* Sandbox Chrome Bar */}
+        <div className="flex items-center justify-between gap-3 px-4 py-3 bg-[#0B1220]/95 border-b border-white/10">
+          <div className="flex items-center gap-2.5 min-w-0">
+            <span className="inline-flex h-2 w-2 rounded-full bg-[#27CBCE] shadow-[0_0_8px_#27CBCE]" />
+            <span className="text-xs font-mono uppercase tracking-wider text-slate-300 truncate font-medium">
+              Interactive Power BI Fabric Sandbox • {activeProject.index}
+            </span>
+          </div>
+
+          <div className="flex items-center gap-2 shrink-0">
+            <a
+              href={activeProject.liveUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-xs font-medium text-slate-300 hover:text-[#8CF6F7] border border-white/10 transition-colors"
+            >
+              External
+              <ExternalLink className="w-3 h-3" />
+            </a>
+            <button
+              type="button"
+              onClick={() => setIsFullscreen((prev) => !prev)}
+              aria-label={fullscreenMode ? 'Exit fullscreen preview' : 'Expand fullscreen preview'}
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#27CBCE]/10 hover:bg-[#27CBCE]/20 text-xs font-medium text-[#8CF6F7] border border-[#27CBCE]/30 transition-colors cursor-pointer"
+            >
+              {fullscreenMode ? (
+                <>
+                  <Minimize2 className="w-3.5 h-3.5" />
+                  <span>Exit</span>
+                </>
+              ) : (
+                <>
+                  <Maximize2 className="w-3.5 h-3.5" />
+                  <span>Fullscreen</span>
+                </>
+              )}
+            </button>
+          </div>
+        </div>
+
+        {/* Preview Image or Interactive Iframe */}
+        <div className="relative flex-1 bg-[#050810] overflow-hidden">
+          {showInteractiveIframe && activeProject.embedUrl ? (
+            <>
+              {!iframeLoaded && (
+                <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 bg-[#070B14] z-10">
+                  <div className="w-8 h-8 rounded-full border-2 border-[#27CBCE]/30 border-t-[#8CF6F7] animate-spin" />
+                  <p className="text-xs font-mono text-slate-400">
+                    Initializing Power BI interactive canvas...
+                  </p>
+                </div>
+              )}
+              <iframe
+                key={activeProject.id}
+                title={`${activeProject.title} — Power BI Report`}
+                src={`${activeProject.embedUrl}&navContentPaneEnabled=false&transparent=1`}
+                onLoad={() => setIframeLoaded(true)}
+                className="w-full h-full border-0"
+                allowFullScreen
+              />
+            </>
+          ) : (
+            <div
+              className="group/stage relative w-full h-full flex flex-col items-center justify-center cursor-pointer"
+              onClick={() => {
+                if (isMobile) {
+                  window.open(activeProject.liveUrl, '_blank', 'noopener,noreferrer');
+                } else {
+                  setShowInteractiveIframe(true);
+                }
+              }}
+            >
+              {/* Preview Image */}
+              <img
+                src={activeProject.previewImage}
+                alt={`${activeProject.title} preview`}
+                className="absolute inset-0 w-full h-full object-contain object-center transition-transform duration-700 group-hover/stage:scale-[1.02]"
+                loading="lazy"
+              />
+              <div className="absolute inset-0 bg-black/45 group-hover/stage:bg-black/25 transition-colors duration-500" />
+
+              {/* Center Launch CTA Pill */}
+              <div className="relative z-10 flex items-center gap-3 px-6 py-3.5 rounded-2xl border border-accent-cyan/50 bg-[#0a0e1a]/95 text-accent-cyan shadow-[0_0_25px_rgba(39,203,206,0.3)] group-hover/stage:shadow-[0_0_35px_rgba(39,203,206,0.55)] group-hover/stage:scale-105 transition-all">
+                <Play className="h-4 w-4 fill-accent-cyan/30 text-accent-cyan" />
+                <span className="text-xs sm:text-sm font-semibold font-sans tracking-wide">
+                  <span className="inline md:hidden">Tap to view live report</span>
+                  <span className="hidden md:inline">Click to launch interactive view</span>
+                </span>
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+    );
+  };
+
   return (
     <section
       id="projects"
-      className="relative z-20 pt-16 sm:pt-20 lg:pt-28 pb-12 sm:pb-16 lg:pb-20 px-4 sm:px-6 overflow-hidden border-t"
+      aria-labelledby="projects-heading"
+      className="relative py-20 sm:py-28 px-4 sm:px-6 lg:px-8 bg-[#050810] text-slate-100 overflow-hidden border-t scroll-mt-24"
       style={{
-        backgroundColor: "var(--background-projects)",
-        borderColor: "var(--border-color)",
+        borderColor: 'var(--border-color)',
       }}
     >
-      {/* Enhanced turquoise radial gradient */}
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(39,203,206,0.12),transparent_60%)] pointer-events-none" />
-      <div className="absolute inset-0 bg-gradient-to-b from-transparent via-[rgba(10,14,26,0.8)] to-[var(--background-projects)] pointer-events-none" />
+      {/* Subtle Ambient Glow */}
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute top-0 left-1/2 -translate-x-1/2 w-[1100px] h-[380px] bg-[#27CBCE]/10 blur-[150px] rounded-full"
+      />
 
-      <div className="max-w-7xl mx-auto relative z-10 space-y-8">
-        <div className="text-center space-y-4 sm:space-y-6 max-w-7xl mx-auto px-4">
-          <motion.p
-            className="text-xs sm:text-sm uppercase tracking-[0.6em] text-accent-cyan font-sans font-semibold"
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.5 }}
+      <div className="relative max-w-7xl 2xl:max-w-[1440px] mx-auto">
+        {/* Section Header */}
+        <div className="mb-12 sm:mb-16">
+          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#27CBCE]/10 border border-[#27CBCE]/25 text-[#8CF6F7] text-xs sm:text-sm font-mono uppercase tracking-widest mb-4">
+            <Layers className="w-3.5 h-3.5" />
+            <span>Engineered Systems Catalog</span>
+          </div>
+          <h2
+            id="projects-heading"
+            className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold tracking-tight text-white leading-[1.12] font-serif max-w-5xl"
           >
-            Selected Works
-          </motion.p>
-          <motion.h2
-            className="font-serif text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold bg-gradient-to-r from-[#27CBCE] via-[#20B2AA] to-[#00D9FF] bg-clip-text text-transparent tracking-tight leading-[1.1] mb-2"
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: "50px" }}
-            transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
-          >
-            Data Intelligence &amp; Strategic Systems
-          </motion.h2>
-          <motion.p
-            className="text-base sm:text-lg md:text-xl lg:text-2xl text-text-muted leading-relaxed font-sans max-w-5xl mx-auto"
-            initial={{ opacity: 0 }}
-            whileInView={{ opacity: 1 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.8, delay: 0.2 }}
-          >
-            <span className="text-white font-medium">
-              Production-grade operational intelligence, full-stack logistics automation, and executive BI platforms.
-            </span>{" "}
-            Featuring live web applications and real-time dashboards engineered to transform high-volume commercial data into measurable margin expansion.
-          </motion.p>
+            Data Intelligence &amp;{' '}
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#27CBCE] via-[#20B2AA] to-[#8CF6F7]">
+              Autonomous Systems
+            </span>
+          </h2>
         </div>
 
-        <div className="space-y-20">
-          {dashboards.map((dashboard) => (
-            <DashboardCard key={dashboard.title} {...dashboard} />
-          ))}
+        {/* =====================================================================
+            ZONE 1: THE 10-SECOND INDEX (All 4 Projects Visible Without Scrolling)
+           ===================================================================== */}
+        <div
+          role="tablist"
+          aria-label="Portfolio Projects Index"
+          className="grid grid-cols-2 lg:grid-cols-4 gap-3.5 sm:gap-4 mb-8"
+        >
+          {PROJECTS.map((project, idx) => {
+            const isActive = project.id === activeProject.id;
+            return (
+              <button
+                key={project.id}
+                role="tab"
+                type="button"
+                aria-selected={isActive}
+                aria-controls={`panel-${project.id}`}
+                id={`tab-${project.id}`}
+                onClick={() => handleSelectProject(project.id)}
+                onKeyDown={(e) => handleTabKeyDown(e, idx)}
+                className={`group relative text-left p-4 sm:p-5 rounded-2xl border transition-all duration-300 cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-[#8CF6F7] ${
+                  isActive
+                    ? project.isCapstone
+                      ? 'bg-[#0B1526]/95 border-[#8CF6F7]/80 shadow-[0_0_36px_-6px_rgba(39,203,206,0.45)]'
+                      : 'bg-[#0B1220]/95 border-[#27CBCE]/70 shadow-[0_0_28px_-8px_rgba(39,203,206,0.35)]'
+                    : project.isCapstone
+                    ? 'bg-[#09101D]/80 border-[#27CBCE]/35 hover:border-[#8CF6F7]/60 hover:bg-[#0D1628]'
+                    : 'bg-[#090E1A]/80 border-white/10 hover:border-white/30 hover:bg-[#0D1424]'
+                }`}
+              >
+                {/* Top Row: Number + Badge */}
+                <div className="flex items-center justify-between gap-2 mb-3">
+                  <span
+                    className={`inline-flex items-center gap-1.5 text-xs font-mono font-bold ${
+                      isActive ? 'text-[#8CF6F7]' : 'text-slate-400 group-hover:text-slate-200'
+                    }`}
+                  >
+                    {getProjectIcon(project.index, 'w-3.5 h-3.5')}
+                    <span>{project.index}</span>
+                  </span>
+
+                  <span
+                    className={`px-2.5 py-0.5 rounded-full text-[11px] font-mono uppercase tracking-wider truncate font-semibold ${
+                      project.isCapstone
+                        ? 'bg-[#27CBCE]/20 text-[#8CF6F7] border border-[#27CBCE]/40'
+                        : isActive
+                        ? 'bg-white/15 text-white'
+                        : 'bg-white/5 text-slate-400'
+                    }`}
+                  >
+                    {project.badgeText}
+                  </span>
+                </div>
+
+                {/* Title */}
+                <h3
+                  className={`text-base sm:text-lg font-bold leading-snug line-clamp-1 ${
+                    isActive ? 'text-white' : 'text-slate-200 group-hover:text-white'
+                  }`}
+                >
+                  {project.shortTitle}
+                </h3>
+
+                {/* Quick Recruiter Metric */}
+                <div className="mt-2.5 flex items-baseline gap-2 text-xs">
+                  <span className="font-mono font-bold text-[#8CF6F7] text-sm tabular-nums">
+                    {project.headlineMetric.value}
+                  </span>
+                  <span className="text-slate-300 truncate text-xs">
+                    {project.headlineMetric.label}
+                  </span>
+                </div>
+
+                {/* Active Bottom Indicator */}
+                {isActive && (
+                  <motion.div
+                    layoutId="activeProjectIndicator"
+                    transition={{ type: 'spring', stiffness: 380, damping: 32 }}
+                    className="absolute inset-x-4 -bottom-[1px] h-[3px] bg-gradient-to-r from-[#27CBCE] via-[#8CF6F7] to-[#27CBCE]"
+                  />
+                )}
+              </button>
+            );
+          })}
         </div>
 
-        <div className="mt-12 sm:mt-16 p-8 sm:p-10 lg:p-12 rounded-3xl border border-accent-cyan/20 bg-gradient-to-br from-accent-cyan/5 to-transparent shadow-glass-soft">
-          <h3 className="font-serif text-2xl sm:text-3xl md:text-4xl font-bold mb-8 sm:mb-10 flex items-center gap-3 text-text-primary tracking-tight leading-tight">
-            <span className="text-accent-cyan text-3xl sm:text-4xl">⚡</span>
-            Technical implementation highlights
+        {/* =====================================================================
+            ZONE 2: MASTER-DETAIL EXECUTIVE STAGE
+           ===================================================================== */}
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={activeProject.id}
+            role="tabpanel"
+            id={`panel-${activeProject.id}`}
+            aria-labelledby={`tab-${activeProject.id}`}
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+            transition={{ duration: 0.25, ease: 'easeOut' }}
+            className={`grid grid-cols-1 lg:grid-cols-12 gap-6 sm:gap-8 p-5 sm:p-8 rounded-3xl border backdrop-blur-xl ${
+              activeProject.isCapstone
+                ? 'bg-[#091221]/95 border-[#27CBCE]/45 shadow-[0_0_80px_-20px_rgba(39,203,206,0.3)]'
+                : 'bg-[#0A101D]/90 border-white/10 shadow-[0_25px_70px_-25px_rgba(0,0,0,0.85)]'
+            }`}
+          >
+            {/* LEFT PANEL (5 Cols): 10-Second Recruiter Business Brief */}
+            <div className="lg:col-span-5 flex flex-col justify-between gap-6">
+              <div>
+                {/* Domain + Capstone Callout */}
+                <div className="flex flex-wrap items-center gap-2 mb-3.5">
+                  <span className="text-xs font-mono uppercase tracking-widest text-[#27CBCE] font-semibold">
+                    {activeProject.domain}
+                  </span>
+                  {activeProject.isCapstone && (
+                    <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-md bg-gradient-to-r from-[#27CBCE]/25 to-[#8CF6F7]/15 border border-[#8CF6F7]/40 text-[#8CF6F7] text-xs font-mono font-bold">
+                      <Sparkles className="w-3.5 h-3.5" />
+                      CAPSTONE SHOWCASE
+                    </span>
+                  )}
+                </div>
+
+                {/* Full Project Title */}
+                <h3 className="text-2xl sm:text-3xl font-bold text-white tracking-tight leading-tight font-serif">
+                  {activeProject.title}
+                </h3>
+
+                {/* Hero KPI Banner */}
+                <div className="mt-5 p-4 rounded-2xl bg-[#060B14] border border-[#27CBCE]/30 flex items-center justify-between gap-4">
+                  <div>
+                    <div className="text-3xl sm:text-4xl font-bold font-mono tabular-nums text-transparent bg-clip-text bg-gradient-to-r from-[#27CBCE] to-[#8CF6F7]">
+                      {activeProject.headlineMetric.value}
+                    </div>
+                    <div className="text-xs sm:text-sm font-semibold text-slate-200 mt-0.5">
+                      {activeProject.headlineMetric.label}
+                    </div>
+                  </div>
+                  <div className="text-right text-xs text-slate-300 max-w-[180px] leading-snug">
+                    {activeProject.headlineMetric.context}
+                  </div>
+                </div>
+
+                {/* Problem -> Solution */}
+                <div className="mt-6 space-y-4">
+                  <div>
+                    <h4 className="text-xs font-mono uppercase tracking-widest text-[#27CBCE] mb-1.5 font-bold">
+                      Business Problem
+                    </h4>
+                    <p className="text-sm sm:text-base text-slate-300 leading-relaxed">
+                      {activeProject.problem}
+                    </p>
+                  </div>
+
+                  <div>
+                    <h4 className="text-xs font-mono uppercase tracking-widest text-[#27CBCE] mb-1.5 font-bold">
+                      Engineered Solution
+                    </h4>
+                    <p className="text-sm sm:text-base text-slate-300 leading-relaxed">
+                      {activeProject.solution}
+                    </p>
+                  </div>
+                </div>
+
+                {/* Quantifiable Business Impact */}
+                <div className="mt-6">
+                  <h4 className="text-xs font-mono uppercase tracking-widest text-slate-400 mb-2.5 font-semibold">
+                    Verified Outcomes
+                  </h4>
+                  <ul className="space-y-2.5">
+                    {activeProject.impactBullets.map((bullet) => (
+                      <li
+                        key={bullet}
+                        className="flex items-start gap-3 text-sm text-slate-200 leading-relaxed"
+                      >
+                        <CheckCircle2 className="w-4 h-4 text-[#27CBCE] shrink-0 mt-0.5" />
+                        <span>{bullet}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              </div>
+
+              {/* Bottom Stack + Action CTAs */}
+              <div className="pt-5 border-t border-white/10 space-y-4">
+                <div className="flex flex-wrap gap-2">
+                  {activeProject.stack.map((tech) => (
+                    <span
+                      key={tech}
+                      className="px-3 py-1 rounded-lg text-xs font-mono bg-white/[0.05] text-slate-200 border border-white/10 font-medium"
+                    >
+                      {tech}
+                    </span>
+                  ))}
+                </div>
+
+                <div className="flex flex-wrap items-center gap-3">
+                  <a
+                    href={activeProject.liveUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center justify-center gap-2 px-5 py-3 rounded-xl text-xs sm:text-sm font-bold bg-gradient-to-r from-[#27CBCE] to-[#8CF6F7] text-[#050810] hover:brightness-110 shadow-[0_0_24px_-6px_rgba(39,203,206,0.7)] transition-all cursor-pointer"
+                  >
+                    <span>{activeProject.liveCtaLabel}</span>
+                    <ArrowUpRight className="w-4 h-4" />
+                  </a>
+
+                  <button
+                    type="button"
+                    onClick={() => setIsFullscreen(true)}
+                    className="inline-flex items-center justify-center gap-2 px-4 py-3 rounded-xl text-xs sm:text-sm font-medium bg-white/5 hover:bg-white/10 text-slate-200 border border-white/15 transition-colors cursor-pointer"
+                  >
+                    <Maximize2 className="w-4 h-4 text-[#8CF6F7]" />
+                    <span>Expand Stage</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            {/* RIGHT PANEL (7 Cols): Live Interactive Sandbox */}
+            <div className="lg:col-span-7">{renderInteractiveStage(false)}</div>
+          </motion.div>
+        </AnimatePresence>
+
+        {/* Technical Implementation Highlights (Retained Competencies) */}
+        <div className="mt-12 sm:mt-16 p-8 sm:p-10 rounded-3xl border border-accent-cyan/20 bg-gradient-to-br from-accent-cyan/5 to-transparent">
+          <h3 className="font-serif text-2xl sm:text-3xl font-bold mb-6 flex items-center gap-3 text-text-primary tracking-tight">
+            <span className="text-accent-cyan text-3xl">⚡</span>
+            Technical Architecture Highlights
           </h3>
           <div className="grid gap-6 sm:gap-8 md:grid-cols-3">
             {techHighlights.map((highlight) => (
-              <TechHighlight key={highlight.title} {...highlight} />
+              <div
+                key={highlight.title}
+                className="rounded-2xl border border-white/10 hover:border-accent-cyan/30 bg-[#0a0e1a]/90 p-6 transition-all duration-300"
+              >
+                <div className="text-3xl mb-3">{highlight.icon}</div>
+                <h4 className="text-lg sm:text-xl font-bold text-text-primary mb-2 font-serif tracking-tight">
+                  {highlight.title}
+                </h4>
+                <p className="text-sm text-text-muted leading-relaxed font-sans">
+                  {highlight.description}
+                </p>
+              </div>
             ))}
           </div>
         </div>
       </div>
+
+      {/* =====================================================================
+          FULLSCREEN SANDBOX MODAL
+         ===================================================================== */}
+      <AnimatePresence>
+        {isFullscreen && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.18 }}
+            role="dialog"
+            aria-modal="true"
+            aria-label={`${activeProject.title} fullscreen view`}
+            className="fixed inset-0 z-50 bg-[#050810]/95 backdrop-blur-md p-3 sm:p-6 flex flex-col"
+          >
+            <div className="flex items-center justify-between mb-3">
+              <div className="flex items-center gap-3">
+                <span className="px-2.5 py-1 rounded-md bg-[#27CBCE]/15 border border-[#27CBCE]/35 text-[#8CF6F7] text-xs font-mono font-bold">
+                  {activeProject.index}
+                </span>
+                <span className="text-sm sm:text-base font-bold text-white truncate">
+                  {activeProject.title}
+                </span>
+              </div>
+              <button
+                type="button"
+                onClick={() => setIsFullscreen(false)}
+                aria-label="Close fullscreen view"
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/10 hover:bg-white/20 text-xs font-medium text-white border border-white/15 transition-colors cursor-pointer"
+              >
+                <X className="w-4 h-4" />
+                <span className="hidden sm:inline">Close (Esc)</span>
+              </button>
+            </div>
+
+            <div className="flex-1 min-h-0">{renderInteractiveStage(true)}</div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </section>
   );
 }

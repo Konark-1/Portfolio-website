@@ -4,20 +4,35 @@ import React from 'react';
 
 export default function HeroBackgroundMobile() {
   return (
-    <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none bg-[#050810]" suppressHydrationWarning>
-      {/* Primary cyan ambient glow */}
-      <div 
-        className="absolute top-[10%] left-[10%] w-[80vw] h-[80vw] rounded-full"
+    <div
+      aria-hidden="true"
+      className="pointer-events-none absolute inset-0 overflow-hidden bg-[#050810]"
+      suppressHydrationWarning
+    >
+      {/* Primary cyan diagonal silk aura (always visible SSR + instant frame 0) */}
+      <div
+        className="absolute -top-1/4 -left-1/4 h-[140%] w-[140%] opacity-85 will-change-transform animate-[pulse_10s_ease-in-out_infinite] motion-reduce:animate-none"
         style={{
-          background: 'radial-gradient(circle, rgba(39, 203, 206, 0.15) 0%, rgba(39, 203, 206, 0.05) 40%, transparent 70%)',
+          background:
+            'radial-gradient(ellipse 65% 40% at 32% 45%, rgba(39, 203, 206, 0.22) 0%, rgba(11, 77, 89, 0.14) 42%, rgba(5, 8, 16, 0) 75%)',
         }}
       />
-      
-      {/* Secondary dark blue glow */}
-      <div 
-        className="absolute bottom-[10%] right-[5%] w-[90vw] h-[90vw] rounded-full"
+
+      {/* Secondary counter-wave glow */}
+      <div
+        className="absolute inset-0 opacity-80"
         style={{
-          background: 'radial-gradient(circle, rgba(16, 28, 64, 0.4) 0%, rgba(16, 28, 64, 0.1) 50%, transparent 70%)',
+          background:
+            'radial-gradient(ellipse 55% 35% at 72% 58%, rgba(39, 203, 206, 0.18) 0%, rgba(13, 92, 99, 0.10) 48%, rgba(5, 8, 16, 0) 78%)',
+        }}
+      />
+
+      {/* Soft obsidian vignette to keep header & typography perfectly crisp */}
+      <div
+        className="absolute inset-0 pointer-events-none"
+        style={{
+          background:
+            'linear-gradient(180deg, rgba(5, 8, 16, 0.5) 0%, transparent 25%, transparent 75%, rgba(5, 8, 16, 0.8) 100%)',
         }}
       />
     </div>

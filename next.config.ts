@@ -2,6 +2,9 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   /* config options here */
+  // Allow phone access over local Wi-Fi in development
+  allowedDevOrigins: ['192.168.1.50', '192.168.1.50:3000'],
+
   // Optimize for performance
   compress: true,
   

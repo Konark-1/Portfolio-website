@@ -38,7 +38,7 @@ export default function AboutSection(): React.JSX.Element {
         <section
             ref={sectionRef}
             id="about"
-            className="relative z-10 min-h-[100svh] flex items-center justify-center px-4 sm:px-6 lg:px-8 py-24 sm:py-32 lg:py-40"
+            className="relative z-10 min-h-[100svh] flex items-center justify-center px-4 sm:px-6 lg:px-8 py-24 sm:py-32 lg:py-40 scroll-mt-24"
             style={{
                 backgroundColor: 'var(--background-about)',
             }}
@@ -75,11 +75,11 @@ export default function AboutSection(): React.JSX.Element {
                 />
             </div>
 
-            <div className="max-w-5xl mx-auto w-full relative z-10">
+            <div className="max-w-7xl 2xl:max-w-[1440px] mx-auto w-full relative z-10">
                 {/* Header with Dynamic Scaling */}
                 <div className="text-center mb-12 sm:mb-16 lg:mb-20">
                     <motion.p
-                        className="text-xs sm:text-sm uppercase tracking-[0.3em] sm:tracking-[0.5em] text-accent-cyan font-sans font-semibold mb-4 sm:mb-6"
+                        className="text-xs sm:text-sm uppercase tracking-[0.4em] sm:tracking-[0.5em] text-accent-cyan font-sans font-semibold mb-4 sm:mb-6"
                         initial={{ opacity: 0, y: 20 }}
                         whileInView={{ opacity: 1, y: 0 }}
                         viewport={{ once: true }}
@@ -91,7 +91,7 @@ export default function AboutSection(): React.JSX.Element {
                     {/* Dynamic Scaling Name - Semantically H2 to preserve single H1 per page */}
                     <motion.h2
                         ref={nameRef as any}
-                        className="font-serif text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-bold text-white leading-[1.1] mb-6 sm:mb-8 origin-center px-2"
+                        className="font-serif text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-7xl 2xl:text-8xl font-bold text-white leading-[1.1] mb-6 sm:mb-8 origin-center px-2 tracking-tight"
                         initial={{ opacity: 0, y: 15 }}
                         whileInView={{ opacity: 1, y: 0 }}
                         viewport={{ once: true }}
@@ -102,7 +102,7 @@ export default function AboutSection(): React.JSX.Element {
 
                     {/* Parallax Description */}
                     <motion.p
-                        className="text-base sm:text-lg md:text-xl text-text-muted font-sans max-w-2xl mx-auto leading-relaxed px-2"
+                        className="text-base sm:text-lg md:text-xl text-text-muted font-sans max-w-3xl mx-auto leading-relaxed px-2"
                         initial={{ opacity: 0, y: 15 }}
                         whileInView={{ opacity: 1, y: 0 }}
                         viewport={{ once: true }}
@@ -122,7 +122,7 @@ export default function AboutSection(): React.JSX.Element {
                         {capabilities.map(({ num, title, subtitle, desc }, index) => (
                             <motion.div
                                 key={index}
-                                className="relative group p-6 sm:p-8 bg-[rgba(10,14,26,0.95)] overflow-hidden hover:bg-[rgba(39,203,206,0.05)] transition-colors duration-500"
+                                className="relative group p-7 sm:p-9 bg-[rgba(10,14,26,0.95)] overflow-hidden hover:bg-[rgba(39,203,206,0.05)] transition-colors duration-500"
                                 initial={{ opacity: 0, y: 30 }}
                                 animate={cardsInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
                                 transition={{
@@ -131,18 +131,18 @@ export default function AboutSection(): React.JSX.Element {
                                     ease: [0.25, 0.46, 0.45, 0.94]
                                 }}
                             >
-                                <span className="text-xs text-text-muted/50 font-mono tracking-wider">{num}</span>
+                                <span className="text-xs sm:text-sm text-text-muted/60 font-mono tracking-wider">{num}</span>
                                 <motion.h3
-                                    className="text-2xl sm:text-3xl font-bold text-white font-serif mt-4 mb-1 group-hover:text-accent-cyan transition-colors duration-300"
+                                    className="text-2xl sm:text-3xl lg:text-4xl font-bold text-white font-serif mt-4 mb-2 group-hover:text-accent-cyan transition-colors duration-300 tracking-tight"
                                     whileHover={{ scale: 1.02 }}
                                     transition={{ type: "spring", stiffness: 300, damping: 20 }}
                                 >
                                     {title}
                                 </motion.h3>
-                                <p className="text-xs uppercase tracking-[0.2em] text-accent-cyan/70 font-sans mb-4">
+                                <p className="text-xs sm:text-sm uppercase tracking-[0.2em] text-accent-cyan/80 font-sans mb-4 font-medium">
                                     {subtitle}
                                 </p>
-                                <p className="text-sm text-text-muted leading-relaxed font-sans">
+                                <p className="text-base sm:text-lg text-text-muted leading-relaxed font-sans">
                                     {desc}
                                 </p>
                             </motion.div>

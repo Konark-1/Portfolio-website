@@ -33,13 +33,10 @@ export default function HomePage() {
             {/* Immediate ambient glow base: renders at frame 0 in SSR HTML, eliminating black screen */}
             <HeroBackgroundMobile />
 
-            {/* Ultra-lightweight WebGL Silk waves: Canvas rendered in SSR, connects instantly on mount */}
+            {/* Progressive Premultiplied WebGL Silk Waves: transitions smoothly once Frame 0 verified */}
             <Silk
-              speed={shouldReduceMotion ? 0 : 7.5}
-              scale={1}
-              color="#27CBCE"
-              noiseIntensity={5.9}
-              rotation={0}
+              speed={shouldReduceMotion ? 0 : 1.0}
+              intensity={1.0}
             />
           </div>
 
@@ -52,11 +49,11 @@ export default function HomePage() {
           {/* Content container with proper spacing from header */}
           <div className="relative z-10 flex flex-col items-center justify-center min-h-[100svh] pt-24 sm:pt-28 lg:pt-32 pb-8 px-4 sm:px-6" suppressHydrationWarning>
             {/* Main heading */}
-            <div className="text-center max-w-6xl mx-auto space-y-4 sm:space-y-6" suppressHydrationWarning>
-              <h1 className="font-serif text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl 2xl:text-8xl font-bold tracking-tight leading-[1.1] text-white px-2" suppressHydrationWarning>
-                Data Analyst & Business Intelligence Specialist
+            <div className="text-center max-w-7xl 2xl:max-w-[1440px] mx-auto space-y-4 sm:space-y-6" suppressHydrationWarning>
+              <h1 className="font-serif text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-7xl 2xl:text-8xl font-bold tracking-tight leading-[1.1] text-white px-2" suppressHydrationWarning>
+                Data Analyst &amp; Business Intelligence Specialist
               </h1>
-              <p className="max-w-3xl mx-auto text-sm sm:text-base md:text-lg lg:text-xl leading-relaxed text-white/80 font-sans px-2" suppressHydrationWarning>
+              <p className="max-w-3xl mx-auto text-base sm:text-lg md:text-xl leading-relaxed text-white/85 font-sans px-2" suppressHydrationWarning>
                 I find the signal in the noise. Transforming complex data into actionable business intelligence.
               </p>
             </div>

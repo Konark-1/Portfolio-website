@@ -89,6 +89,21 @@ function ExperienceEntry({
   isLast,
 }: ExperienceEntryProps): React.JSX.Element {
   const formattedIndex = String(index + 1).padStart(2, '0');
+  const dotRef = useRef<HTMLDivElement>(null);
+
+  // Individual dot activation tracking as the scroll passes each position
+  const { scrollYProgress: dotProgress } = useScroll({
+    target: dotRef,
+    offset: ["start center", "end center"]
+  });
+
+  // Activate when spark passes (progress hits center)
+  const dotActivation = useSpring(useTransform(dotProgress, [0, 0.1], [0, 1]), {
+    stiffness: 100,
+    damping: 30
+  });
+  
+  const dotScale = useTransform(dotActivation, [0, 1], [0.4, 1]);
 
   return (
     <motion.div
@@ -102,49 +117,57 @@ function ExperienceEntry({
       }}
       className="relative sm:pl-16 group/entry"
     >
+      {/* Timeline dot Ref for activation detection */}
+      <div ref={dotRef} className="absolute sm:left-[25px] top-1/2 -translate-y-1/2 w-3 h-3 pointer-events-none" />
+
       {/* Timeline dot - centered with the box (center at 31px) */}
       <div className="hidden sm:flex absolute sm:left-[25px] top-1/2 -translate-y-1/2 w-3 h-3 rounded-full border-2 border-white/20 bg-background z-10 transition-colors duration-500 group-hover/entry:border-accent-cyan">
-        <div 
-          className="absolute inset-[-2px] rounded-full bg-accent-cyan shadow-[0_0_15px_#27CBCE] z-20 opacity-0 group-hover/entry:opacity-100 transition-opacity duration-300"
+        <motion.div 
+          style={{ 
+            opacity: dotActivation,
+            scale: dotScale,
+          }}
+          className="absolute inset-[-2px] rounded-full bg-accent-cyan shadow-[0_0_15px_#27CBCE] z-20 group-hover/entry:opacity-100 transition-opacity duration-300"
         />
         {/* Inner core to keep it looking sharp */}
-        <div 
-          className="absolute inset-[2px] rounded-full bg-white z-30 opacity-0 group-hover/entry:opacity-100 transition-opacity duration-300"
+        <motion.div 
+          style={{ opacity: dotActivation }}
+          className="absolute inset-[2px] rounded-full bg-white z-30 group-hover/entry:opacity-100 transition-opacity duration-300"
         />
       </div>
 
       {/* Card */}
       <div
-        className="rounded-2xl sm:rounded-3xl border border-border p-6 sm:p-8 transition-all duration-300 hover:border-accent-cyan/40 group"
+        className="rounded-2xl sm:rounded-3xl border border-border p-7 sm:p-9 lg:p-10 transition-all duration-300 hover:border-accent-cyan/40 group"
         style={{
           backgroundColor: 'var(--surface-elevated)',
           boxShadow: '0 4px 24px -12px rgba(0,0,0,0.5)',
         }}
       >
         {/* Top row: Number + Duration */}
-        <div className="flex items-center justify-between mb-4">
-          <span className="text-[10px] sm:text-xs text-accent-cyan font-mono tracking-widest uppercase">Entry {formattedIndex}</span>
-          <span className="text-[10px] sm:text-xs text-text-primary/90 font-sans font-medium px-3 py-1 rounded-full bg-white/5 border border-white/10">{duration}</span>
+        <div className="flex items-center justify-between mb-5">
+          <span className="text-xs sm:text-sm text-accent-cyan font-mono tracking-widest uppercase font-semibold">Entry {formattedIndex}</span>
+          <span className="text-xs sm:text-sm text-text-primary/95 font-sans font-medium px-3.5 py-1.5 rounded-full bg-white/5 border border-white/10">{duration}</span>
         </div>
 
         {/* Title & Company */}
         <div className="mb-6">
-          <h3 className="text-xl sm:text-2xl font-bold text-text-primary font-serif mb-1 group-hover:text-accent-cyan transition-colors duration-300">
+          <h3 className="text-2xl sm:text-3xl font-bold text-text-primary font-serif mb-2 group-hover:text-accent-cyan transition-colors duration-300 tracking-tight">
             {title}
           </h3>
-          <p className="text-sm sm:text-base text-accent-cyan font-sans font-medium">{company}</p>
+          <p className="text-base sm:text-lg text-accent-cyan font-sans font-medium">{company}</p>
         </div>
 
         {/* Summary */}
-        <p className="text-sm sm:text-base text-text-muted leading-relaxed font-sans mb-6 italic opacity-95">{summary}</p>
+        <p className="text-base sm:text-lg text-text-muted leading-relaxed font-sans mb-7 italic opacity-95">{summary}</p>
 
         {/* Achievements */}
         <div className="space-y-4 mb-8">
-          <p className="text-[10px] uppercase tracking-[0.25em] text-text-muted font-sans font-bold">Key Accomplishments</p>
-          <ul className="space-y-3">
+          <p className="text-xs sm:text-sm uppercase tracking-[0.25em] text-text-muted font-sans font-bold">Key Accomplishments</p>
+          <ul className="space-y-3.5">
             {achievements.map((item) => (
-              <li key={item} className="flex items-start gap-3 text-sm sm:text-base text-text-primary/90 leading-relaxed font-sans">
-                <span className="text-accent-cyan mt-1.5 flex-shrink-0 text-xs">▹</span>
+              <li key={item} className="flex items-start gap-3.5 text-base sm:text-lg text-text-primary/90 leading-relaxed font-sans">
+                <span className="text-accent-cyan mt-1.5 flex-shrink-0 text-sm">▹</span>
                 <span>{item}</span>
               </li>
             ))}
@@ -152,11 +175,11 @@ function ExperienceEntry({
         </div>
 
         {/* Skill Tags */}
-        <div className="flex flex-wrap gap-2 pt-6 border-t border-white/5">
+        <div className="flex flex-wrap gap-2.5 pt-6 border-t border-white/5">
           {skillTags.map((tag) => (
             <span
               key={tag}
-              className="text-[10px] sm:text-[11px] uppercase tracking-wider rounded-lg border border-accent-cyan/20 bg-accent-cyan/5 px-3 py-1.5 text-accent-cyan/70 font-sans font-semibold hover:bg-accent-cyan/10 hover:border-accent-cyan/40 transition-colors duration-200"
+              className="text-xs sm:text-sm uppercase tracking-wider rounded-xl border border-accent-cyan/20 bg-accent-cyan/5 px-3.5 py-2 text-accent-cyan/80 font-sans font-semibold hover:bg-accent-cyan/10 hover:border-accent-cyan/40 transition-colors duration-200 cursor-default"
             >
               {tag}
             </span>
@@ -167,13 +190,16 @@ function ExperienceEntry({
   );
 }
 
-function DesktopSpark({ targetRef }: { targetRef: React.RefObject<HTMLDivElement | null> }) {
-  const { scrollYProgress } = useScroll({
-    target: targetRef,
-    offset: ["start 65%", "end 65%"]
+export default function ExperienceSection() {
+  const isMobile = useIsMobile();
+  const experienceRef = useRef<HTMLElement>(null);
+
+  const { scrollYProgress: experienceProgress } = useScroll({
+    target: experienceRef,
+    offset: ["start center", "end center"]
   });
 
-  const smoothProgress = useSpring(scrollYProgress, {
+  const smoothProgress = useSpring(experienceProgress, {
     stiffness: 100,
     damping: 30,
     restDelta: 0.001
@@ -183,32 +209,9 @@ function DesktopSpark({ targetRef }: { targetRef: React.RefObject<HTMLDivElement
   const sparkOpacity = useTransform(smoothProgress, [0, 0.05, 0.95, 1], [0, 1, 1, 0]);
 
   return (
-    <motion.div
-      style={{ 
-        top: sparkY,
-        opacity: sparkOpacity
-      }}
-      className="absolute left-1/2 -translate-x-1/2 z-30"
-    >
-      {/* Glowing Spark */}
-      <div className="relative">
-        <div className="absolute inset-0 bg-accent-cyan blur-[6px] rounded-full scale-150 animate-pulse" />
-        <div className="h-2.5 w-2.5 rounded-full bg-accent-cyan border border-white shadow-[0_0_15px_#27CBCE]" />
-        
-        {/* Trailing light effect */}
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-8 h-8 bg-accent-cyan/20 blur-xl rounded-full" />
-      </div>
-    </motion.div>
-  );
-}
-
-export default function ExperienceSection() {
-  const isMobile = useIsMobile();
-  const timelineRef = useRef<HTMLDivElement>(null);
-
-  return (
     <section 
       id="experience" 
+      ref={experienceRef}
       className="relative z-20 text-foreground border-t" 
       style={{
         backgroundColor: 'var(--background-experience)',
@@ -217,13 +220,13 @@ export default function ExperienceSection() {
     >
       {/* Subtle turquoise gradient overlay */}
       <div className="absolute inset-0 bg-gradient-to-br from-transparent via-[rgba(39,203,206,0.02)] to-transparent pointer-events-none" />
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-20 sm:py-28 lg:py-36 relative z-10">
-        <div className="flex flex-col lg:flex-row gap-12 lg:gap-20">
+      <div className="mx-auto max-w-7xl 2xl:max-w-[1440px] px-4 sm:px-6 lg:px-8 py-20 sm:py-28 lg:py-36 relative z-10">
+        <div className="flex flex-col lg:flex-row gap-12 lg:gap-16 xl:gap-20">
           {/* Left Column - Heading (Sticky on Desktop) */}
-          <div className="lg:w-1/3">
+          <div className="lg:w-[35%] xl:w-[32%]">
             <div className="lg:sticky lg:top-40 lg:h-fit space-y-4 sm:space-y-6">
               <motion.p 
-                className="text-xs sm:text-sm uppercase tracking-[0.3em] sm:tracking-[0.5em] text-accent-cyan font-sans font-semibold"
+                className="text-xs sm:text-sm uppercase tracking-[0.4em] sm:tracking-[0.6em] text-accent-cyan font-sans font-semibold"
                 initial={{ opacity: 0, x: -20 }}
                 whileInView={{ opacity: 1, x: 0 }}
                 viewport={{ once: true }}
@@ -232,7 +235,7 @@ export default function ExperienceSection() {
                 Professional Journey
               </motion.p>
               <motion.h2
-                className="font-serif text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-text-primary tracking-tight leading-tight"
+                className="font-serif text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold text-text-primary tracking-tight leading-tight"
                 initial={{ opacity: 0 }}
                 whileInView={{ opacity: 1 }}
                 viewport={{ once: true }}
@@ -241,7 +244,7 @@ export default function ExperienceSection() {
                 Hands-on history
               </motion.h2>
               <motion.p 
-                className="text-sm sm:text-base md:text-lg text-text-muted leading-relaxed font-sans max-w-md"
+                className="text-base sm:text-lg md:text-xl text-text-muted leading-relaxed font-sans max-w-md"
                 initial={{ opacity: 0 }}
                 whileInView={{ opacity: 1 }}
                 viewport={{ once: true }}
@@ -256,11 +259,29 @@ export default function ExperienceSection() {
           </div>
           
           {/* Right Column - Timeline */}
-          <div className="lg:w-2/3">
-            <div ref={timelineRef} className="relative space-y-12 sm:space-y-16">
+          <div className="lg:w-[65%] xl:w-[68%]">
+            <div className="relative space-y-12 sm:space-y-16">
               {/* Timeline line - aligned with dots */}
               <div className="absolute left-[21px] sm:left-[31px] top-8 bottom-0 w-px bg-gradient-to-b from-accent-cyan/40 via-accent-cyan/15 to-transparent hidden sm:block">
-                {isMobile === false && <DesktopSpark targetRef={timelineRef} />}
+                {/* Dynamic Progress Spark */}
+                {isMobile === false && (
+                  <motion.div
+                    style={{ 
+                      top: sparkY,
+                      opacity: sparkOpacity
+                    }}
+                    className="absolute left-1/2 -translate-x-1/2 z-30 pointer-events-none"
+                  >
+                    {/* Glowing Spark */}
+                    <div className="relative">
+                      <div className="absolute inset-0 bg-accent-cyan blur-[6px] rounded-full scale-150 animate-pulse" />
+                      <div className="h-2.5 w-2.5 rounded-full bg-accent-cyan border border-white shadow-[0_0_15px_#27CBCE]" />
+                      
+                      {/* Trailing light effect */}
+                      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-8 h-8 bg-accent-cyan/20 blur-xl rounded-full" />
+                    </div>
+                  </motion.div>
+                )}
               </div>
               {experienceTimeline.map((item, index) => (
                 <ExperienceEntry

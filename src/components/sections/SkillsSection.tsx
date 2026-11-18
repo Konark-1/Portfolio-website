@@ -106,7 +106,7 @@ function SkillCard({ icon: Icon, title, level, description }: SkillCardProps): R
         </div>
       </motion.div>
       <motion.p
-        className="text-sm text-text-muted leading-relaxed font-sans"
+        className="text-sm sm:text-base text-text-muted leading-relaxed font-sans"
         initial={{ opacity: 0 }}
         whileInView={{ opacity: 1 }}
         viewport={{ once: true }}
@@ -126,7 +126,7 @@ export default function SkillsSection() {
     }}>
       {/* Subtle gradient overlay */}
       <div className="absolute inset-0 bg-gradient-to-br from-[rgba(39,203,206,0.03)] via-transparent to-transparent pointer-events-none" />
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-12 sm:py-16 lg:py-24 space-y-12 sm:space-y-16 relative z-10">
+      <div className="mx-auto max-w-7xl 2xl:max-w-[1440px] px-4 sm:px-6 lg:px-8 py-16 sm:py-20 lg:py-28 space-y-12 sm:space-y-16 relative z-10">
         <div className="text-center space-y-4 max-w-4xl mx-auto px-4">
           <motion.p
             className="text-xs sm:text-sm uppercase tracking-[0.3em] sm:tracking-[0.5em] text-accent-cyan font-sans font-semibold"
@@ -138,7 +138,7 @@ export default function SkillsSection() {
             Technical expertise
           </motion.p>
           <motion.h2
-            className="font-serif text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-text-primary tracking-tight leading-tight"
+            className="font-serif text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold text-text-primary tracking-tight leading-[1.15]"
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
