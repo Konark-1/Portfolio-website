@@ -640,17 +640,25 @@ export default function ProjectsSection() {
                     <span>{project.index}</span>
                   </span>
 
-                  <span
-                    className={`px-2.5 py-0.5 rounded-full text-[11px] font-mono uppercase tracking-wider truncate font-semibold ${
-                      project.isCapstone
-                        ? 'bg-[#27CBCE]/20 text-[#8CF6F7] border border-[#27CBCE]/40'
-                        : isActive
-                        ? 'bg-white/15 text-white'
-                        : 'bg-white/5 text-slate-400'
-                    }`}
-                  >
-                    {project.badgeText}
-                  </span>
+                  <div className="flex items-center gap-1.5">
+                    {isActive && (
+                      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-mono font-bold bg-[#27CBCE]/20 text-[#8CF6F7] border border-[#27CBCE]/40">
+                        <span className="w-1.5 h-1.5 rounded-full bg-[#8CF6F7] animate-pulse" />
+                        ACTIVE
+                      </span>
+                    )}
+                    <span
+                      className={`px-2.5 py-0.5 rounded-full text-[11px] font-mono uppercase tracking-wider truncate font-semibold ${
+                        project.isCapstone
+                          ? 'bg-[#27CBCE]/20 text-[#8CF6F7] border border-[#27CBCE]/40'
+                          : isActive
+                          ? 'bg-white/15 text-white'
+                          : 'bg-white/5 text-slate-400'
+                      }`}
+                    >
+                      {project.badgeText}
+                    </span>
+                  </div>
                 </div>
 
                 {/* Title */}
@@ -672,13 +680,16 @@ export default function ProjectsSection() {
                   </span>
                 </div>
 
-                {/* Active Bottom Indicator */}
+                {/* Active Seamless Inset Contour (Eliminates Glitchy Exterior Bottom Line) */}
                 {isActive && (
-                  <motion.div
-                    layoutId="activeProjectIndicator"
-                    transition={{ type: 'spring', stiffness: 380, damping: 32 }}
-                    className="absolute inset-x-4 -bottom-[1px] h-[3px] bg-gradient-to-r from-[#27CBCE] via-[#8CF6F7] to-[#27CBCE]"
-                  />
+                  <>
+                    <motion.div
+                      layoutId="activeProjectPill"
+                      transition={{ type: 'spring', stiffness: 420, damping: 36 }}
+                      className="absolute inset-0 rounded-2xl border-2 border-[#27CBCE] bg-gradient-to-b from-[#27CBCE]/12 via-[#27CBCE]/[0.02] to-transparent pointer-events-none shadow-[0_0_28px_-6px_rgba(39,203,206,0.35)]"
+                    />
+                    <div className="absolute top-0 inset-x-8 h-[2px] rounded-full bg-gradient-to-r from-transparent via-[#8CF6F7] to-transparent pointer-events-none" />
+                  </>
                 )}
               </button>
             );
