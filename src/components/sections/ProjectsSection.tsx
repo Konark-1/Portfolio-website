@@ -52,7 +52,7 @@ export interface ProjectSpec {
   headlineMetric: ProjectMetric;
   problem: string;
   solution: string;
-  impactBullets: string[];
+  impactBullets?: string[];
   stack: string[];
   previewImage: string;
   embedUrl?: string;
@@ -79,11 +79,6 @@ export const PROJECTS: ProjectSpec[] = [
       'Enterprise sales reports often aggregate high-level revenue figures, masking localized margin leakage. High-volume, low-margin SKUs and regional distributor discounting quietly eroded net operating profit without alerting executive leadership until month-end financial reconciliations.',
     solution:
       'Engineered a high-performance Star-Schema dimensional model in Power BI paired with custom DAX margin-attribution measures and synchronized geographic drill-throughs. The system enables executive leadership to seamlessly transition from macro P&L summaries down to granular micro-unit SKU profitability in two clicks.',
-    impactBullets: [
-      'Isolates profit-vs-volume divergence across product categories in <2 clicks',
-      'Surfaces underperforming regional cohorts dragging aggregate gross margin',
-      'Unifies executive P&L summaries with granular SKU profitability diagnostics',
-    ],
     stack: ['Power BI', 'DAX Measures', 'Dimensional Modeling', 'Geographic Viz'],
     previewImage: '/images/dashboard-previews/Macro & Micro Level Analysis.webp',
     embedUrl:
@@ -102,19 +97,14 @@ export const PROJECTS: ProjectSpec[] = [
     badgeText: 'Real-Time APIs',
     headlineMetric: {
       value: 'Live API',
-      label: 'Threshold-Driven UI Telemetry',
+      label: 'Context-Aware Alert State Telemetry',
       context: 'Dynamic DAX styling across multi-city feeds',
     },
     problem:
-      'Static operational dashboards fail to trigger immediate visual escalation when environmental thresholds breach safe logistics or retail conditions.',
+      'Static operational dashboards force dispatch teams to manually cross-reference external weather feeds against delivery schedules, delaying proactive rerouting and staffing decisions during severe disruptions.',
     solution:
-      'Built an API-ingested Power BI telemetry layer utilizing context-aware DAX conditional formatting that mutates card geometry and alert states in real time.',
-    impactBullets: [
-      'Tracks multi-city environmental indices via automated API ingestion pipelines',
-      'Triggers adaptive visual state shifts automatically on severity threshold breaches',
-      'Eliminates manual monitoring overhead for weather-sensitive dispatch teams',
-    ],
-    stack: ['Power BI', 'Dynamic DAX', 'Weather APIs', 'Context-Aware Alerts'],
+      'Automated a real-time REST API ingestion pipeline in Power BI paired with context-aware DAX rules. The interface autonomously mutates visual state, alert hierarchies, and SVG indicators the second environmental severity thresholds are breached.',
+    stack: ['Power BI', 'Dynamic DAX', 'REST API Ingestion', 'SVG & Visual Formatting'],
     previewImage: '/images/dashboard-previews/Adaptive Weather Visuals.webp',
     embedUrl:
       'https://app.fabric.microsoft.com/view?r=eyJrIjoiNGQ0MzFkY2UtN2M1ZS00Mzg4LTk0YzAtZjc4MmVjMDhjY2ZhIiwidCI6IjE4YjExOTE3LTU2NGQtNDJhYi05M2M4LWMxY2JhZDlhNjRiMiJ9',
@@ -127,24 +117,19 @@ export const PROJECTS: ProjectSpec[] = [
     index: '03',
     title: 'Distribution & Trend Analysis',
     shortTitle: 'Distribution & PnL',
-    domain: 'Financial Operations, Cost Efficiency & Trend Forecasting',
+    domain: 'Regional P&L Leakage & Seasonal Variance Analytics',
     type: 'powerbi',
-    badgeText: 'Financial Governance',
+    badgeText: 'Profitability & P&L',
     headlineMetric: {
-      value: '0.99x',
-      label: 'Cost-to-Revenue Ratio Governance',
-      context: 'Monthly PnL anomaly & seasonal forecasting',
+      value: '₹2.13M OpEx',
+      label: 'Multi-State Margin Audit',
+      context: 'Diagnosing cyclical loss spikes and regional margin compression across ₹2.13M operating volume',
     },
     problem:
-      'Unmonitored seasonal inventory swings and state-level fulfillment costs silently eroded operating margins before monthly books closed.',
+      'Despite ₹2.13M in operating volume, annual net profit was compressed to just ₹37K. Aggregated monthly reporting masked acute cyclical loss spikes (May, July, November) and hid which state-level distribution nodes and product categories were silently draining operating margins.',
     solution:
-      'Developed statistical time-series forecasting models and state-mapped expense ratio diagnostics to detect monthly PnL loss vectors ahead of replenishment cycles.',
-    impactBullets: [
-      'Enforces strict 0.99x cost-ratio governance with instant anomaly flagging',
-      'Pinpoints state-level distribution inefficiencies across seasonal demand curves',
-      'Supports proactive inventory allocation using rolling time-series baselines',
-    ],
-    stack: ['Power BI', 'Statistical Time-Series', 'Expense Ratio Analysis', 'State Mapping'],
+      'Engineered a multi-dimensional Power BI diagnostic model dissecting product mix (Clothing 46.6%, Electronics 37.8%, Furniture 15.6%) against state-level P&L geography and monthly variance curves—pinpointing unprofitable distribution nodes for immediate margin intervention.',
+    stack: ['Power BI', 'DAX Measures', 'P&L Variance Modeling', 'Geographic Audit'],
     previewImage: '/images/dashboard-previews/Distribution & Trend Analysis.webp',
     embedUrl:
       'https://app.powerbi.com/view?r=eyJrIjoiNmE4MmRhMmItNTFlNC00MzMzLTkwZjQtNjc1NjEyZDI2ZTczIiwidCI6IjE4YjExOTE3LTU2NGQtNDJhYi05M2M4LWMxY2JhZDlhNjRiMiJ9&pageName=ReportSection',
@@ -163,25 +148,19 @@ export const PROJECTS: ProjectSpec[] = [
     badgeText: 'CAPSTONE • FULL-STACK',
     headlineMetric: {
       value: '30%+',
-      label: 'COD RTO Failure Defense',
-      context: 'Autonomous NDR audit + WhatsApp recovery',
+      label: 'COD RTO Failure Interception',
+      context: 'Autonomous courier NDR telemetry audit & WhatsApp recovery',
     },
     problem:
-      'D2C brands lose 25–35% of Cash-on-Delivery revenue to Return-to-Origin (RTO) shipments driven by fake courier "customer unavailable" NDR logs.',
+      'Indian D2C brands lose 25–35% of Cash-on-Delivery GMV to Return-to-Origin (RTO) failures caused by bogus courier Non-Delivery Reports ("Door Locked"), invalid customer phone data, and slow manual re-attempt workflows.',
     solution:
-      'Architected an event-driven MERN + Redis autonomous defense platform that ingests live courier webhooks, audits delivery telemetry for fraud anomalies, and triggers 1-tap WhatsApp location recovery.',
-    impactBullets: [
-      'Intercepts 30%+ COD failure exposure via automated NDR verification loops',
-      'Audits Delhivery & BlueDart webhook telemetry to flag fake non-delivery claims',
-      'Recovers failed delivery attempts through 1-tap WhatsApp Cloud API workflows',
-    ],
+      'Architected an event-driven MERN + Redis autonomous intercept engine that ingests live carrier webhooks (Delhivery, BlueDart), audits scan telemetry for fake-delivery anomalies, and triggers 1-tap WhatsApp location recovery directly with the buyer.',
     stack: [
       'MongoDB',
       'Express.js',
       'React 19',
       'Node.js',
       'Redis',
-      'REST APIs',
       'Courier Webhooks',
       'WhatsApp Cloud API',
     ],
@@ -220,21 +199,21 @@ export const PROJECTS: ProjectSpec[] = [
 export const techHighlights = [
   {
     icon: '🎯',
-    title: 'Advanced DAX & Star Schema',
+    title: 'Semantic Modeling & DAX Engineering',
     description:
-      'Complex business logic measures, dynamic time intelligence, and optimized dimensional data models.',
+      'Production Star-Schema models, context-transition measures, dynamic ranking, and time-intelligence variance analysis.',
   },
   {
     icon: '⚡',
-    title: 'Full-Stack Logistics & APIs',
+    title: 'REST APIs & Automated Ingestion',
     description:
-      'Autonomous engineering builds in MongoDB, Express.js, React, Node.js, and webhook-driven courier automation.',
+      'Automated Power Query (M) pipelines, live webhook ingestion, and real-time operational alert state telemetry.',
   },
   {
-    icon: '📊',
-    title: 'Commercial & Financial BI',
+    icon: '📦',
+    title: 'Event-Driven Full-Stack Systems',
     description:
-      'Executive and operational intelligence dashboards connecting granular SKU data to macro profitability.',
+      'Full-stack MERN + Redis architecture, carrier logistics webhook integration, and automated WhatsApp Cloud API recovery.',
   },
 ];
 
@@ -481,15 +460,6 @@ export default function ProjectsSection() {
           </div>
 
           <div className="flex items-center gap-2 shrink-0">
-            <a
-              href={activeProject.liveUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-xs font-medium text-slate-300 hover:text-[#8CF6F7] border border-white/10 transition-colors"
-            >
-              External
-              <ExternalLink className="w-3 h-3" />
-            </a>
             <button
               type="button"
               onClick={() => setIsFullscreen((prev) => !prev)}
@@ -738,74 +708,62 @@ export default function ProjectsSection() {
                 </h3>
 
                 {/* Hero KPI Banner */}
-                <div className="mt-5 p-4 rounded-2xl bg-[#060B14] border border-[#27CBCE]/30 flex items-center justify-between gap-4">
+                <div className="mt-5 p-4 rounded-2xl bg-[#060B14]/90 border border-[#27CBCE]/30 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                   <div>
-                    <div className="text-3xl sm:text-4xl font-bold font-mono tabular-nums text-transparent bg-clip-text bg-gradient-to-r from-[#27CBCE] to-[#8CF6F7]">
-                      {activeProject.headlineMetric.value}
+                    <div className="flex items-baseline gap-2.5">
+                      <span className="text-2xl sm:text-3xl font-bold font-mono tabular-nums text-transparent bg-clip-text bg-gradient-to-r from-[#27CBCE] to-[#8CF6F7]">
+                        {activeProject.headlineMetric.value}
+                      </span>
+                      <span className="text-xs sm:text-sm font-semibold text-slate-200">
+                        {activeProject.headlineMetric.label}
+                      </span>
                     </div>
-                    <div className="text-xs sm:text-sm font-semibold text-slate-200 mt-0.5">
-                      {activeProject.headlineMetric.label}
-                    </div>
-                  </div>
-                  <div className="text-right text-xs text-slate-300 max-w-[180px] leading-snug">
-                    {activeProject.headlineMetric.context}
+                    <p className="text-xs text-slate-400 mt-1 leading-snug">
+                      {activeProject.headlineMetric.context}
+                    </p>
                   </div>
                 </div>
 
-                {/* Problem -> Solution */}
-                <div className="mt-6 space-y-4">
-                  <div>
-                    <h4 className="text-xs font-mono uppercase tracking-widest text-[#27CBCE] mb-1.5 font-bold">
-                      Business Problem
-                    </h4>
-                    <p className="text-sm sm:text-base text-slate-300 leading-relaxed">
+                {/* Expanded Problem & Resolution Cards (Spacious, Clear, Authoritative) */}
+                <div className="mt-5 space-y-4">
+                  {/* Business Problem Card */}
+                  <div className="p-4 sm:p-5 rounded-2xl bg-amber-500/[0.03] border border-amber-500/20 hover:border-amber-500/35 transition-colors">
+                    <div className="flex items-center gap-2 text-xs font-mono font-bold uppercase tracking-wider text-amber-400/90 mb-2">
+                      <AlertCircle className="w-3.5 h-3.5 text-amber-400 shrink-0" />
+                      <span>Business Problem</span>
+                    </div>
+                    <p className="text-sm sm:text-[15px] text-slate-200 leading-relaxed font-sans">
                       {activeProject.problem}
                     </p>
                   </div>
 
-                  <div>
-                    <h4 className="text-xs font-mono uppercase tracking-widest text-[#27CBCE] mb-1.5 font-bold">
-                      Engineered Solution
-                    </h4>
-                    <p className="text-sm sm:text-base text-slate-300 leading-relaxed">
+                  {/* Engineered Resolution Card */}
+                  <div className="p-4 sm:p-5 rounded-2xl bg-[#27CBCE]/[0.04] border border-[#27CBCE]/25 hover:border-[#27CBCE]/40 transition-colors">
+                    <div className="flex items-center gap-2 text-xs font-mono font-bold uppercase tracking-wider text-[#8CF6F7] mb-2">
+                      <CheckCircle2 className="w-3.5 h-3.5 text-[#27CBCE] shrink-0" />
+                      <span>Engineered Resolution</span>
+                    </div>
+                    <p className="text-sm sm:text-[15px] text-slate-200 leading-relaxed font-sans">
                       {activeProject.solution}
                     </p>
                   </div>
                 </div>
-
-                {/* Quantifiable Business Impact */}
-                <div className="mt-6">
-                  <h4 className="text-xs font-mono uppercase tracking-widest text-slate-400 mb-2.5 font-semibold">
-                    Verified Outcomes
-                  </h4>
-                  <ul className="space-y-2.5">
-                    {activeProject.impactBullets.map((bullet) => (
-                      <li
-                        key={bullet}
-                        className="flex items-start gap-3 text-sm text-slate-200 leading-relaxed"
-                      >
-                        <CheckCircle2 className="w-4 h-4 text-[#27CBCE] shrink-0 mt-0.5" />
-                        <span>{bullet}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
               </div>
 
-              {/* Bottom Stack + Action CTAs */}
-              <div className="pt-5 border-t border-white/10 space-y-4">
+              {/* Bottom Stack + Single Primary Action CTA */}
+              <div className="pt-4 border-t border-white/10 space-y-4">
                 <div className="flex flex-wrap gap-2">
                   {activeProject.stack.map((tech) => (
                     <span
                       key={tech}
-                      className="px-3 py-1 rounded-lg text-xs font-mono bg-white/[0.05] text-slate-200 border border-white/10 font-medium"
+                      className="px-2.5 py-1 rounded-lg text-xs font-mono bg-white/[0.05] text-slate-300 border border-white/10 font-medium"
                     >
                       {tech}
                     </span>
                   ))}
                 </div>
 
-                <div className="flex flex-wrap items-center gap-3">
+                <div>
                   <a
                     href={activeProject.liveUrl}
                     target="_blank"
@@ -815,15 +773,6 @@ export default function ProjectsSection() {
                     <span>{activeProject.liveCtaLabel}</span>
                     <ArrowUpRight className="w-4 h-4" />
                   </a>
-
-                  <button
-                    type="button"
-                    onClick={() => setIsFullscreen(true)}
-                    className="inline-flex items-center justify-center gap-2 px-4 py-3 rounded-xl text-xs sm:text-sm font-medium bg-white/5 hover:bg-white/10 text-slate-200 border border-white/15 transition-colors cursor-pointer"
-                  >
-                    <Maximize2 className="w-4 h-4 text-[#8CF6F7]" />
-                    <span>Expand Stage</span>
-                  </button>
                 </div>
               </div>
             </div>
