@@ -12,6 +12,7 @@ import {
   ExternalLink,
   ArrowUpRight,
   CheckCircle2,
+  AlertCircle,
   Layers,
   Activity,
   Sparkles,
@@ -75,9 +76,9 @@ export const PROJECTS: ProjectSpec[] = [
       context: 'Executive P&L to micro-unit profitability',
     },
     problem:
-      'High-volume sales reporting masked negative-margin SKUs and regional discounting leaks behind aggregated revenue totals.',
+      'Enterprise sales reports often aggregate high-level revenue figures, masking localized margin leakage. High-volume, low-margin SKUs and regional distributor discounting quietly eroded net operating profit without alerting executive leadership until month-end financial reconciliations.',
     solution:
-      'Engineered a star-schema dimensional model in Power BI paired with custom DAX margin-attribution measures and synchronized geographic drill-throughs.',
+      'Engineered a high-performance Star-Schema dimensional model in Power BI paired with custom DAX margin-attribution measures and synchronized geographic drill-throughs. The system enables executive leadership to seamlessly transition from macro P&L summaries down to granular micro-unit SKU profitability in two clicks.',
     impactBullets: [
       'Isolates profit-vs-volume divergence across product categories in <2 clicks',
       'Surfaces underperforming regional cohorts dragging aggregate gross margin',
