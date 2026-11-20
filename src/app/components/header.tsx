@@ -9,12 +9,9 @@ import { MagneticButton } from "@/components/ui/magnetic-button";
 
 function Header() {
   const [isScrolled, setIsScrolled] = useState(false);
-  const [isVisible, setIsVisible] = useState(true);
-  const [isHovered, setIsHovered] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [deviceCaps, setDeviceCaps] = useState<ReturnType<typeof detectDeviceCapabilities> | null>(null);
   const lastScrollY = useRef(0);
-  const hideHeaderTimeout = useRef<NodeJS.Timeout | null>(null);
   const mobileMenuRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -45,32 +42,6 @@ function Header() {
           setIsMobileMenuOpen(false);
         }
 
-        if (!scrolledPastHero) {
-          if (hideHeaderTimeout.current) {
-            clearTimeout(hideHeaderTimeout.current);
-            hideHeaderTimeout.current = null;
-          }
-          setIsVisible(true);
-          lastScrollY.current = currentScrollY;
-          rafId = null;
-          return;
-        }
-
-        if (currentScrollY < lastScrollY.current) {
-          if (hideHeaderTimeout.current) {
-            clearTimeout(hideHeaderTimeout.current);
-            hideHeaderTimeout.current = null;
-          }
-          setIsVisible(true);
-        } else if (!isHovered && !isMobileMenuOpen) {
-          if (!hideHeaderTimeout.current) {
-            hideHeaderTimeout.current = setTimeout(() => {
-              setIsVisible(false);
-              hideHeaderTimeout.current = null;
-            }, 200);
-          }
-        }
-
         lastScrollY.current = currentScrollY;
         rafId = null;
       });
@@ -82,11 +53,8 @@ function Header() {
       if (rafId) {
         cancelAnimationFrame(rafId);
       }
-      if (hideHeaderTimeout.current) {
-        clearTimeout(hideHeaderTimeout.current);
-      }
     };
-  }, [isHovered, isMobileMenuOpen]);
+  }, [isMobileMenuOpen]);
 
   // Handle clicking outside mobile menu to close it
   useEffect(() => {
@@ -271,33 +239,12 @@ function Header() {
 
   return (
     <header
-      className={`fixed top-0 left-0 right-0 z-50 transition-transform duration-300 ease-in-out ${isScrolled && !isVisible ? '-translate-y-full' : 'translate-y-0'
-        }`}
+      className="fixed top-0 left-0 right-0 z-50 transition-all duration-300 ease-in-out translate-y-0"
       style={{
         WebkitBackfaceVisibility: 'hidden',
         backfaceVisibility: 'hidden',
-        WebkitTransform: isScrolled && !isVisible ? 'translate3d(0, -100%, 0)' : 'translate3d(0, 0, 0)',
       }}
       suppressHydrationWarning
-      onMouseEnter={() => {
-        setIsHovered(true);
-        // Clear any existing hide timer when hovering
-        if (hideHeaderTimeout.current) {
-          clearTimeout(hideHeaderTimeout.current);
-          hideHeaderTimeout.current = null;
-        }
-        // Show header immediately when hovering
-        setIsVisible(true);
-      }}
-      onMouseLeave={() => {
-        setIsHovered(false);
-        // If scrolled past hero, start the hide timer again
-        if (isScrolled && window.scrollY > lastScrollY.current && !isMobileMenuOpen) {
-          hideHeaderTimeout.current = setTimeout(() => {
-            setIsVisible(false);
-          }, 700);
-        }
-      }}
     >
       {/* Container A - Top State: Full-width transparent */}
       <div className={`absolute inset-0 transition-opacity duration-300 ease-in-out ${!isScrolled ? 'opacity-100' : 'opacity-0 pointer-events-none'
