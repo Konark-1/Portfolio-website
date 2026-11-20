@@ -8,39 +8,39 @@ import type { LucideIcon } from "lucide-react";
 export const skillsShowcase = [
   {
     icon: BarChart3,
-    title: "Power BI",
+    title: "BI & KPI Reporting",
     level: "Advanced",
-    description: "Interactive dashboards, DAX modeling, storytelling layouts.",
+    description: "Power BI, DAX, Star Schema Modeling, KPI Tracking & Variance Analysis.",
   },
   {
     icon: Database,
-    title: "SQL",
+    title: "SQL & Data Audits",
     level: "Proficient",
-    description: "Query optimisation, stored procedures, audit-ready outputs.",
-  },
-  {
-    icon: Code2,
-    title: "Python",
-    level: "Proficient",
-    description: "Pandas, NumPy, data-cleaning automations with AI copilots.",
-  },
-  {
-    icon: Server,
-    title: "Full-Stack & APIs",
-    level: "Proficient",
-    description: "M.E.R.N. architecture, webhook ingestion pipelines, REST APIs.",
+    description: "Complex Joins, CTEs, Window Functions, and audit-ready data validation.",
   },
   {
     icon: Layers,
-    title: "Excel",
+    title: "Advanced Excel",
     level: "Advanced",
-    description: "Complex formulas, Power Query, executive reporting packs.",
+    description: "XLOOKUP, Pivot Tables, master deduplication trackers & batch verification.",
   },
   {
     icon: Brain,
-    title: "AI Workflow",
+    title: "Business & Ops Analytics",
     level: "Expert",
-    description: "Prompt-driven tooling to accelerate analysis 3x.",
+    description: "SLA throughput tracking, root-cause analysis, quality benchmarking & rubrics.",
+  },
+  {
+    icon: Code2,
+    title: "Python Data Prep",
+    level: "Proficient",
+    description: "Pandas, dataset standardization, exception & anomaly identification.",
+  },
+  {
+    icon: Server,
+    title: "Full-Stack & Telemetry",
+    level: "Proficient",
+    description: "M.E.R.N. architecture, live carrier webhook ingestion pipelines & Redis queues.",
   },
 ];
 

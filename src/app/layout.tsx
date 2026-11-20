@@ -14,12 +14,12 @@ const playfair = Playfair_Display({
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://konarkparihar.vercel.app"),
-  title: "Konark Parihar | Data Analyst & Business Analyst | Delhi NCR",
-  description: "Data Analyst & Business Analyst based in Noida, Delhi NCR. Specializing in Power BI, SQL, Python, DAX, ETL pipelines, and API integration. View live dashboards and projects.",
-  keywords: ["Data Analyst Noida", "Business Analyst Delhi NCR", "Power BI Developer", "SQL Analyst", "Python Data Analyst", "Konark Parihar", "ETL Pipeline", "DAX", "fresher data analyst India"],
+  title: "Konark Parihar | Business Analyst & KPI Specialist | Noida, Delhi NCR",
+  description: "Business Analyst based in Noida, Delhi NCR. Specializing in KPI reporting, executive Power BI dashboards, SQL queries, process audits, and data quality workflows.",
+  keywords: ["Business Analyst Noida", "KPI Reporting", "Power BI Developer", "SQL Analyst", "Data Operations Analyst", "Process & Data Quality", "Konark Parihar", "DAX Star Schema", "Business Analyst Delhi NCR"],
   openGraph: {
-    title: "Konark Parihar | Data Analyst & Business Analyst | Delhi NCR",
-    description: "Data Analyst & Business Analyst based in Noida, Delhi NCR. Power BI, SQL, Python, DAX, ETL pipelines. View live dashboards and projects.",
+    title: "Konark Parihar | Business Analyst & KPI Specialist | Delhi NCR",
+    description: "Business Analyst combining corporate operations experience with quantitative AI evaluation, executive Power BI dashboards, and SQL data audits.",
     url: "https://konarkparihar.vercel.app",
     siteName: "Konark Parihar Portfolio",
     images: [
@@ -27,7 +27,7 @@ export const metadata: Metadata = {
         url: "/og-thumbnail.webp",
         width: 1200,
         height: 630,
-        alt: "Konark Parihar - Data Analyst & Business Analyst Portfolio",
+        alt: "Konark Parihar - Business Analyst Portfolio",
       },
     ],
     locale: "en_US",
@@ -35,8 +35,8 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Konark Parihar | Data Analyst & Business Analyst | Delhi NCR",
-    description: "Data Analyst & Business Analyst based in Noida, Delhi NCR. Power BI, SQL, Python, DAX, ETL pipelines. View live dashboards and projects.",
+    title: "Konark Parihar | Business Analyst & KPI Specialist | Delhi NCR",
+    description: "Business Analyst combining corporate operations with executive Power BI dashboards and SQL data audits.",
     images: ["/og-thumbnail.webp"],
   },
 };
@@ -46,14 +46,14 @@ const jsonLd = {
   "@type": "Person",
   "name": "Konark Parihar",
   "url": "https://konarkparihar.vercel.app",
-  "jobTitle": "Data Analyst & Business Analyst",
+  "jobTitle": "Business Analyst",
   "alumniOf": "Amity University",
   "sameAs": [
     "https://www.linkedin.com/in/konarkparihar",
     "https://github.com/Konark-1"
   ],
-  "knowsAbout": ["Data Analytics", "Power BI", "SQL", "Python", "Business Intelligence", "DAX", "ETL Pipelines"],
-  "description": "Data Analyst & Business Analyst based in Noida, Delhi NCR specializing in Power BI, SQL, and Python."
+  "knowsAbout": ["Business Analysis", "KPI Reporting", "Power BI", "SQL", "Data Quality Audits", "DAX", "Process Optimization", "Python"],
+  "description": "Business Analyst based in Noida, Delhi NCR specializing in KPI reporting, executive Power BI dashboards, and SQL data audits."
 };
 
 import { SpeedInsights } from "@vercel/speed-insights/next";

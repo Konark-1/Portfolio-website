@@ -6,64 +6,52 @@ import { useIsMobile } from "@/hooks/useIsMobile";
 
 export const experienceTimeline = [
   {
-    title: "AI-Analyst",
+    title: "AI Analyst — Multimodal Evaluation & Prompt Engineering",
     company: "Innodata Inc., Noida (Remote)",
     duration: "Jan 2026 – Present",
     summary:
-      "Spearheaded Multi-Modal Prompt Engineering across diverse AI models (text, image, audio, and video). Engineered and refined complex prompts, and conducted comparative evaluations to improve model performance.",
+      "Assessed multimodal model performance against defined business and quality rubrics to identify output gaps and logic failures.",
     achievements: [
-      "Achieved an average quality score of 3.29/4.00, surpassing the target benchmark of 2.00 by over 64%, as independently verified by senior QA reviewers.",
-      "Conducted rigorous comparative evaluations and A/B testing of AI-generated content to resolve factual and structural inconsistencies."
+      "Delivered a 3.29/4.00 verified quality benchmark, exceeding the 2.00 operational baseline across evaluated prompt workflows.",
+      "Synthesized recurring failure patterns into actionable diagnostic notes to guide prompt refinement and accuracy improvements.",
     ],
-    skillTags: ["Prompt Engineering", "Quality Assurance", "AI Training", "Process Standardization"],
+    skillTags: ["Quality Benchmarking", "Evaluation Rubrics", "Prompt Engineering", "Root-Cause Analysis"],
   },
   {
-    title: "Certified Data Analyst",
-    company: "Ducat, Noida",
+    title: "Certified Data Analyst (Full-Time 16-Month Program)",
+    company: "Ducat, Noida (Full-Time Classroom Curriculum)",
     duration: "Jul 2024 – Nov 2025",
     summary:
-      "Undertook an intensive, practical upskilling program focused on modern data architecture, bridging the gap between business logic and technical execution using AI-augmented workflows.",
+      "Completed full-time 16-month curriculum covering Advanced SQL, Power BI (DAX, Star Schema), Python, and Excel business reporting.",
     achievements: [
-      "Mastered the full data lifecycle: Extraction (SQL), Transformation (Python/Excel), and Visualization (Power BI).",
-      "Developed AI-assisted coding protocols to accelerate query generation and complex DAX formulation.",
+      "Executed end-to-end data pipelines and KPI monitoring models, translating business requirements into automated reporting.",
+      "Mastered the full data lifecycle: Extraction (SQL), Transformation (Python/Pandas/Excel), and Visualization (Power BI).",
     ],
-    skillTags: ["SQL", "Python", "Power BI", "Excel", "VBA", "Generative AI"],
+    skillTags: ["Advanced SQL", "Power BI & DAX", "Star Schema", "Advanced Excel", "Python (Pandas)"],
   },
   {
-    title: "Claims Analyst",
-    company: "Xceedance Consulting India Pvt. Ltd.",
+    title: "Data Operations Analyst — Medical Provider Network (MPN)",
+    company: "Xceedance Consulting, Noida",
     duration: "Jul 2023 – Feb 2024",
     summary:
-      "Delivered high-velocity data processing and database maintenance for US-based healthcare clients, consistently outperforming production targets through rapid process adaptation.",
+      "Audited and maintained the Medical Provider Network (MPN) database, verifying doctor credentials, clinic locations, contact numbers, and healthcare provider specializations.",
     achievements: [
-      "Maintained 99.9% data integrity for the Medical Provider Network (MPN) database with zero compliance errors.",
-      "Surpassed daily production KPIs by 15% within the first month of operations.",
+      "Streamlined batch validation by designing master Excel deduplication trackers with XLOOKUP and Pivot Tables to eliminate redundant provider listings.",
+      "Surpassed daily operational throughput targets by 15% while maintaining zero-compromise record accuracy and directory compliance.",
     ],
-    skillTags: ["Data Integrity", "SLA Management", "Healthcare Ops"],
+    skillTags: ["MPN Database Audit", "Excel Deduplication", "SLA Throughput (+15%)", "Directory Compliance"],
   },
   {
-    title: "Marketing & Sales Trainee",
-    company: "IFortis Corporate",
-    duration: "May 2021 – Jul 2021",
-    summary:
-      "Built foundational business intelligence skills through consumer trend analysis, market segmentation, and the alignment of sales operations with corporate strategy.",
-    achievements: [
-      "Leveraged market segmentation analysis to refine targeting approaches for active campaigns.",
-      "Managed sales operations to ensure seamless execution of strategic promotional plans.",
-    ],
-    skillTags: ["Market Analysis", "Consumer Behavior", "Stakeholder Ops"],
-  },
-  {
-    title: "Bachelor of Commerce (Hons)",
+    title: "Bachelor of Commerce (Honours) in Accounting & Finance",
     company: "Amity University, Noida",
     duration: "May 2019 – Nov 2022",
     summary:
-      "Developed a strong foundation in business logic, accounting, and finance, which now informs my analytical approach to commerce-driven data insights.",
+      "Graduated with a Major in Accounting and Finance (CGPA: 7.55/10.0), establishing core competencies in corporate accounting, financial variance analysis, and operational business logic.",
     achievements: [
-      "Major in Accounting and Finance with a CGPA of 7.55/10.0.",
-      "Built core competencies in financial modeling and business process understanding.",
+      "Applied financial logic and accounting principles directly to commercial data modeling and KPI architectures.",
+      "Built foundational quantitative skills in cost accounting, P&L reporting, and variance identification.",
     ],
-    skillTags: ["Accounting", "Finance", "Business Logic"],
+    skillTags: ["Accounting & Finance", "Variance Analysis", "Business Logic", "P&L Reporting"],
   },
 ];
 

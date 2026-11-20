@@ -49,10 +49,10 @@ export default function HomePage() {
             {/* Main heading */}
             <div className="text-center max-w-7xl 2xl:max-w-[1440px] mx-auto space-y-4 sm:space-y-6" suppressHydrationWarning>
               <h1 className="font-serif text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-7xl 2xl:text-8xl font-bold tracking-tight leading-[1.1] text-white px-2" suppressHydrationWarning>
-                Data Analyst &amp; Business Intelligence Specialist
+                Business Analyst &amp; KPI Specialist
               </h1>
               <p className="max-w-3xl mx-auto text-base sm:text-lg md:text-xl leading-relaxed text-white/85 font-sans px-2" suppressHydrationWarning>
-                I find the signal in the noise. Transforming complex data into actionable business intelligence.
+                Translating complex operational data into executive Power BI dashboards, SQL queries, and automated workflows that drive throughput and quality.
               </p>
             </div>
 

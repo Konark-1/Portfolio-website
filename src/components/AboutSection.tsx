@@ -14,25 +14,25 @@ export default function AboutSection(): React.JSX.Element {
     const capabilities = [
         {
             num: "01",
-            title: "Dynamic",
-            subtitle: "Stakeholder Views",
-            desc: "Multi-user dashboards tailored for different decision-makers"
+            title: "Executive",
+            subtitle: "KPI Reporting",
+            desc: "Star-schema Power BI models, DAX measures, and variance tracking tailored for leadership decisions."
         },
         {
             num: "02",
-            title: "Automated",
-            subtitle: "Intelligence",
-            desc: "AI-driven workflows that accelerate insight delivery"
+            title: "Data Audits",
+            subtitle: "& Process Quality",
+            desc: "Rigorous SQL querying, deduplication, and exception identification ensuring zero-compromise data integrity."
         },
         {
             num: "03",
-            title: "Targeted",
-            subtitle: "Decision Support",
-            desc: "Focused analytics that drive actionable outcomes"
+            title: "Operational",
+            subtitle: "Throughput & SLAs",
+            desc: "Root-cause diagnostics and automated validation workflows that systematically eliminate bottlenecks."
         },
     ];
 
-    const skills = ["Power BI", "SQL", "DAX", "Python", "Excel", "VBA", "AI Workflow", "Logistics & RTO Analytics", "Healthcare Analytics"];
+    const skills = ["Power BI", "DAX & Star Schema", "SQL (CTEs, Joins)", "Advanced Excel", "Python (Pandas)", "KPI Tracking", "SLA Throughput", "Root-Cause Analysis", "Data Quality Audits"];
 
     return (
         <section
@@ -108,11 +108,10 @@ export default function AboutSection(): React.JSX.Element {
                         viewport={{ once: true }}
                         transition={{ duration: 0.5, delay: 0.1, ease: "easeOut" }}
                     >
-                        Data Analyst specializing in{" "}
-                        <span className="text-accent-cyan">Power BI</span>,{" "}
-                        <span className="text-accent-cyan">SQL</span>, and{" "}
-                        <span className="text-accent-cyan">AI-powered workflows</span> —
-                        transforming complex data into strategic business decisions.
+                        Business Analyst combining corporate operations experience in Medical Provider Network (MPN) database quality assurance with quantitative AI quality evaluation — skilled in translating complex operational data into executive{" "}
+                        <span className="text-accent-cyan">Power BI dashboards</span>,{" "}
+                        <span className="text-accent-cyan">SQL queries</span>, and{" "}
+                        <span className="text-accent-cyan">Excel workflows</span> that improve accuracy and throughput.
                     </motion.p>
                 </div>
 
