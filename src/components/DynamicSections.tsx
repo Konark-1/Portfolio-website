@@ -186,6 +186,7 @@ function ViewportGate({
 
   return (
     <div
+      id={shouldMount ? undefined : id}
       ref={hostRef}
       className={`w-full ${heightClass} cv-auto`}
       style={{ "--cv-height": cvHeight } as React.CSSProperties}
