@@ -18,6 +18,7 @@ function SectionSkeleton({
 }) {
   return (
     <div
+      role="status"
       aria-busy="true"
       aria-label={`Loading ${label}`}
       className={`w-full ${heightClass} rounded-2xl border border-[#27CBCE]/10 bg-[#050810] contain-layout`}
