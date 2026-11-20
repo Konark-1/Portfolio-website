@@ -126,9 +126,9 @@ export const PROJECTS: ProjectSpec[] = [
       context: 'Diagnosing cyclical loss spikes and regional margin compression across ₹2.13M operating volume',
     },
     problem:
-      'Despite ₹2.13M in operating volume, annual net profit was compressed to just ₹37K. Aggregated monthly reporting masked acute cyclical loss spikes (May, July, November) and hid which state-level distribution nodes and product categories were silently draining operating margins.',
+      'Despite ₹2.13M in operating volume, annual net profit was compressed to just ₹37K. Aggregated monthly reporting masked acute cyclical loss spikes (May, July, September, December) and hid which state-level distribution nodes and product categories were silently draining operating margins.',
     solution:
-      'Engineered a multi-dimensional Power BI diagnostic model dissecting product mix (Clothing 46.6%, Electronics 37.8%, Furniture 15.6%) against state-level P&L geography and monthly variance curves—pinpointing unprofitable distribution nodes for immediate margin intervention.',
+      'Engineered a multi-dimensional Power BI diagnostic model dissecting product mix (Clothing 62.62%, Electronics 20.55%, Furniture 16.83%) against state-level P&L geography and monthly variance curves—pinpointing unprofitable distribution nodes for immediate margin intervention.',
     stack: ['Power BI', 'DAX Measures', 'P&L Variance Modeling', 'Geographic Audit'],
     previewImage: '/images/dashboard-previews/Distribution & Trend Analysis.webp',
     embedUrl:
