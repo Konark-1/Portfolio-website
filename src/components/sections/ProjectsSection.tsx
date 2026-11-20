@@ -301,7 +301,7 @@ export default function ProjectsSection() {
       return (
         <div
           className={`relative flex flex-col bg-[#070B14] border border-[#27CBCE]/30 rounded-2xl overflow-hidden shadow-[0_0_50px_-15px_rgba(39,203,206,0.22)] ${
-            fullscreenMode ? 'h-full w-full' : 'h-[460px] sm:h-[520px] lg:h-full lg:min-h-[540px]'
+            fullscreenMode ? 'h-full w-full' : 'min-h-[420px] sm:min-h-[460px] lg:h-full lg:min-h-[540px]'
           }`}
         >
           {/* Chrome Header */}
@@ -355,17 +355,17 @@ export default function ProjectsSection() {
 
           {/* Stage Body */}
           {rescueViewMode === 'architecture' ? (
-            <div className="relative flex-1 p-5 sm:p-7 flex flex-col justify-between overflow-y-auto bg-[radial-gradient(ellipse_at_top_right,rgba(39,203,206,0.14),transparent_65%)]">
+            <div className="relative flex-1 p-4 sm:p-6 lg:p-7 flex flex-col justify-between overflow-y-auto bg-[radial-gradient(ellipse_at_top_right,rgba(39,203,206,0.14),transparent_65%)]">
               <div className="flex items-center justify-between gap-3 mb-4">
-                <div>
+                <div className="min-w-0 flex-1">
                   <p className="text-xs font-mono uppercase tracking-widest text-[#27CBCE] font-semibold">
                     Autonomous NDR Recovery Loop
                   </p>
-                  <h4 className="text-lg sm:text-xl font-bold text-white mt-1">
+                  <h4 className="text-base sm:text-lg lg:text-xl font-bold text-white mt-1 break-words">
                     Event-Driven RTO Interception Pipeline
                   </h4>
                 </div>
-                <span className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-mono bg-emerald-500/10 text-emerald-300 border border-emerald-500/25">
+                <span className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-mono bg-emerald-500/10 text-emerald-300 border border-emerald-500/25 shrink-0">
                   <Activity className="w-3.5 h-3.5" />
                   Production Live
                 </span>
@@ -447,7 +447,7 @@ export default function ProjectsSection() {
     return (
       <div
         className={`relative flex flex-col bg-[#070B14] border border-white/10 rounded-2xl overflow-hidden shadow-[0_20px_60px_-20px_rgba(0,0,0,0.8)] ${
-          fullscreenMode ? 'h-full w-full' : 'h-[460px] sm:h-[520px] lg:h-full lg:min-h-[540px]'
+          fullscreenMode ? 'h-full w-full' : 'aspect-[16/10] sm:aspect-[16/9] lg:aspect-auto lg:h-full lg:min-h-[540px]'
         }`}
       >
         {/* Sandbox Chrome Bar */}
@@ -541,7 +541,7 @@ export default function ProjectsSection() {
     <section
       id="projects-section-content"
       aria-labelledby="projects-heading"
-      className="relative py-20 sm:py-28 px-4 sm:px-6 lg:px-8 bg-[#050810] text-slate-100 overflow-hidden border-t scroll-mt-24"
+      className="relative py-14 sm:py-20 lg:py-28 px-4 sm:px-6 lg:px-8 bg-[#050810] text-slate-100 overflow-hidden border-t scroll-mt-24"
       style={{
         borderColor: 'var(--border-color)',
       }}
@@ -554,14 +554,14 @@ export default function ProjectsSection() {
 
       <div className="relative max-w-7xl 2xl:max-w-[1440px] mx-auto">
         {/* Section Header */}
-        <div className="mb-12 sm:mb-16">
+        <div className="mb-8 sm:mb-12 lg:mb-16">
           <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#27CBCE]/10 border border-[#27CBCE]/25 text-[#8CF6F7] text-xs sm:text-sm font-mono uppercase tracking-widest mb-4">
             <Layers className="w-3.5 h-3.5" />
             <span>Engineered Systems Catalog</span>
           </div>
           <h2
             id="projects-heading"
-            className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold tracking-tight text-white leading-[1.12] font-serif max-w-5xl"
+            className="text-3xl sm:text-5xl md:text-6xl lg:text-7xl font-bold tracking-tight text-white leading-[1.12] font-serif max-w-5xl"
           >
             Data Intelligence &amp;{' '}
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#27CBCE] via-[#20B2AA] to-[#8CF6F7]">
@@ -573,10 +573,52 @@ export default function ProjectsSection() {
         {/* =====================================================================
             ZONE 1: THE 10-SECOND INDEX (All 4 Projects Visible Without Scrolling)
            ===================================================================== */}
+        {/* MOBILE SELECTOR TABS: Horizontal Swipeable Pill Bar (< lg) */}
         <div
           role="tablist"
-          aria-label="Portfolio Projects Index"
-          className="grid grid-cols-2 lg:grid-cols-4 gap-3.5 sm:gap-4 mb-8"
+          aria-label="Portfolio Projects Selector"
+          className="flex lg:hidden items-center gap-2 overflow-x-auto no-scrollbar pb-3 mb-6 -mx-4 px-4 scroll-smooth snap-x"
+        >
+          {PROJECTS.map((project) => {
+            const isActive = project.id === activeProject.id;
+            return (
+              <button
+                key={`mobile-tab-${project.id}`}
+                role="tab"
+                type="button"
+                aria-selected={isActive}
+                aria-controls={`panel-${project.id}`}
+                id={`mobile-tab-${project.id}`}
+                onClick={() => handleSelectProject(project.id)}
+                className={`flex-shrink-0 snap-start flex items-center gap-2 px-3.5 py-2.5 rounded-full border transition-all duration-200 cursor-pointer text-xs font-sans focus:outline-none focus-visible:ring-2 focus-visible:ring-[#8CF6F7] ${
+                  isActive
+                    ? 'bg-[#27CBCE]/15 border-[#27CBCE] text-white shadow-[0_0_18px_rgba(39,203,206,0.45)]'
+                    : 'bg-[#090E1A]/80 border-white/10 text-slate-400 hover:text-white hover:border-white/20'
+                }`}
+              >
+                <span className={`font-mono font-bold text-xs ${isActive ? 'text-[#8CF6F7]' : 'text-slate-500'}`}>
+                  {project.index}
+                </span>
+                <span className="font-semibold whitespace-nowrap">
+                  {project.shortTitle}
+                </span>
+                {project.isCapstone ? (
+                  <span className="px-1.5 py-0.5 rounded text-[10px] font-mono font-bold bg-[#27CBCE]/25 text-[#8CF6F7] border border-[#27CBCE]/35">
+                    CAPSTONE
+                  </span>
+                ) : isActive ? (
+                  <span className="w-1.5 h-1.5 rounded-full bg-[#8CF6F7] animate-pulse" />
+                ) : null}
+              </button>
+            );
+          })}
+        </div>
+
+        {/* DESKTOP SELECTOR TABS: 4-Column Cards (>= lg) */}
+        <div
+          role="tablist"
+          aria-label="Portfolio Projects Desktop Index"
+          className="hidden lg:grid lg:grid-cols-4 gap-4 mb-8"
         >
           {PROJECTS.map((project, idx) => {
             const isActive = project.id === activeProject.id;
@@ -724,6 +766,11 @@ export default function ProjectsSection() {
                   </div>
                 </div>
 
+                {/* MOBILE VISUAL STAGE: Placed immediately below KPI banner on phone screens (< lg) */}
+                <div className="block lg:hidden my-5">
+                  {renderInteractiveStage(false)}
+                </div>
+
                 {/* Expanded Problem & Resolution Cards (Spacious, Clear, Authoritative) */}
                 <div className="mt-5 space-y-4">
                   {/* Business Problem Card */}
@@ -768,7 +815,7 @@ export default function ProjectsSection() {
                     href={activeProject.liveUrl}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex items-center justify-center gap-2 px-5 py-3 rounded-xl text-xs sm:text-sm font-bold bg-gradient-to-r from-[#27CBCE] to-[#8CF6F7] text-[#050810] hover:brightness-110 shadow-[0_0_24px_-6px_rgba(39,203,206,0.7)] transition-all cursor-pointer"
+                    className="inline-flex w-full sm:w-auto items-center justify-center gap-2 px-5 py-3 rounded-xl text-xs sm:text-sm font-bold bg-gradient-to-r from-[#27CBCE] to-[#8CF6F7] text-[#050810] hover:brightness-110 shadow-[0_0_24px_-6px_rgba(39,203,206,0.7)] transition-all cursor-pointer"
                   >
                     <span>{activeProject.liveCtaLabel}</span>
                     <ArrowUpRight className="w-4 h-4" />
@@ -777,28 +824,28 @@ export default function ProjectsSection() {
               </div>
             </div>
 
-            {/* RIGHT PANEL (7 Cols): Live Interactive Sandbox */}
-            <div className="lg:col-span-7">{renderInteractiveStage(false)}</div>
+            {/* RIGHT PANEL (7 Cols): Live Interactive Sandbox (Desktop Only, Mobile is hoisted above) */}
+            <div className="hidden lg:block lg:col-span-7">{renderInteractiveStage(false)}</div>
           </motion.div>
         </AnimatePresence>
 
         {/* Technical Implementation Highlights (Retained Competencies) */}
-        <div className="mt-12 sm:mt-16 p-8 sm:p-10 rounded-3xl border border-accent-cyan/20 bg-gradient-to-br from-accent-cyan/5 to-transparent">
-          <h3 className="font-serif text-2xl sm:text-3xl font-bold mb-6 flex items-center gap-3 text-text-primary tracking-tight">
-            <span className="text-accent-cyan text-3xl">⚡</span>
+        <div className="mt-12 sm:mt-16 p-5 sm:p-8 lg:p-10 rounded-2xl sm:rounded-3xl border border-accent-cyan/20 bg-gradient-to-br from-accent-cyan/5 to-transparent">
+          <h3 className="font-serif text-xl sm:text-2xl lg:text-3xl font-bold mb-6 flex items-center gap-3 text-text-primary tracking-tight">
+            <span className="text-accent-cyan text-2xl sm:text-3xl">⚡</span>
             Technical Architecture Highlights
           </h3>
-          <div className="grid gap-6 sm:gap-8 md:grid-cols-3">
+          <div className="grid gap-4 sm:gap-6 md:grid-cols-3">
             {techHighlights.map((highlight) => (
               <div
                 key={highlight.title}
-                className="rounded-2xl border border-white/10 hover:border-accent-cyan/30 bg-[#0a0e1a]/90 p-6 transition-all duration-300"
+                className="rounded-xl sm:rounded-2xl border border-white/10 hover:border-accent-cyan/30 bg-[#0a0e1a]/90 p-4 sm:p-6 transition-all duration-300"
               >
-                <div className="text-3xl mb-3">{highlight.icon}</div>
-                <h4 className="text-lg sm:text-xl font-bold text-text-primary mb-2 font-serif tracking-tight">
+                <div className="text-2xl sm:text-3xl mb-2 sm:mb-3">{highlight.icon}</div>
+                <h4 className="text-base sm:text-lg lg:text-xl font-bold text-text-primary mb-2 font-serif tracking-tight">
                   {highlight.title}
                 </h4>
-                <p className="text-sm text-text-muted leading-relaxed font-sans">
+                <p className="text-xs sm:text-sm text-text-muted leading-relaxed font-sans">
                   {highlight.description}
                 </p>
               </div>

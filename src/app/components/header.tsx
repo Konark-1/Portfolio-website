@@ -121,28 +121,19 @@ function Header() {
       window.dispatchEvent(new CustomEvent('mount-section', { detail: sectionId }));
     }
 
-    // 2. Perform rock-solid scroll calculation using getBoundingClientRect
+    // 2. Perform smooth scroll respecting CSS scroll-margin-top
     const performScroll = () => {
       const element = document.getElementById(sectionId);
       if (element) {
-        const headerHeight = 90;
-        const rect = element.getBoundingClientRect();
-        const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
-        const targetY = Math.max(0, rect.top + scrollTop - headerHeight);
-
-        window.scrollTo({
-          top: targetY,
-          behavior: 'smooth'
-        });
+        element.scrollIntoView({ behavior: 'smooth' });
         // Close mobile menu after navigation
         setIsMobileMenuOpen(false);
       }
     };
 
     performScroll();
-    requestAnimationFrame(() => {
-      performScroll();
-    });
+    requestAnimationFrame(performScroll);
+    setTimeout(performScroll, 60);
   }, []);
 
   const scrollToTop = useCallback(() => {

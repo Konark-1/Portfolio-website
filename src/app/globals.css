@@ -1028,4 +1028,13 @@ body::-webkit-scrollbar {
   content-visibility: auto;
   contain-intrinsic-block-size: auto var(--cv-height, 800px);
 }
+
+/* Universal utility to hide scrollbars while preserving touch/trackpad scroll */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
 

@@ -126,36 +126,36 @@ function ExperienceEntry({
 
       {/* Card */}
       <div
-        className="rounded-2xl sm:rounded-3xl border border-border p-7 sm:p-9 lg:p-10 transition-all duration-300 hover:border-accent-cyan/40 group"
+        className="rounded-2xl sm:rounded-3xl border border-border p-5 sm:p-8 lg:p-10 transition-all duration-300 hover:border-accent-cyan/40 group"
         style={{
           backgroundColor: 'var(--surface-elevated)',
           boxShadow: '0 4px 24px -12px rgba(0,0,0,0.5)',
         }}
       >
         {/* Top row: Number + Duration */}
-        <div className="flex items-center justify-between mb-5">
+        <div className="flex items-center justify-between mb-4 sm:mb-5">
           <span className="text-xs sm:text-sm text-accent-cyan font-mono tracking-widest uppercase font-semibold">Entry {formattedIndex}</span>
-          <span className="text-xs sm:text-sm text-text-primary/95 font-sans font-medium px-3.5 py-1.5 rounded-full bg-white/5 border border-white/10">{duration}</span>
+          <span className="text-xs sm:text-sm text-text-primary/95 font-sans font-medium px-3 sm:px-3.5 py-1 sm:py-1.5 rounded-full bg-white/5 border border-white/10">{duration}</span>
         </div>
 
         {/* Title & Company */}
-        <div className="mb-6">
-          <h3 className="text-2xl sm:text-3xl font-bold text-text-primary font-serif mb-2 group-hover:text-accent-cyan transition-colors duration-300 tracking-tight">
+        <div className="mb-4 sm:mb-6">
+          <h3 className="text-xl sm:text-2xl lg:text-3xl font-bold text-text-primary font-serif mb-1.5 sm:mb-2 group-hover:text-accent-cyan transition-colors duration-300 tracking-tight leading-snug">
             {title}
           </h3>
-          <p className="text-base sm:text-lg text-accent-cyan font-sans font-medium">{company}</p>
+          <p className="text-sm sm:text-base lg:text-lg text-accent-cyan font-sans font-medium">{company}</p>
         </div>
 
         {/* Summary */}
-        <p className="text-base sm:text-lg text-text-muted leading-relaxed font-sans mb-7 italic opacity-95">{summary}</p>
+        <p className="text-sm sm:text-base lg:text-lg text-text-muted leading-relaxed font-sans mb-5 sm:mb-7 italic opacity-95">{summary}</p>
 
         {/* Achievements */}
-        <div className="space-y-4 mb-8">
+        <div className="space-y-3 sm:space-y-4 mb-6 sm:mb-8">
           <p className="text-xs sm:text-sm uppercase tracking-[0.25em] text-text-muted font-sans font-bold">Key Accomplishments</p>
-          <ul className="space-y-3.5">
+          <ul className="space-y-2.5 sm:space-y-3.5">
             {achievements.map((item) => (
-              <li key={item} className="flex items-start gap-3.5 text-base sm:text-lg text-text-primary/90 leading-relaxed font-sans">
-                <span className="text-accent-cyan mt-1.5 flex-shrink-0 text-sm">▹</span>
+              <li key={item} className="flex items-start gap-2.5 sm:gap-3.5 text-xs sm:text-base lg:text-lg text-text-primary/90 leading-relaxed font-sans">
+                <span className="text-accent-cyan mt-1 flex-shrink-0 text-sm">▹</span>
                 <span>{item}</span>
               </li>
             ))}
@@ -163,11 +163,11 @@ function ExperienceEntry({
         </div>
 
         {/* Skill Tags */}
-        <div className="flex flex-wrap gap-2.5 pt-6 border-t border-white/5">
+        <div className="flex flex-wrap gap-2 sm:gap-2.5 pt-5 sm:pt-6 border-t border-white/5">
           {skillTags.map((tag) => (
             <span
               key={tag}
-              className="text-xs sm:text-sm uppercase tracking-wider rounded-xl border border-accent-cyan/20 bg-accent-cyan/5 px-3.5 py-2 text-accent-cyan/80 font-sans font-semibold hover:bg-accent-cyan/10 hover:border-accent-cyan/40 transition-colors duration-200 cursor-default"
+              className="text-[11px] sm:text-sm uppercase tracking-wider rounded-xl border border-accent-cyan/20 bg-accent-cyan/5 px-2.5 sm:px-3.5 py-1.5 sm:py-2 text-accent-cyan/80 font-sans font-semibold hover:bg-accent-cyan/10 hover:border-accent-cyan/40 transition-colors duration-200 cursor-default"
             >
               {tag}
             </span>
@@ -208,11 +208,11 @@ export default function ExperienceSection() {
     >
       {/* Subtle turquoise gradient overlay */}
       <div className="absolute inset-0 bg-gradient-to-br from-transparent via-[rgba(39,203,206,0.02)] to-transparent pointer-events-none" />
-      <div className="mx-auto max-w-7xl 2xl:max-w-[1440px] px-4 sm:px-6 lg:px-8 py-20 sm:py-28 lg:py-36 relative z-10">
-        <div className="flex flex-col lg:flex-row gap-12 lg:gap-16 xl:gap-20">
+      <div className="mx-auto max-w-7xl 2xl:max-w-[1440px] px-4 sm:px-6 lg:px-8 py-14 sm:py-24 lg:py-36 relative z-10">
+        <div className="flex flex-col lg:flex-row gap-8 sm:gap-12 lg:gap-16 xl:gap-20">
           {/* Left Column - Heading (Sticky on Desktop) */}
           <div className="lg:w-[35%] xl:w-[32%]">
-            <div className="lg:sticky lg:top-40 lg:h-fit space-y-4 sm:space-y-6">
+            <div className="lg:sticky lg:top-40 lg:h-fit space-y-3 sm:space-y-6">
               <motion.p 
                 className="text-xs sm:text-sm uppercase tracking-[0.4em] sm:tracking-[0.6em] text-accent-cyan font-sans font-semibold"
                 initial={{ opacity: 0, x: -20 }}
@@ -223,7 +223,7 @@ export default function ExperienceSection() {
                 Professional Journey
               </motion.p>
               <motion.h2
-                className="font-serif text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold text-text-primary tracking-tight leading-tight"
+                className="font-serif text-3xl sm:text-5xl md:text-6xl lg:text-7xl font-bold text-text-primary tracking-tight leading-tight"
                 initial={{ opacity: 0 }}
                 whileInView={{ opacity: 1 }}
                 viewport={{ once: true }}
@@ -232,7 +232,7 @@ export default function ExperienceSection() {
                 Hands-on history
               </motion.h2>
               <motion.p 
-                className="text-base sm:text-lg md:text-xl text-text-muted leading-relaxed font-sans max-w-md"
+                className="text-sm sm:text-lg md:text-xl text-text-muted leading-relaxed font-sans max-w-md"
                 initial={{ opacity: 0 }}
                 whileInView={{ opacity: 1 }}
                 viewport={{ once: true }}
@@ -248,7 +248,7 @@ export default function ExperienceSection() {
           
           {/* Right Column - Timeline */}
           <div className="lg:w-[65%] xl:w-[68%]">
-            <div className="relative space-y-12 sm:space-y-16">
+            <div className="relative space-y-6 sm:space-y-12 sm:space-y-16">
               {/* Timeline line - aligned with dots */}
               <div className="absolute left-[21px] sm:left-[31px] top-8 bottom-0 w-px bg-gradient-to-b from-accent-cyan/40 via-accent-cyan/15 to-transparent hidden sm:block">
                 {/* Dynamic Progress Spark */}

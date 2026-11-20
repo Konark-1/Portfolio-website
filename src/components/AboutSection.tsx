@@ -21,7 +21,7 @@ export default function AboutSection(): React.JSX.Element {
         {
             num: "02",
             title: "Data Audits",
-            subtitle: "& Process Quality",
+            subtitle: "Quality & Integrity",
             desc: "Rigorous SQL querying, deduplication, and exception identification ensuring zero-compromise data integrity."
         },
         {
@@ -38,7 +38,7 @@ export default function AboutSection(): React.JSX.Element {
         <section
             ref={sectionRef}
             id="about"
-            className="relative z-10 min-h-[100svh] flex items-center justify-center px-4 sm:px-6 lg:px-8 py-24 sm:py-32 lg:py-40 scroll-mt-24"
+            className="relative z-10 min-h-[100svh] flex items-center justify-center px-4 sm:px-6 lg:px-8 py-16 sm:py-24 lg:py-40 scroll-mt-24"
             style={{
                 backgroundColor: 'var(--background-about)',
             }}
@@ -121,7 +121,7 @@ export default function AboutSection(): React.JSX.Element {
                         {capabilities.map(({ num, title, subtitle, desc }, index) => (
                             <motion.div
                                 key={index}
-                                className="relative group p-7 sm:p-9 bg-[rgba(10,14,26,0.95)] overflow-hidden hover:bg-[rgba(39,203,206,0.05)] transition-colors duration-500"
+                                className="relative group p-5 sm:p-7 lg:p-9 bg-[rgba(10,14,26,0.95)] overflow-hidden hover:bg-[rgba(39,203,206,0.05)] transition-colors duration-500"
                                 initial={{ opacity: 0, y: 30 }}
                                 animate={cardsInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
                                 transition={{
@@ -132,16 +132,16 @@ export default function AboutSection(): React.JSX.Element {
                             >
                                 <span className="text-xs sm:text-sm text-text-muted/60 font-mono tracking-wider">{num}</span>
                                 <motion.h3
-                                    className="text-2xl sm:text-3xl lg:text-4xl font-bold text-white font-serif mt-4 mb-2 group-hover:text-accent-cyan transition-colors duration-300 tracking-tight"
+                                    className="text-xl sm:text-2xl lg:text-3xl font-bold text-white font-serif mt-3 mb-1.5 group-hover:text-accent-cyan transition-colors duration-300 tracking-tight"
                                     whileHover={{ scale: 1.02 }}
                                     transition={{ type: "spring", stiffness: 300, damping: 20 }}
                                 >
                                     {title}
                                 </motion.h3>
-                                <p className="text-xs sm:text-sm uppercase tracking-[0.2em] text-accent-cyan/80 font-sans mb-4 font-medium">
+                                <p className="text-xs sm:text-sm uppercase tracking-[0.2em] text-accent-cyan/80 font-sans mb-3 font-medium">
                                     {subtitle}
                                 </p>
-                                <p className="text-base sm:text-lg text-text-muted leading-relaxed font-sans">
+                                <p className="text-sm sm:text-base lg:text-lg text-text-muted leading-relaxed font-sans">
                                     {desc}
                                 </p>
                             </motion.div>
@@ -152,7 +152,7 @@ export default function AboutSection(): React.JSX.Element {
                 {/* Skills - Cascading Fade In */}
                 <div className="overflow-hidden">
                     <motion.div
-                        className="flex items-center justify-center gap-4 mb-8"
+                        className="flex items-center justify-center gap-4 mb-6 sm:mb-8"
                         initial={{ opacity: 0 }}
                         whileInView={{ opacity: 1 }}
                         viewport={{ once: true }}
@@ -163,11 +163,11 @@ export default function AboutSection(): React.JSX.Element {
                         <div className="h-px flex-1 max-w-[100px]" style={{ background: 'linear-gradient(to left, transparent, rgba(39, 203, 206, 0.2))' }} />
                     </motion.div>
 
-                    <div className="flex flex-wrap justify-center gap-3">
+                    <div className="flex flex-wrap justify-center gap-2 sm:gap-3">
                         {skills.map((skill, index) => (
                             <motion.span
                                 key={skill}
-                                className="px-4 py-2 text-sm text-text-muted border rounded-full 
+                                className="px-3 py-1.5 sm:px-4 sm:py-2 text-xs sm:text-sm text-text-muted border rounded-full 
                            hover:text-white
                            transition-all duration-300 cursor-default font-sans"
                                 style={{

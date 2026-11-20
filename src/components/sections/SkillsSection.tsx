@@ -66,17 +66,17 @@ function SkillCard({ icon: Icon, title, level, description }: SkillCardProps): R
         scale: 1.02,
         transition: { duration: 0.3, ease: "easeOut" }
       }}
-      className="rounded-3xl border border-border bg-card/80 p-6 shadow-glass-soft hover:border-accent-cyan/30 hover:bg-card/90 transition-colors duration-300"
+      className="rounded-2xl sm:rounded-3xl border border-border bg-card/80 p-4 sm:p-6 shadow-glass-soft hover:border-accent-cyan/30 hover:bg-card/90 transition-colors duration-300"
     >
       <motion.div
-        className="flex items-center gap-3 mb-4"
+        className="flex items-center gap-3 mb-3 sm:mb-4"
         initial={{ opacity: 0, x: -20 }}
         whileInView={{ opacity: 1, x: 0 }}
         viewport={{ once: true }}
         transition={{ duration: 0.4, delay: 0.1 }}
       >
         <motion.div
-          className="flex h-11 w-11 items-center justify-center rounded-2xl bg-accent-cyan/10 text-accent-cyan"
+          className="flex h-10 w-10 sm:h-11 sm:w-11 items-center justify-center rounded-xl sm:rounded-2xl bg-accent-cyan/10 text-accent-cyan shrink-0"
           whileHover={{
             scale: 1.08,
             transition: { duration: 0.2, ease: "easeOut" }
@@ -86,7 +86,7 @@ function SkillCard({ icon: Icon, title, level, description }: SkillCardProps): R
         </motion.div>
         <div>
           <motion.p
-            className="text-xs uppercase tracking-[0.35em] text-text-muted font-sans"
+            className="text-[10px] sm:text-xs uppercase tracking-[0.35em] text-text-muted font-sans"
             initial={{ opacity: 0 }}
             whileInView={{ opacity: 1 }}
             viewport={{ once: true }}
@@ -95,7 +95,7 @@ function SkillCard({ icon: Icon, title, level, description }: SkillCardProps): R
             {level}
           </motion.p>
           <motion.h3
-            className="text-lg font-semibold text-text-primary font-serif"
+            className="text-base sm:text-lg font-semibold text-text-primary font-serif tracking-tight"
             initial={{ opacity: 0 }}
             whileInView={{ opacity: 1 }}
             viewport={{ once: true }}
@@ -106,7 +106,7 @@ function SkillCard({ icon: Icon, title, level, description }: SkillCardProps): R
         </div>
       </motion.div>
       <motion.p
-        className="text-sm sm:text-base text-text-muted leading-relaxed font-sans"
+        className="text-xs sm:text-sm lg:text-base text-text-muted leading-relaxed font-sans"
         initial={{ opacity: 0 }}
         whileInView={{ opacity: 1 }}
         viewport={{ once: true }}
@@ -126,8 +126,8 @@ export default function SkillsSection() {
     }}>
       {/* Subtle gradient overlay */}
       <div className="absolute inset-0 bg-gradient-to-br from-[rgba(39,203,206,0.03)] via-transparent to-transparent pointer-events-none" />
-      <div className="mx-auto max-w-7xl 2xl:max-w-[1440px] px-4 sm:px-6 lg:px-8 py-16 sm:py-20 lg:py-28 space-y-12 sm:space-y-16 relative z-10">
-        <div className="text-center space-y-4 max-w-4xl mx-auto px-4">
+      <div className="mx-auto max-w-7xl 2xl:max-w-[1440px] px-4 sm:px-6 lg:px-8 py-12 sm:py-16 lg:py-24 space-y-8 sm:space-y-12 lg:space-y-16 relative z-10">
+        <div className="text-center space-y-3 sm:space-y-4 max-w-4xl mx-auto px-4">
           <motion.p
             className="text-xs sm:text-sm uppercase tracking-[0.3em] sm:tracking-[0.5em] text-accent-cyan font-sans font-semibold"
             initial={{ opacity: 0, y: 20 }}
@@ -138,7 +138,7 @@ export default function SkillsSection() {
             Technical expertise
           </motion.p>
           <motion.h2
-            className="font-serif text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold text-text-primary tracking-tight leading-[1.15]"
+            className="font-serif text-2xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold text-text-primary tracking-tight leading-[1.15]"
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
@@ -147,7 +147,7 @@ export default function SkillsSection() {
             Toolbox for insight generation
           </motion.h2>
           <motion.p
-            className="text-base sm:text-lg md:text-xl text-text-muted leading-relaxed font-sans"
+            className="text-sm sm:text-lg md:text-xl text-text-muted leading-relaxed font-sans"
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
@@ -157,14 +157,14 @@ export default function SkillsSection() {
           </motion.p>
         </div>
 
-        <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
+        <div className="grid gap-3.5 sm:gap-5 md:grid-cols-2 xl:grid-cols-3">
           {skillsShowcase.map((skill) => (
             <SkillCard key={skill.title} {...skill} />
           ))}
         </div>
 
         <motion.div
-          className="rounded-3xl border border-accent-cyan/40 bg-accent-cyan/10 p-8 shadow-glass-soft"
+          className="rounded-2xl sm:rounded-3xl border border-accent-cyan/40 bg-accent-cyan/10 p-5 sm:p-8 shadow-glass-soft"
           initial={{ opacity: 0, scale: 0.95, y: 30 }}
           whileInView={{ opacity: 1, scale: 1, y: 0 }}
           viewport={{ once: true, margin: "50px" }}
@@ -180,7 +180,7 @@ export default function SkillsSection() {
           }}
         >
           <motion.h3
-            className="font-serif text-2xl sm:text-3xl font-bold text-text-primary mb-4 flex items-center gap-3 tracking-tight leading-tight"
+            className="font-serif text-xl sm:text-2xl lg:text-3xl font-bold text-text-primary mb-3 sm:mb-4 flex items-center gap-3 tracking-tight leading-tight"
             initial={{ opacity: 0, x: -20 }}
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
@@ -203,7 +203,7 @@ export default function SkillsSection() {
             AI Workflow Advantage
           </motion.h3>
           <motion.p
-            className="text-base text-text-muted leading-relaxed font-sans"
+            className="text-xs sm:text-sm lg:text-base text-text-muted leading-relaxed font-sans"
             initial={{ opacity: 0 }}
             whileInView={{ opacity: 1 }}
             viewport={{ once: true }}

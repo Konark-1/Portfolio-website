@@ -98,22 +98,15 @@ export default function HomePage() {
                   const performScroll = () => {
                     const element = document.getElementById('projects');
                     if (element) {
-                      const headerHeight = 90;
-                      const rect = element.getBoundingClientRect();
-                      const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
-                      const targetY = Math.max(0, rect.top + scrollTop - headerHeight);
-                      window.scrollTo({
-                        top: targetY,
-                        behavior: 'smooth'
-                      });
+                      element.scrollIntoView({ behavior: 'smooth' });
                     } else {
-                      window.location.href = '/portfolio';
+                      setTimeout(() => {
+                        document.getElementById('projects')?.scrollIntoView({ behavior: 'smooth' });
+                      }, 60);
                     }
                   };
                   performScroll();
-                  requestAnimationFrame(() => {
-                    performScroll();
-                  });
+                  requestAnimationFrame(performScroll);
                 }}
               >
                 <GlassButton
