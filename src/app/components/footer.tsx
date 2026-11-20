@@ -306,10 +306,13 @@ export default function Footer() {
 
             {/* Back to top */}
             <MagneticButton
+              type="button"
+              aria-label="Scroll to top"
+              title="Scroll to top"
               onClick={scrollToTop}
               className="w-12 h-12 rounded-full footer-glass-pill flex items-center justify-center text-text-muted hover:text-white group order-3"
             >
-              <ArrowUp className="w-5 h-5 transform group-hover:-translate-y-1.5 transition-transform duration-300" />
+              <ArrowUp aria-hidden="true" className="w-5 h-5 transform group-hover:-translate-y-1.5 transition-transform duration-300" />
             </MagneticButton>
 
           </div>

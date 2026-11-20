@@ -1021,4 +1021,11 @@ body::-webkit-scrollbar {
 .tabs_let-content {
   -ms-overflow-style: none;
   scrollbar-width: none;
-}
+}
+
+/* Offscreen layout containment and style computation skip */
+.cv-auto {
+  content-visibility: auto;
+  contain-intrinsic-block-size: auto var(--cv-height, 800px);
+}
+

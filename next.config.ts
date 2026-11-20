@@ -13,7 +13,7 @@ const nextConfig: NextConfig = {
   
   // Enable experimental features for better performance
   experimental: {
-    optimizePackageImports: ['framer-motion', 'lucide-react', '@react-three/fiber', 'three', 'gsap'],
+    optimizePackageImports: ['framer-motion', 'lucide-react', 'gsap'],
   },
   
   // Optimize images with better caching

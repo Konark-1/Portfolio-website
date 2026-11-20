@@ -3,7 +3,6 @@ import { Inter, Playfair_Display } from "next/font/google";
 import "./globals.css";
 import Header from "./components/header"; // Import the header
 import Footer from "./components/footer"; // Import the footer
-import Script from "next/script";
 
 const inter = Inter({ subsets: ["latin"], display: "swap", variable: "--font-sans" });
 const playfair = Playfair_Display({
@@ -112,7 +111,6 @@ export default function RootLayout({
         <Footer />
         <SpeedInsights />
         <Analytics />
-        <Script src="/pbi-resize.js" strategy="lazyOnload" />
       </body>
     </html>
   );

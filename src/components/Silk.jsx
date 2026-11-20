@@ -642,7 +642,8 @@ export default function Silk({
     handleResize();
     renderFrame(0);
 
-    const startTime = performance.now();
+    let lastTimestamp = performance.now();
+    let elapsedTime = 0;
 
     const tick = (now) => {
       if (disposed) return;
@@ -650,14 +651,20 @@ export default function Silk({
         rafId = 0;
         return;
       }
-      const elapsedSec = (now - startTime) * 0.001;
-      renderFrame(elapsedSec);
+      // Clamped delta-time accumulation prevents teleporting/speed surges on tab switch or scroll resume
+      const dt = Math.min((now - lastTimestamp) / 1000, 0.05);
+      lastTimestamp = now;
+      elapsedTime += dt;
+      renderFrame(elapsedTime);
       rafId = window.requestAnimationFrame(tick);
     };
 
     const startLoop = () => {
       if (disposed || rafId !== 0) return;
       if (!isVisible || !isTabActive || prefersReducedMotion) return;
+      lastTimestamp = performance.now();
+      // Render immediate frame synchronously before scheduling next rAF to eliminate any blank frame
+      renderFrame(elapsedTime);
       rafId = window.requestAnimationFrame(tick);
     };
 
@@ -668,10 +675,15 @@ export default function Silk({
       }
     };
 
+    let resizeTimer = null;
     let resizeObserver = null;
     const onResize = () => {
-      handleResize();
-      renderFrame((performance.now() - startTime) * 0.001);
+      clearTimeout(resizeTimer);
+      resizeTimer = setTimeout(() => {
+        if (disposed) return;
+        handleResize();
+        if (isVisible) renderFrame(elapsedTime);
+      }, 100);
     };
 
     if (typeof ResizeObserver !== 'undefined') {
@@ -690,7 +702,7 @@ export default function Silk({
           if (isVisible) startLoop();
           else stopLoop();
         },
-        { threshold: 0.01 }
+        { rootMargin: '100px 0px', threshold: 0 }
       );
       intersectionObserver.observe(container);
     }
@@ -725,6 +737,7 @@ export default function Silk({
     return () => {
       disposed = true;
       stopLoop();
+      clearTimeout(resizeTimer);
       if (resizeObserver) resizeObserver.disconnect();
       else window.removeEventListener('resize', onResize);
       if (intersectionObserver) intersectionObserver.disconnect();
