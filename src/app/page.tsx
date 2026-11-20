@@ -31,10 +31,13 @@ export default function HomePage() {
             {/* Immediate ambient glow base: renders at frame 0 in SSR HTML, eliminating black screen */}
             <HeroBackgroundMobile />
 
-            {/* Progressive Premultiplied WebGL Silk Waves: transitions smoothly once Frame 0 verified */}
+            {/* Authentic React Bits WebGL Silk Waves */}
             <Silk
-              speed={shouldReduceMotion ? 0 : 1.0}
-              intensity={1.0}
+              speed={shouldReduceMotion ? 0 : 7.5}
+              scale={1}
+              color="#27CBCE"
+              noiseIntensity={5.9}
+              rotation={0}
             />
           </div>
 
