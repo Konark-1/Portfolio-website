@@ -33,8 +33,14 @@ export default function HomePage() {
 
             {/* Progressive Premultiplied WebGL Silk Waves: transitions smoothly once Frame 0 verified */}
             <Silk
-              speed={shouldReduceMotion ? 0 : 1.0}
-              intensity={1.0}
+              color="#27c4ff"
+              sheenColor="#8cf6f7"
+              speed={shouldReduceMotion ? 0 : 2.5}
+              scale={1.0}
+              sheen={0.5}
+              depth={0.5}
+              glow={0.3}
+              noiseIntensity={1.2}
             />
           </div>
 
