@@ -122,20 +122,27 @@ function Header() {
     }
 
     // 2. Perform rock-solid scroll calculation using getBoundingClientRect
-    const element = document.getElementById(sectionId);
-    if (element) {
-      const headerHeight = 90;
-      const rect = element.getBoundingClientRect();
-      const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
-      const targetY = Math.max(0, rect.top + scrollTop - headerHeight);
+    const performScroll = () => {
+      const element = document.getElementById(sectionId);
+      if (element) {
+        const headerHeight = 90;
+        const rect = element.getBoundingClientRect();
+        const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+        const targetY = Math.max(0, rect.top + scrollTop - headerHeight);
 
-      window.scrollTo({
-        top: targetY,
-        behavior: 'smooth'
-      });
-      // Close mobile menu after navigation
-      setIsMobileMenuOpen(false);
-    }
+        window.scrollTo({
+          top: targetY,
+          behavior: 'smooth'
+        });
+        // Close mobile menu after navigation
+        setIsMobileMenuOpen(false);
+      }
+    };
+
+    performScroll();
+    requestAnimationFrame(() => {
+      performScroll();
+    });
   }, []);
 
   const scrollToTop = useCallback(() => {
@@ -150,93 +157,6 @@ function Header() {
     scrollToSection('projects');
   }, [scrollToSection]);
 
-  // Reusable header content component
-  const HeaderContent = () => (
-    <>
-      <div className="flex-shrink-0">
-        <Link href="/" className="flex items-center gap-2">
-          <span
-            className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold text-text-primary font-serif tracking-tight"
-            style={{ fontSize: 'clamp(1.25rem, 4.5vw, 2.5rem)' }}
-          >
-            Konark Parihar
-          </span>
-        </Link>
-      </div>
-      <div className="hidden md:block">
-        <GlassButton
-          width="auto"
-          height={44}
-          borderRadius={50}
-          backgroundOpacity={0.08}
-          blur={12}
-          className="ring-1 ring-border px-1"
-        >
-          <div className="flex items-center gap-0.5">
-            <MagneticButton intensity={0.4} range="p-1 sm:p-1.5">
-              <button
-                onClick={scrollToTop}
-                className="relative z-10 rounded-full px-3 py-1.5 text-base font-medium text-white/80 hover:text-white transition-colors duration-200"
-              >
-                Home
-              </button>
-            </MagneticButton>
-            <MagneticButton intensity={0.4} range="p-1 sm:p-1.5">
-              <button
-                onClick={() => scrollToSection('about')}
-                className="relative z-10 rounded-full px-3 py-1.5 text-base font-medium text-white/80 hover:text-white transition-colors duration-200"
-              >
-                About
-              </button>
-            </MagneticButton>
-            <MagneticButton intensity={0.4} range="p-1 sm:p-1.5">
-              <button
-                onClick={() => scrollToSection('experience')}
-                className="relative z-10 rounded-full px-3 py-1.5 text-base font-medium text-white/80 hover:text-white transition-colors duration-200"
-              >
-                Experience
-              </button>
-            </MagneticButton>
-            <MagneticButton intensity={0.4} range="p-1 sm:p-1.5">
-              <button
-                onClick={scrollToPortfolio}
-                className="relative z-10 rounded-full px-3 py-1.5 text-base font-medium text-white/80 hover:text-white transition-colors duration-200"
-              >
-                Portfolio
-              </button>
-            </MagneticButton>
-            <MagneticButton intensity={0.4} range="p-1 sm:p-1.5">
-              <button
-                onClick={() => scrollToSection('certificates')}
-                className="relative z-10 rounded-full px-3 py-1.5 text-base font-medium text-white/80 hover:text-white transition-colors duration-200"
-              >
-                Certificates
-              </button>
-            </MagneticButton>
-            <MagneticButton intensity={0.4} range="p-1 sm:p-1.5">
-              <button
-                onClick={() => scrollToSection('contact')}
-                className="relative z-10 rounded-full px-3 py-1.5 text-base font-medium text-white/80 hover:text-white transition-colors duration-200"
-              >
-                Contact
-              </button>
-            </MagneticButton>
-          </div>
-        </GlassButton>
-      </div>
-      {/* Mobile menu button */}
-      <div className="md:hidden">
-        <button
-          onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-          className="p-2.5 min-w-[44px] min-h-[44px] flex items-center justify-center text-text-primary hover:text-text-muted transition-all duration-200 hover:scale-105 active:scale-95 rounded-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-cyan"
-          aria-label="Toggle mobile menu"
-        >
-          {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
-        </button>
-      </div>
-    </>
-  );
-
   return (
     <header
       className="fixed top-0 left-0 right-0 z-50 transition-all duration-300 ease-in-out translate-y-0"
@@ -246,42 +166,104 @@ function Header() {
       }}
       suppressHydrationWarning
     >
-      {/* Container A - Top State: Full-width transparent */}
-      <div className={`absolute inset-0 transition-opacity duration-300 ease-in-out ${!isScrolled ? 'opacity-100' : 'opacity-0 pointer-events-none'
-        }`}>
-        <div className="flex items-center justify-between w-full h-24 sm:h-28 lg:h-32 px-4 sm:px-6 lg:px-8">
-          <HeaderContent />
-        </div>
-      </div>
+      <div
+        className={`w-full transition-all duration-300 ease-in-out ${
+          isScrolled
+            ? 'py-3 sm:py-4 px-4 sm:px-6'
+            : 'py-5 sm:py-6 lg:py-7 px-4 sm:px-6 lg:px-8'
+        }`}
+      >
+        <div
+          className={`mx-auto flex items-center justify-between transition-all duration-300 ease-in-out ${
+            isScrolled
+              ? 'w-full max-w-5xl px-4 sm:px-6 py-2 rounded-full bg-white/10 backdrop-blur-md border border-white/15 shadow-[0_4px_24px_-4px_rgba(0,0,0,0.25)]'
+              : 'w-full bg-transparent border border-transparent'
+          }`}
+        >
+          {/* Brand */}
+          <div className="flex-shrink-0">
+            <Link href="/" className="flex items-center gap-2">
+              <span
+                className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold text-text-primary font-serif tracking-tight"
+                style={{ fontSize: 'clamp(1.25rem, 4.5vw, 2.5rem)' }}
+              >
+                Konark Parihar
+              </span>
+            </Link>
+          </div>
 
-      {/* Container B - Scrolled State: Centered GlassSurface */}
-      <div className={`transition-opacity duration-300 ease-in-out py-4 ${isScrolled ? 'opacity-100' : 'opacity-0 pointer-events-none'
-        }`}>
-        <div className={`mx-auto transition-all duration-300 ease-in-out ${isScrolled ? 'w-4/5 md:w-4/5' : 'w-full'
-          }`}>
-          <div className="relative h-[60px]">
-            {/* Lightweight CSS-only glass header */}
-            <div
-              className="absolute left-1/2 transform -translate-x-1/2 flex items-center justify-center overflow-hidden"
-              style={{
-                width: '114%',
-                height: '60px',
-                borderRadius: '50px',
-                background: 'rgba(255, 255, 255, 0.1)',
-                backdropFilter: 'blur(12px) saturate(1.2)',
-                WebkitBackdropFilter: 'blur(12px) saturate(1.2)',
-                border: '1px solid rgba(255, 255, 255, 0.15)',
-                boxShadow: `
-                  inset 0 1px 0 0 rgba(255, 255, 255, 0.15),
-                  inset 0 -1px 0 0 rgba(255, 255, 255, 0.05),
-                  0 4px 24px -4px rgba(0, 0, 0, 0.15)
-                `,
-              }}
+          {/* Desktop Navigation */}
+          <div className="hidden md:block">
+            <GlassButton
+              width="auto"
+              height={44}
+              borderRadius={50}
+              backgroundOpacity={0.08}
+              blur={12}
+              className="ring-1 ring-border px-1"
             >
-              <div className="flex items-center justify-between w-full h-full px-4">
-                <HeaderContent />
+              <div className="flex items-center gap-0.5">
+                <MagneticButton intensity={0.4} range="p-1 sm:p-1.5">
+                  <button
+                    onClick={scrollToTop}
+                    className="relative z-10 rounded-full px-3 py-1.5 text-base font-medium text-white/80 hover:text-white transition-colors duration-200"
+                  >
+                    Home
+                  </button>
+                </MagneticButton>
+                <MagneticButton intensity={0.4} range="p-1 sm:p-1.5">
+                  <button
+                    onClick={() => scrollToSection('about')}
+                    className="relative z-10 rounded-full px-3 py-1.5 text-base font-medium text-white/80 hover:text-white transition-colors duration-200"
+                  >
+                    About
+                  </button>
+                </MagneticButton>
+                <MagneticButton intensity={0.4} range="p-1 sm:p-1.5">
+                  <button
+                    onClick={() => scrollToSection('experience')}
+                    className="relative z-10 rounded-full px-3 py-1.5 text-base font-medium text-white/80 hover:text-white transition-colors duration-200"
+                  >
+                    Experience
+                  </button>
+                </MagneticButton>
+                <MagneticButton intensity={0.4} range="p-1 sm:p-1.5">
+                  <button
+                    onClick={scrollToPortfolio}
+                    className="relative z-10 rounded-full px-3 py-1.5 text-base font-medium text-white/80 hover:text-white transition-colors duration-200"
+                  >
+                    Portfolio
+                  </button>
+                </MagneticButton>
+                <MagneticButton intensity={0.4} range="p-1 sm:p-1.5">
+                  <button
+                    onClick={() => scrollToSection('certificates')}
+                    className="relative z-10 rounded-full px-3 py-1.5 text-base font-medium text-white/80 hover:text-white transition-colors duration-200"
+                  >
+                    Certificates
+                  </button>
+                </MagneticButton>
+                <MagneticButton intensity={0.4} range="p-1 sm:p-1.5">
+                  <button
+                    onClick={() => scrollToSection('contact')}
+                    className="relative z-10 rounded-full px-3 py-1.5 text-base font-medium text-white/80 hover:text-white transition-colors duration-200"
+                  >
+                    Contact
+                  </button>
+                </MagneticButton>
               </div>
-            </div>
+            </GlassButton>
+          </div>
+
+          {/* Mobile menu button */}
+          <div className="md:hidden">
+            <button
+              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+              className="p-2.5 min-w-[44px] min-h-[44px] flex items-center justify-center text-text-primary hover:text-text-muted transition-all duration-200 hover:scale-105 active:scale-95 rounded-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-cyan"
+              aria-label="Toggle mobile menu"
+            >
+              {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
+            </button>
           </div>
         </div>
       </div>

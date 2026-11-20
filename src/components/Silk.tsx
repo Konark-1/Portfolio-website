@@ -716,16 +716,15 @@ const Silk = ({
         >
           {/* Animated diagonal silk wave sheen for non-WebGL browsers */}
           <div
-            className="absolute inset-0 opacity-40 animate-pulse motion-reduce:animate-none"
+            className="absolute inset-0 silk-fallback-sheen motion-reduce:animate-none"
             style={{
               backgroundImage: `repeating-linear-gradient(
                 -45deg,
                 transparent,
                 transparent 45px,
-                ${cleanColor}14 45px,
-                ${cleanColor}14 90px
+                ${cleanColor}18 45px,
+                ${cleanColor}18 90px
               )`,
-              animationDuration: '7s',
             }}
           />
         </div>
