@@ -148,13 +148,21 @@ function Header() {
   }, [isMobileMenuOpen]);
 
   const scrollToSection = useCallback((sectionId: string) => {
+    // 1. Force mount if section is lazy/dynamic
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(new CustomEvent('mount-section', { detail: sectionId }));
+    }
+
+    // 2. Perform rock-solid scroll calculation using getBoundingClientRect
     const element = document.getElementById(sectionId);
     if (element) {
       const headerHeight = 90;
-      const elementPosition = element.offsetTop - headerHeight;
+      const rect = element.getBoundingClientRect();
+      const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+      const targetY = Math.max(0, rect.top + scrollTop - headerHeight);
 
       window.scrollTo({
-        top: elementPosition,
+        top: targetY,
         behavior: 'smooth'
       });
       // Close mobile menu after navigation
@@ -171,14 +179,7 @@ function Header() {
   }, []);
 
   const scrollToPortfolio = useCallback(() => {
-    const projectsSection = document.getElementById('projects');
-
-    if (projectsSection) {
-      scrollToSection('projects');
-      return;
-    }
-
-    window.location.href = '/portfolio';
+    scrollToSection('projects');
   }, [scrollToSection]);
 
   // Reusable header content component

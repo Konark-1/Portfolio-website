@@ -92,15 +92,18 @@ export default function HomePage() {
                 className="cursor-pointer pointer-events-auto group"
                 onClick={(e) => {
                   e.preventDefault();
+                  if (typeof window !== 'undefined') {
+                    window.dispatchEvent(new CustomEvent('mount-section', { detail: 'projects' }));
+                  }
                   const element = document.getElementById('projects');
                   if (element) {
-                    const headerHeight = 115;
-                    const elementPosition = element.offsetTop - headerHeight;
-                    requestAnimationFrame(() => {
-                      window.scrollTo({
-                        top: elementPosition,
-                        behavior: 'smooth'
-                      });
+                    const headerHeight = 90;
+                    const rect = element.getBoundingClientRect();
+                    const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+                    const targetY = Math.max(0, rect.top + scrollTop - headerHeight);
+                    window.scrollTo({
+                      top: targetY,
+                      behavior: 'smooth'
                     });
                   } else {
                     window.location.href = '/portfolio';

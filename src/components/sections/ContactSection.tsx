@@ -194,7 +194,7 @@ export default function ContactSection() {
   }, [formData, validateForm]);
 
   return (
-    <section id="contact" className="relative z-20 text-foreground border-t" style={{
+    <section id="contact-section-content" className="relative z-20 text-foreground border-t" style={{
       backgroundColor: 'var(--background-contact)',
       borderColor: 'var(--border-color)'
     }}>

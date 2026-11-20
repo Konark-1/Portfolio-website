@@ -162,9 +162,20 @@ function ViewportGate({
     };
     window.addEventListener("hashchange", onHashChange);
 
+    const onMountSection = (e: Event) => {
+      const customEvent = e as CustomEvent<string>;
+      if (customEvent.detail === id) {
+        setShouldMount(true);
+      }
+    };
+    window.addEventListener("mount-section", onMountSection);
+
     const el = hostRef.current;
     if (!el) {
-      return () => window.removeEventListener("hashchange", onHashChange);
+      return () => {
+        window.removeEventListener("hashchange", onHashChange);
+        window.removeEventListener("mount-section", onMountSection);
+      };
     }
 
     const observer = new IntersectionObserver(
@@ -181,14 +192,15 @@ function ViewportGate({
     return () => {
       observer.disconnect();
       window.removeEventListener("hashchange", onHashChange);
+      window.removeEventListener("mount-section", onMountSection);
     };
   }, [id]);
 
   return (
     <div
-      id={shouldMount ? undefined : id}
+      id={id}
       ref={hostRef}
-      className={`w-full ${heightClass} cv-auto`}
+      className={`w-full ${heightClass} cv-auto scroll-mt-24`}
       style={{ "--cv-height": cvHeight } as React.CSSProperties}
     >
       {shouldMount ? children : <SectionSkeleton heightClass={heightClass} label={id} />}

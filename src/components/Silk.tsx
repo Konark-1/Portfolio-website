@@ -702,6 +702,35 @@ const Silk = ({
         }}
       />
 
+      {/* Non-WebGL Animated Rich Silk Ribbon Fallback */}
+      {!hasWebGL && (
+        <div
+          className="absolute inset-0 pointer-events-none overflow-hidden"
+          style={{
+            background: `
+              radial-gradient(ellipse 75% 45% at 30% 40%, ${cleanColor}33 0%, transparent 65%),
+              radial-gradient(ellipse 65% 40% at 75% 60%, ${cleanSheenColor}26 0%, transparent 60%),
+              linear-gradient(135deg, rgba(5, 8, 16, 0.85) 0%, rgba(10, 35, 48, 0.35) 50%, rgba(5, 8, 16, 0.95) 100%)
+            `,
+          }}
+        >
+          {/* Animated diagonal silk wave sheen for non-WebGL browsers */}
+          <div
+            className="absolute inset-0 opacity-40 animate-pulse motion-reduce:animate-none"
+            style={{
+              backgroundImage: `repeating-linear-gradient(
+                -45deg,
+                transparent,
+                transparent 45px,
+                ${cleanColor}14 45px,
+                ${cleanColor}14 90px
+              )`,
+              animationDuration: '7s',
+            }}
+          />
+        </div>
+      )}
+
       <canvas
         ref={canvasRef}
         className="silk-canvas"

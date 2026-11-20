@@ -539,7 +539,7 @@ export default function ProjectsSection() {
 
   return (
     <section
-      id="projects"
+      id="projects-section-content"
       aria-labelledby="projects-heading"
       className="relative py-20 sm:py-28 px-4 sm:px-6 lg:px-8 bg-[#050810] text-slate-100 overflow-hidden border-t scroll-mt-24"
       style={{

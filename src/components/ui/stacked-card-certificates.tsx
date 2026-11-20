@@ -149,7 +149,7 @@ export function StackedCardCertificates({ certificates }: StackedCardCertificate
 
     return (
         <section
-            id="certificates"
+            id="certificates-section-content"
             className="relative z-20 text-white border-t"
             style={{
                 backgroundColor: 'var(--background-experience)',
