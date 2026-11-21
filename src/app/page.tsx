@@ -65,27 +65,18 @@ export default function HomePage() {
             {/* Action buttons */}
             <div className="mt-8 sm:mt-12 lg:mt-16 flex flex-col sm:flex-row justify-center items-center gap-0 w-full max-w-xl mx-auto px-4" suppressHydrationWarning>
               <MagneticButton
-                intensity={0.6}
+                intensity={0.2}
                 className="cursor-pointer pointer-events-auto group"
-                onClick={() => {
-                  const a = document.createElement('a');
-                  a.href = '/KONARK_PARIHAR.pdf';
-                  a.download = 'KONARK_PARIHAR.pdf';
-                  a.click();
-                }}
               >
                 <GlassButton
+                  as="a"
+                  href="/KONARK_PARIHAR.pdf"
+                  download="KONARK_PARIHAR.pdf"
                   width={220}
                   height={55}
                   borderRadius={50}
                   backgroundOpacity={0.1}
                   blur={12}
-                  onClick={() => {
-                    const a = document.createElement('a');
-                    a.href = '/KONARK_PARIHAR.pdf';
-                    a.download = 'KONARK_PARIHAR.pdf';
-                    a.click();
-                  }}
                 >
                   <span className="px-6 py-3 text-text-primary font-semibold w-full h-full text-sm sm:text-base tracking-wide flex items-center justify-center gap-2 font-sans uppercase">
                     <Download className="h-4 w-4 sm:h-5 sm:w-5" />
@@ -94,30 +85,11 @@ export default function HomePage() {
                 </GlassButton>
               </MagneticButton>
               <MagneticButton
-                intensity={0.6}
+                intensity={0.2}
                 className="cursor-pointer pointer-events-auto group"
-                onClick={(e) => {
-                  e.preventDefault();
-                  if (typeof window !== 'undefined') {
-                    window.dispatchEvent(new CustomEvent('mount-section', { detail: 'projects' }));
-                  }
-                  const performScroll = () => {
-                    const element = document.getElementById('projects');
-                    if (element) {
-                      const headerOffset = 76;
-                      const elementPosition = element.getBoundingClientRect().top;
-                      const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
-                      window.scrollTo({
-                        top: Math.max(0, offsetPosition),
-                        behavior: 'smooth'
-                      });
-                    }
-                  };
-                  performScroll();
-                  setTimeout(performScroll, 80);
-                }}
               >
                 <GlassButton
+                  as="button"
                   width={220}
                   height={55}
                   borderRadius={50}
@@ -125,6 +97,7 @@ export default function HomePage() {
                   blur={12}
                   onClick={(e) => {
                     e.preventDefault();
+                    e.stopPropagation();
                     if (typeof window !== 'undefined') {
                       window.dispatchEvent(new CustomEvent('mount-section', { detail: 'projects' }));
                     }

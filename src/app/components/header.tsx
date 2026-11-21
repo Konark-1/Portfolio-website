@@ -116,8 +116,12 @@ function Header() {
   }, [isMobileMenuOpen]);
 
   const scrollToSection = useCallback((sectionId: string) => {
-    // 1. Force mount if section is lazy/dynamic
     if (typeof window !== 'undefined') {
+      if (window.location.pathname !== '/') {
+        window.location.href = `/#${sectionId}`;
+        return;
+      }
+      // 1. Force mount if section is lazy/dynamic
       window.dispatchEvent(new CustomEvent('mount-section', { detail: sectionId }));
     }
 
@@ -142,6 +146,10 @@ function Header() {
   }, []);
 
   const scrollToTop = useCallback(() => {
+    if (typeof window !== 'undefined' && window.location.pathname !== '/') {
+      window.location.href = '/';
+      return;
+    }
     window.scrollTo({
       top: 0,
       behavior: 'smooth'
@@ -199,7 +207,7 @@ function Header() {
               className="ring-1 ring-border px-1"
             >
               <div className="flex items-center gap-0.5">
-                <MagneticButton intensity={0.4} range="p-1 sm:p-1.5">
+                <MagneticButton intensity={0.2} range="p-1 sm:p-1.5">
                   <button
                     onClick={scrollToTop}
                     className="relative z-10 rounded-full px-3 py-1.5 text-base font-medium text-white/80 hover:text-white transition-colors duration-200"
@@ -207,7 +215,7 @@ function Header() {
                     Home
                   </button>
                 </MagneticButton>
-                <MagneticButton intensity={0.4} range="p-1 sm:p-1.5">
+                <MagneticButton intensity={0.2} range="p-1 sm:p-1.5">
                   <button
                     onClick={() => scrollToSection('about')}
                     className="relative z-10 rounded-full px-3 py-1.5 text-base font-medium text-white/80 hover:text-white transition-colors duration-200"
@@ -215,7 +223,7 @@ function Header() {
                     About
                   </button>
                 </MagneticButton>
-                <MagneticButton intensity={0.4} range="p-1 sm:p-1.5">
+                <MagneticButton intensity={0.2} range="p-1 sm:p-1.5">
                   <button
                     onClick={() => scrollToSection('experience')}
                     className="relative z-10 rounded-full px-3 py-1.5 text-base font-medium text-white/80 hover:text-white transition-colors duration-200"
@@ -223,7 +231,7 @@ function Header() {
                     Experience
                   </button>
                 </MagneticButton>
-                <MagneticButton intensity={0.4} range="p-1 sm:p-1.5">
+                <MagneticButton intensity={0.2} range="p-1 sm:p-1.5">
                   <button
                     onClick={scrollToPortfolio}
                     className="relative z-10 rounded-full px-3 py-1.5 text-base font-medium text-white/80 hover:text-white transition-colors duration-200"
@@ -231,7 +239,7 @@ function Header() {
                     Portfolio
                   </button>
                 </MagneticButton>
-                <MagneticButton intensity={0.4} range="p-1 sm:p-1.5">
+                <MagneticButton intensity={0.2} range="p-1 sm:p-1.5">
                   <button
                     onClick={() => scrollToSection('certificates')}
                     className="relative z-10 rounded-full px-3 py-1.5 text-base font-medium text-white/80 hover:text-white transition-colors duration-200"
@@ -239,7 +247,7 @@ function Header() {
                     Certificates
                   </button>
                 </MagneticButton>
-                <MagneticButton intensity={0.4} range="p-1 sm:p-1.5">
+                <MagneticButton intensity={0.2} range="p-1 sm:p-1.5">
                   <button
                     onClick={() => scrollToSection('contact')}
                     className="relative z-10 rounded-full px-3 py-1.5 text-base font-medium text-white/80 hover:text-white transition-colors duration-200"

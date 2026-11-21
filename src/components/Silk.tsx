@@ -1,737 +1,795 @@
 'use client';
 
-import { useEffect, useRef, useState, type CSSProperties } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import './Silk.css';
 
 export interface SilkProps {
+  /** Animation speed multiplier (default: 2.5) */
   speed?: number;
+  /** Wave UV scale (default: 1.0) */
   scale?: number;
+  /** Primary silk midtone hex color (default: '#27c4ff') */
   color?: string;
+  /** Specular fold crest highlight hex color (default: '#8cf6f7') */
   sheenColor?: string;
+  /** Specular fold crest alias for compatibility */
+  highlightColor?: string;
+  /** Deep obsidian trough/base hex color (default: '#050810') */
+  baseColor?: string;
+  /** Subtle organic film grain intensity (default: 0.25) */
   noiseIntensity?: number;
+  /** Rotation angle in radians (default: 0) */
   rotation?: number;
+  /** Sheen intensity (default: 0.5) */
   sheen?: number;
+  /** Depth intensity (default: 0.5) */
   depth?: number;
+  /** Glow intensity (default: 0.3) */
   glow?: number;
-  ripple?: number;
-  wave?: number;
-  variation?: number;
-  mouseInteraction?: boolean;
-  interactionStrength?: number;
-  clickRipple?: boolean;
-  intro?: boolean;
-  fade?: number;
-  lightMode?: boolean;
-  paused?: boolean;
-  dpr?: number;
+  /** Optional wrapper className */
   className?: string;
-  style?: CSSProperties;
+  /** Optional force engine mode for testing/QA ('auto' | 'webgl' | 'canvas2d') */
+  forceEngine?: 'auto' | 'webgl' | 'canvas2d';
+  /** Optional inline style */
+  style?: React.CSSProperties;
 }
 
-interface Settings {
-  speed: number;
-  scale: number;
-  color: string;
-  sheenColor: string;
-  noiseIntensity: number;
-  rotation: number;
-  sheen: number;
-  depth: number;
-  glow: number;
-  ripple: number;
-  wave: number;
-  variation: number;
-  mouseInteraction: boolean;
-  interactionStrength: number;
-  clickRipple: boolean;
-  intro: boolean;
-  fade: number;
-  lightMode: boolean;
-  paused: boolean;
-  dpr?: number;
+type EngineMode = 'webgl' | 'canvas2d';
+type RGB = [number, number, number];
+
+// ---------------------------------------------------------------------------
+// Color Utilities
+// ---------------------------------------------------------------------------
+function parseHexToRgb255(hex: string, fallback: RGB): RGB {
+  const clean = hex.trim().replace(/^#/, '');
+  if (clean.length === 3) {
+    const r = parseInt(clean[0] + clean[0], 16);
+    const g = parseInt(clean[1] + clean[1], 16);
+    const b = parseInt(clean[2] + clean[2], 16);
+    if (!Number.isNaN(r) && !Number.isNaN(g) && !Number.isNaN(b)) return [r, g, b];
+  } else if (clean.length === 6) {
+    const r = parseInt(clean.slice(0, 2), 16);
+    const g = parseInt(clean.slice(2, 4), 16);
+    const b = parseInt(clean.slice(4, 6), 16);
+    if (!Number.isNaN(r) && !Number.isNaN(g) && !Number.isNaN(b)) return [r, g, b];
+  }
+  return fallback;
 }
 
-type Uniforms = Record<string, WebGLUniformLocation | null>;
-
-interface Program {
-  program: WebGLProgram;
-  uniforms: Uniforms;
+function rgb255ToNorm([r, g, b]: RGB): RGB {
+  return [r / 255, g / 255, b / 255];
 }
 
-interface Wave {
-  x: number;
-  y: number;
-  age: number;
+function mixRgb(a: RGB, b: RGB, t: number): RGB {
+  return [
+    Math.round(a[0] + (b[0] - a[0]) * t),
+    Math.round(a[1] + (b[1] - a[1]) * t),
+    Math.round(a[2] + (b[2] - a[2]) * t),
+  ];
 }
 
-const VERTEX = `#version 300 es
-in vec2 aPosition;
+function rgbaStr([r, g, b]: RGB, a: number): string {
+  return `rgba(${r}, ${g}, ${b}, ${a})`;
+}
+
+// ---------------------------------------------------------------------------
+// Universal GLSL ES 1.00 Shaders (Runs natively on WebGL 2.0 AND WebGL 1.0)
+// ---------------------------------------------------------------------------
+const VERTEX_SHADER_SRC = `
+attribute vec2 aPosition;
+varying vec2 vUv;
+
 void main() {
+  vUv = (aPosition + 1.0) * 0.5;
   gl_Position = vec4(aPosition, 0.0, 1.0);
-}`;
+}
+`;
 
-const SILK = `
-uniform vec2 uView;
+const FRAGMENT_SHADER_SRC = `
+#ifdef GL_FRAGMENT_PRECISION_HIGH
+precision highp float;
+#else
+precision mediump float;
+#endif
+
+varying vec2 vUv;
+
+uniform float uTime;
+uniform vec3 uColor;
+uniform vec3 uHighlightColor;
+uniform vec3 uBaseColor;
+uniform float uSpeed;
 uniform float uScale;
 uniform float uRotation;
-uniform float uTime;
-uniform float uWave;
-uniform float uRipple;
-uniform float uFold;
-uniform vec2 uShift;
-uniform vec4 uPointer;
-uniform vec2 uDrag;
-uniform vec4 uWaves[4];
+uniform float uNoiseIntensity;
+uniform vec2 uResolution;
 
-const float e = 2.71828182845904523536;
+const float E = 2.71828182845904523536;
 
-float noise(vec2 texCoord) {
-  float G = e;
-  vec2 r = (G * sin(G * texCoord));
-  return fract(r.x * r.y * (1.0 + texCoord.x));
+float filmNoise(vec2 coord) {
+  vec2 wrapped = mod(coord, 1024.0);
+  vec2 r = E * sin(E * wrapped);
+  return fract(r.x * r.y * (1.0 + wrapped.x));
 }
 
 vec2 rotateUvs(vec2 uv, float angle) {
   float c = cos(angle);
   float s = sin(angle);
-  mat2 rot = mat2(c, -s, s, c);
-  return rot * uv;
-}
-
-vec2 bend(vec2 uv) {
-  vec2 aspect = vec2(uView.x / uView.y, 1.0);
-  vec2 offset = (uv - uPointer.xy) * aspect;
-  float touch = uPointer.z * exp(-dot(offset, offset) / (uPointer.w * uPointer.w));
-  uv -= uDrag * touch;
-  for (int i = 0; i < 4; i++) {
-    vec4 wave = uWaves[i];
-    if (wave.w <= 0.0) continue;
-    vec2 q = (uv - wave.xy) * aspect;
-    float dist = length(q);
-    float front = dist - wave.z;
-    float ring = exp(-front * front * 60.0) * wave.w;
-    uv += q / max(dist, 0.0001) / aspect * ring * 0.034 * sin(front * 34.0);
-  }
-  return uv;
-}
-
-float silk(vec2 vUv) {
-  vec2 uv = rotateUvs(vUv * uScale, uRotation);
-  vec2 tex = uv * uScale + uShift;
-  float tOffset = uTime;
-  tex.y += 0.03 * uWave * sin(8.0 * tex.x - tOffset);
-  return 0.6 + 0.4 * uFold * sin(5.0 * (tex.x + tex.y + cos(3.0 * tex.x + 5.0 * tex.y) + 0.02 * tOffset) + uRipple * sin(20.0 * (tex.x + tex.y - 0.1 * tOffset)));
-}
-`;
-
-const FIELD = `#version 300 es
-precision highp float;
-${SILK}
-out vec4 outColor;
-
-void main() {
-  vec2 vUv = gl_FragCoord.xy / uView;
-  float pattern = silk(bend(vUv));
-  float n = clamp((pattern - 0.2) / 0.8, 0.0, 1.0);
-  outColor = vec4(pow(n, 6.0), 0.0, 0.0, 1.0);
-}`;
-
-const COMPOSITE = `#version 300 es
-precision highp float;
-${SILK}
-uniform sampler2D uBloom;
-uniform vec3 uColor;
-uniform vec3 uSheenColor;
-uniform float uNoiseIntensity;
-uniform float uDepth;
-uniform float uSheen;
-uniform float uGlow;
-uniform float uLightMode;
-uniform vec3 uLight;
-uniform vec2 uStep;
-uniform float uPresence;
-uniform float uFade;
-out vec4 outColor;
-
-float smootherstep01(float t) {
-  t = clamp(t, 0.0, 1.0);
-  return t * t * t * (t * (t * 6.0 - 15.0) + 10.0);
-}
-
-vec3 softClip(vec3 c) {
-  vec3 over = max(c - 0.75, 0.0);
-  return min(c, 0.75) + 0.25 * (1.0 - exp(-over * 4.0));
+  return mat2(c, -s, s, c) * uv;
 }
 
 void main() {
-  vec2 vUv = gl_FragCoord.xy / uView;
-  vec2 coord = bend(vUv);
-  float pattern = silk(coord);
-  float rnd = noise(gl_FragCoord.xy);
-  float n = clamp((pattern - 0.2) / 0.8, 0.0, 1.0);
+  float rnd = filmNoise(gl_FragCoord.xy);
 
-  float gx = silk(coord + vec2(uStep.x, 0.0)) - pattern;
-  float gy = silk(coord + vec2(0.0, uStep.y)) - pattern;
-  vec3 normal = normalize(vec3(-gx * 26.0, -gy * 26.0, 1.0));
-  vec3 toLight = normalize(vec3(uLight.xy, 0.85));
-  float relief = 1.0 + (dot(normal, toLight) - toLight.z) * 1.8 * uDepth;
-  vec3 halfway = normalize(toLight + vec3(0.0, 0.0, 1.0));
-  float gloss = pow(max(dot(normal, halfway), 0.0), 48.0) * smoothstep(0.25, 0.85, n);
-  float crest = pow(n, 5.0);
-  float shine = (gloss * 0.85 + crest * 0.4) * uSheen * (1.0 + uLight.z * 0.6);
-
-  float bloom = 0.0;
-  if (uGlow > 0.0) {
-    bloom += textureLod(uBloom, vUv, 1.0).r * 0.35;
-    bloom += textureLod(uBloom, vUv, 2.0).r * 0.3;
-    bloom += textureLod(uBloom, vUv, 3.0).r * 0.2;
-    bloom += textureLod(uBloom, vUv, 4.0).r * 0.15;
+  float aspect = uResolution.x / max(uResolution.y, 1.0);
+  vec2 centeredUv = vUv - 0.5;
+  if (aspect < 1.0) {
+    centeredUv.x *= max(0.6, aspect);
   }
 
-  vec3 result;
-  if (uLightMode > 0.5) {
-    float fold = smoothstep(0.28, 0.9, pattern);
-    float specular = smoothstep(0.72, 0.98, pattern);
-    vec3 shadowColor = uColor * (0.72 - 0.12 * uDepth);
-    vec3 bodyColor = min(uColor * 1.18, vec3(1.0));
-    vec3 lightBase = mix(shadowColor, bodyColor, fold) * mix(1.0, relief, 0.6);
-    lightBase = mix(lightBase, vec3(1.0), clamp(specular * 0.92 + shine * 0.22 + bloom * uGlow * 0.2, 0.0, 1.0));
-    float fineNoise = noise(gl_FragCoord.xy * 0.63 + vec2(17.0, 41.0));
-    float grainSignal = (rnd + fineNoise - 1.0);
-    float grainStrength = clamp(uNoiseIntensity * 0.038, 0.0, 0.16);
-    result = clamp(lightBase + grainSignal * grainStrength, 0.0, 1.0);
-  } else {
-    float grain = rnd / 15.0 * uNoiseIntensity;
-    float floorValue = mix(0.2, 0.03, uDepth);
-    float curve = uDepth > 0.0 ? pow(n, 1.0 + 1.4 * uDepth) : n;
-    float shade = uDepth > 0.0 ? floorValue + (1.0 - floorValue) * curve : pattern;
-    vec3 tone = mix(uColor, pow(uColor, vec3(1.45)), (1.0 - n) * uDepth);
-    vec3 lit = tone * shade * relief - vec3(grain);
-    vec3 tint = mix(uColor, uSheenColor, 0.8);
-    vec3 extra = tint * (shine + bloom * uGlow * 0.55);
-    float blend = clamp((uSheen + uGlow) * 4.0, 0.0, 1.0);
-    result = mix(clamp(lit, 0.0, 1.0), clamp(softClip(lit + extra), 0.0, 1.0), blend);
-  }
+  vec2 uv = rotateUvs((centeredUv + 0.5) * uScale, uRotation);
+  vec2 tex = uv * uScale;
+  float tOffset = uSpeed * uTime;
 
-  float edge = uFade * 0.5;
-  float mask = 1.0;
-  if (edge > 0.0) {
-    mask = smootherstep01(vUv.x / edge) * smootherstep01((1.0 - vUv.x) / edge);
-    mask *= smootherstep01(vUv.y / edge) * smootherstep01((1.0 - vUv.y) / edge);
-  }
-  float alpha = uPresence * mask;
-  outColor = vec4(result * alpha, alpha);
+  tex.y += 0.03 * sin(8.0 * tex.x - tOffset);
+
+  float wave = sin(
+    5.0 * (
+      tex.x + tex.y +
+      cos(3.0 * tex.x + 5.0 * tex.y) +
+      0.02 * tOffset
+    ) +
+    sin(20.0 * (tex.x + tex.y - 0.1 * tOffset))
+  );
+
+  float t = clamp(0.5 + 0.5 * wave, 0.0, 1.0);
+
+  float bodyMix = smoothstep(0.08, 0.78, pow(t, 1.25));
+  float crestMix = smoothstep(0.72, 0.99, t);
+
+  vec3 col = mix(uBaseColor, uColor, bodyMix);
+  col = mix(col, uHighlightColor, crestMix * 0.85);
+
+  col -= (rnd - 0.5) * (0.045 * uNoiseIntensity);
+  col = max(col, uBaseColor * 0.65);
+
+  gl_FragColor = vec4(col, 1.0);
 }
 `;
 
-const INTRO_SECONDS = 2.2;
-const INTRO_RUSH = 1.6;
-const WAVE_LIFE = 1.6;
-const DEFAULT_LIGHT = [-0.55, 0.7];
-const LIGHT_TILT = Math.hypot(DEFAULT_LIGHT[0], DEFAULT_LIGHT[1]);
-
-const clamp = (value: number, min: number, max: number) => Math.min(max, Math.max(min, value));
-const ease = (t: number) => t * t * t * (t * (t * 6 - 15) + 10);
-
-const normalizeHex = (hex: string) => {
-  if (!hex) return '#27c4ff';
-  const clean = hex.trim();
-  if (/^[0-9a-fA-F]{3,8}$/.test(clean)) return `#${clean}`;
-  return clean;
+const WEBGL_ATTRS: WebGLContextAttributes = {
+  alpha: false,
+  antialias: false,
+  depth: false,
+  stencil: false,
+  preserveDrawingBuffer: false,
+  powerPreference: 'default',
+  failIfMajorPerformanceCaveat: false,
 };
 
-const variationShift = (variation: number): number[] => {
-  const n = Number(variation) || 0;
-  if (!n) return [0, 0];
-  const wave = (k: number) => {
-    const v = Math.sin(n * 12.9898 + k * 78.233) * 43758.5453;
-    return v - Math.floor(v) - 0.5;
-  };
-  return [wave(1) * 6, wave(2) * 6];
-};
+function acquireHardwareWebGL(canvas: HTMLCanvasElement): WebGLRenderingContext | null {
+  try {
+    const gl =
+      (canvas.getContext('webgl2', WEBGL_ATTRS) as WebGLRenderingContext | null) ||
+      (canvas.getContext('webgl', WEBGL_ATTRS) as WebGLRenderingContext | null) ||
+      (canvas.getContext('experimental-webgl', WEBGL_ATTRS) as WebGLRenderingContext | null);
+    if (!gl || gl.isContextLost()) return null;
+    return gl;
+  } catch {
+    return null;
+  }
+}
 
-const compile = (gl: WebGL2RenderingContext, type: number, source: string) => {
+function compileShader(
+  gl: WebGLRenderingContext,
+  type: number,
+  source: string
+): WebGLShader | null {
   const shader = gl.createShader(type);
   if (!shader) return null;
   gl.shaderSource(shader, source);
   gl.compileShader(shader);
-  if (gl.getShaderParameter(shader, gl.COMPILE_STATUS)) return shader;
-  gl.deleteShader(shader);
-  return null;
-};
-
-const link = (gl: WebGL2RenderingContext, fragmentSource: string): Program | null => {
-  const vertex = compile(gl, gl.VERTEX_SHADER, VERTEX);
-  const fragment = compile(gl, gl.FRAGMENT_SHADER, fragmentSource);
-  const program = gl.createProgram();
-  if (!vertex || !fragment || !program) return null;
-  gl.attachShader(program, vertex);
-  gl.attachShader(program, fragment);
-  gl.bindAttribLocation(program, 0, 'aPosition');
-  gl.linkProgram(program);
-  gl.deleteShader(vertex);
-  gl.deleteShader(fragment);
-  if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
-    gl.deleteProgram(program);
+  if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
+    gl.deleteShader(shader);
     return null;
   }
-  const uniforms: Uniforms = {};
-  const count = gl.getProgramParameter(program, gl.ACTIVE_UNIFORMS);
-  for (let i = 0; i < count; i++) {
-    const info = gl.getActiveUniform(program, i);
-    if (info) uniforms[info.name.replace(/\[0\]$/, '')] = gl.getUniformLocation(program, info.name);
-  }
-  return { program, uniforms };
-};
+  return shader;
+}
 
-const Silk = ({
+// ---------------------------------------------------------------------------
+// Canvas 2D Procedural Silk Ribbon Descriptors (Deterministic Luxury Drapery)
+// ---------------------------------------------------------------------------
+interface RibbonSpec {
+  yRatio: number;
+  thickRatio: number;
+  freq1: number;
+  freq2: number;
+  phase1: number;
+  phase2: number;
+  speed1: number;
+  speed2: number;
+  amp1Ratio: number;
+  amp2Ratio: number;
+  crestAlpha: number;
+  bodyAlpha: number;
+}
+
+const RIBBON_SPECS: readonly RibbonSpec[] = [
+  { yRatio: -0.46, thickRatio: 0.23, freq1: 5.2, freq2: 8.1, phase1: 0.3, phase2: 1.4, speed1: 0.55, speed2: 0.38, amp1Ratio: 0.09, amp2Ratio: 0.045, crestAlpha: 0.45, bodyAlpha: 0.42 },
+  { yRatio: -0.34, thickRatio: 0.25, freq1: 4.8, freq2: 7.4, phase1: 1.5, phase2: 2.9, speed1: 0.62, speed2: 0.41, amp1Ratio: 0.11, amp2Ratio: 0.052, crestAlpha: 0.62, bodyAlpha: 0.52 },
+  { yRatio: -0.21, thickRatio: 0.22, freq1: 5.8, freq2: 9.2, phase1: 2.7, phase2: 0.6, speed1: 0.50, speed2: 0.46, amp1Ratio: 0.10, amp2Ratio: 0.048, crestAlpha: 0.78, bodyAlpha: 0.60 },
+  { yRatio: -0.09, thickRatio: 0.26, freq1: 4.4, freq2: 6.8, phase1: 3.9, phase2: 2.1, speed1: 0.66, speed2: 0.35, amp1Ratio: 0.12, amp2Ratio: 0.055, crestAlpha: 0.88, bodyAlpha: 0.66 },
+  { yRatio:  0.03, thickRatio: 0.24, freq1: 5.5, freq2: 8.6, phase1: 5.1, phase2: 3.7, speed1: 0.58, speed2: 0.44, amp1Ratio: 0.11, amp2Ratio: 0.050, crestAlpha: 0.92, bodyAlpha: 0.68 },
+  { yRatio:  0.16, thickRatio: 0.25, freq1: 4.9, freq2: 7.9, phase1: 0.9, phase2: 5.0, speed1: 0.64, speed2: 0.39, amp1Ratio: 0.10, amp2Ratio: 0.054, crestAlpha: 0.84, bodyAlpha: 0.62 },
+  { yRatio:  0.29, thickRatio: 0.22, freq1: 6.0, freq2: 9.5, phase1: 2.2, phase2: 1.2, speed1: 0.52, speed2: 0.48, amp1Ratio: 0.09, amp2Ratio: 0.046, crestAlpha: 0.72, bodyAlpha: 0.54 },
+  { yRatio:  0.41, thickRatio: 0.24, freq1: 4.6, freq2: 7.1, phase1: 3.6, phase2: 4.3, speed1: 0.60, speed2: 0.36, amp1Ratio: 0.10, amp2Ratio: 0.048, crestAlpha: 0.58, bodyAlpha: 0.46 },
+  { yRatio:  0.53, thickRatio: 0.21, freq1: 5.4, freq2: 8.4, phase1: 4.8, phase2: 2.5, speed1: 0.54, speed2: 0.42, amp1Ratio: 0.08, amp2Ratio: 0.042, crestAlpha: 0.48, bodyAlpha: 0.40 },
+];
+
+const CANVAS2D_SEGMENTS = 32;
+const CANVAS2D_MAX_WIDTH = 960; // Caps fill rate while bilinear scaling ensures locked 60 FPS
+
+// ---------------------------------------------------------------------------
+// Main Component
+// ---------------------------------------------------------------------------
+export const Silk: React.FC<SilkProps> = ({
   speed = 2.5,
-  scale = 1,
+  scale = 1.0,
   color = '#27c4ff',
   sheenColor = '#8cf6f7',
-  noiseIntensity = 1.2,
+  highlightColor,
+  baseColor = '#050810',
+  noiseIntensity = 0.25,
   rotation = 0,
-  sheen = 0.5,
-  depth = 0.5,
-  glow = 0.3,
-  ripple = 1,
-  wave = 1,
-  variation = 0,
-  mouseInteraction = true,
-  interactionStrength = 1,
-  clickRipple = true,
-  intro = true,
-  fade = 0,
-  lightMode = false,
-  paused = false,
-  dpr,
   className = '',
-  style
-}: SilkProps) => {
-  const containerRef = useRef<HTMLDivElement>(null);
-  const canvasRef = useRef<HTMLCanvasElement>(null);
-  const wakeRef = useRef<(() => void) | null>(null);
-  const [hasWebGL, setHasWebGL] = useState<boolean | null>(null);
-  const [isReady, setIsReady] = useState(false);
+  forceEngine = 'auto',
+  style,
+}) => {
+  const finalHighlight = highlightColor || sheenColor || '#8cf6f7';
+  const containerRef = useRef<HTMLDivElement | null>(null);
+  const canvasRef = useRef<HTMLCanvasElement | null>(null);
 
-  const cleanColor = normalizeHex(color);
-  const cleanSheenColor = normalizeHex(sheenColor);
+  const [engineMode, setEngineMode] = useState<EngineMode>(
+    forceEngine === 'canvas2d' ? 'canvas2d' : 'webgl'
+  );
 
-  const settingsRef = useRef<Settings>(null as unknown as Settings);
-  settingsRef.current = {
+  // Keep dynamic visual props in a ref so prop tweaks never tear down the context
+  const configRef = useRef({
     speed,
     scale,
-    color: cleanColor,
-    sheenColor: cleanSheenColor,
-    noiseIntensity: Math.max(0, noiseIntensity),
+    color,
+    highlightColor: finalHighlight,
+    baseColor,
+    noiseIntensity,
     rotation,
-    sheen: Math.max(0, sheen),
-    depth: clamp(depth, 0, 1),
-    glow: Math.max(0, glow),
-    ripple: Math.max(0, ripple),
-    wave: Math.max(0, wave),
-    variation,
-    mouseInteraction,
-    interactionStrength: Math.max(0, interactionStrength),
-    clickRipple,
-    intro,
-    fade: clamp(fade, 0, 1),
-    lightMode,
-    paused,
-    dpr
-  };
+  });
+
+  useEffect(() => {
+    configRef.current = {
+      speed,
+      scale,
+      color,
+      highlightColor: finalHighlight,
+      baseColor,
+      noiseIntensity,
+      rotation,
+    };
+  }, [speed, scale, color, finalHighlight, baseColor, noiseIntensity, rotation]);
+
+  useEffect(() => {
+    if (forceEngine === 'canvas2d') {
+      setEngineMode('canvas2d');
+    } else if (forceEngine === 'webgl') {
+      setEngineMode('webgl');
+    }
+  }, [forceEngine]);
 
   useEffect(() => {
     const container = containerRef.current;
     const canvas = canvasRef.current;
-    if (!container || !canvas) return undefined;
+    if (!container || !canvas) return;
 
-    const gl = canvas.getContext('webgl2', {
-      alpha: true,
-      premultipliedAlpha: true,
-      antialias: false,
-      depth: false,
-      stencil: false,
-      powerPreference: 'high-performance'
-    });
+    let rafId: number | null = null;
+    let isVisible = true;
+    let isTabVisible = typeof document !== 'undefined' ? !document.hidden : true;
+    let disposed = false;
 
-    if (!gl) {
-      setHasWebGL(false);
-      return undefined;
-    }
-    setHasWebGL(true);
+    const motionQuery =
+      typeof window !== 'undefined' && typeof window.matchMedia === 'function'
+        ? window.matchMedia('(prefers-reduced-motion: reduce)')
+        : null;
+    let reducedMotion = motionQuery?.matches ?? false;
 
-    const fieldProgram = link(gl, FIELD);
-    const compositeProgram = link(gl, COMPOSITE);
-    if (!fieldProgram || !compositeProgram) {
-      setHasWebGL(false);
-      return undefined;
-    }
+    let elapsedSec = 0;
+    let lastNow = 0;
 
-    const buffer = gl.createBuffer();
-    const vao = gl.createVertexArray();
-    gl.bindVertexArray(vao);
-    gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
-    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 3, -1, -1, 3]), gl.STATIC_DRAW);
-    gl.enableVertexAttribArray(0);
-    gl.vertexAttribPointer(0, 2, gl.FLOAT, false, 0, 0);
-
-    const texture = gl.createTexture();
-    const framebuffer = gl.createFramebuffer();
-    const target = { width: 0, height: 0 };
-    const sizeTarget = (width: number, height: number) => {
-      const w = Math.max(1, width);
-      const h = Math.max(1, height);
-      if (target.width === w && target.height === h) return;
-      target.width = w;
-      target.height = h;
-      gl.bindTexture(gl.TEXTURE_2D, texture);
-      gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA8, w, h, 0, gl.RGBA, gl.UNSIGNED_BYTE, null);
-      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_LINEAR);
-      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
-      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
-      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-      gl.bindFramebuffer(gl.FRAMEBUFFER, framebuffer);
-      gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, texture, 0);
-    };
-
-    const probe = document.createElement('canvas').getContext('2d', { willReadFrequently: true });
-    const colorCache = new Map<string, number[]>();
-    const toRgb = (value: string): number[] => {
-      const normalized = normalizeHex(value);
-      if (colorCache.has(normalized)) return colorCache.get(normalized) as number[];
-      let rgb = [0.15, 0.77, 1.0]; // Default #27c4ff fallback
-      if (probe) {
-        probe.clearRect(0, 0, 1, 1);
-        probe.fillStyle = normalized;
-        probe.fillRect(0, 0, 1, 1);
-        const [r, g, b] = probe.getImageData(0, 0, 1, 1).data;
-        rgb = [r / 255, g / 255, b / 255];
+    // -----------------------------------------------------------------------
+    // ENGINE A: UNIVERSAL WEBGL 1/2
+    // -----------------------------------------------------------------------
+    if (engineMode === 'webgl') {
+      const gl = acquireHardwareWebGL(canvas);
+      if (!gl) {
+        if (forceEngine !== 'webgl') {
+          setEngineMode('canvas2d');
+        }
+        return;
       }
-      colorCache.set(normalized, rgb);
-      return rgb;
-    };
 
-    const reduce = typeof window !== 'undefined' && window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
-    const view = { width: 1, height: 1, ratio: 1 };
-    const pointer = { x: 0, y: 0, inside: false };
-    const waves: Wave[] = [];
-    const waveData = new Float32Array(16);
-    const state = {
-      flow: 0,
-      intro: settingsRef.current.intro && !reduce ? 0 : 1,
-      touch: 0,
-      x: 0,
-      y: 0,
-      dragX: 0,
-      dragY: 0,
-      lightX: DEFAULT_LIGHT[0],
-      lightY: DEFAULT_LIGHT[1]
-    };
-    let raf = 0;
-    let last = 0;
-    let visible = true;
+      const vertShader = compileShader(gl, gl.VERTEX_SHADER, VERTEX_SHADER_SRC);
+      const fragShader = compileShader(gl, gl.FRAGMENT_SHADER, FRAGMENT_SHADER_SRC);
+      const program = vertShader && fragShader ? gl.createProgram() : null;
 
-    const setShared = (uniforms: Uniforms, width: number, height: number, s: Settings, unfold: number) => {
-      const [shiftX, shiftY] = variationShift(s.variation);
-      gl.uniform2f(uniforms.uView, width, height);
-      gl.uniform1f(uniforms.uScale, s.scale);
-      gl.uniform1f(uniforms.uRotation, s.rotation);
-      gl.uniform1f(uniforms.uTime, state.flow - INTRO_RUSH * (1 - unfold));
-      gl.uniform1f(uniforms.uWave, s.wave);
-      gl.uniform1f(uniforms.uRipple, s.ripple);
-      gl.uniform1f(uniforms.uFold, 0.25 + 0.75 * unfold);
-      gl.uniform2f(uniforms.uShift, shiftX, shiftY);
-      gl.uniform4f(
-        uniforms.uPointer,
-        state.x / Math.max(1, view.width),
-        1 - state.y / Math.max(1, view.height),
-        state.touch * s.interactionStrength,
-        0.32
+      if (!vertShader || !fragShader || !program) {
+        if (vertShader) gl.deleteShader(vertShader);
+        if (fragShader) gl.deleteShader(fragShader);
+        if (forceEngine !== 'webgl') setEngineMode('canvas2d');
+        return;
+      }
+
+      gl.attachShader(program, vertShader);
+      gl.attachShader(program, fragShader);
+      gl.linkProgram(program);
+
+      if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
+        gl.deleteProgram(program);
+        gl.deleteShader(vertShader);
+        gl.deleteShader(fragShader);
+        if (forceEngine !== 'webgl') setEngineMode('canvas2d');
+        return;
+      }
+
+      // Single fullscreen triangle (zero diagonal seam overdraw)
+      const quadBuffer = gl.createBuffer();
+      gl.bindBuffer(gl.ARRAY_BUFFER, quadBuffer);
+      gl.bufferData(
+        gl.ARRAY_BUFFER,
+        new Float32Array([-1, -1, 3, -1, -1, 3]),
+        gl.STATIC_DRAW
       );
-      gl.uniform2f(uniforms.uDrag, state.dragX, state.dragY);
-      gl.uniform4fv(uniforms.uWaves, waveData);
-    };
 
-    const render = () => {
-      const s = settingsRef.current;
-      const unfold = ease(state.intro);
-      const presence = 1 - Math.pow(1 - state.intro, 3);
-      gl.bindVertexArray(vao);
+      const posLoc = gl.getAttribLocation(program, 'aPosition');
+      gl.useProgram(program);
+      gl.enableVertexAttribArray(posLoc);
+      gl.vertexAttribPointer(posLoc, 2, gl.FLOAT, false, 0, 0);
 
-      waveData.fill(0);
-      waves.slice(-4).forEach((item, index) => {
-        waveData.set([item.x, item.y, item.age * 0.6, Math.exp(-item.age / (WAVE_LIFE * 0.45))], index * 4);
+      const uTimeLoc = gl.getUniformLocation(program, 'uTime');
+      const uColorLoc = gl.getUniformLocation(program, 'uColor');
+      const uHighlightLoc = gl.getUniformLocation(program, 'uHighlightColor');
+      const uBaseLoc = gl.getUniformLocation(program, 'uBaseColor');
+      const uSpeedLoc = gl.getUniformLocation(program, 'uSpeed');
+      const uScaleLoc = gl.getUniformLocation(program, 'uScale');
+      const uRotationLoc = gl.getUniformLocation(program, 'uRotation');
+      const uNoiseLoc = gl.getUniformLocation(program, 'uNoiseIntensity');
+      const uResLoc = gl.getUniformLocation(program, 'uResolution');
+
+      const hardwareCores =
+        typeof navigator !== 'undefined' && navigator.hardwareConcurrency
+          ? navigator.hardwareConcurrency
+          : 4;
+      let dprScale = hardwareCores <= 2 ? 1.0 : 1.5;
+
+      const syncWebGLSize = () => {
+        const rect = container.getBoundingClientRect();
+        const cssW = Math.max(1, Math.floor(rect.width));
+        const cssH = Math.max(1, Math.floor(rect.height));
+        const dpr = Math.min(window.devicePixelRatio || 1, dprScale);
+        const targetW = Math.max(1, Math.floor(cssW * dpr));
+        const targetH = Math.max(1, Math.floor(cssH * dpr));
+
+        if (canvas.width !== targetW || canvas.height !== targetH) {
+          canvas.width = targetW;
+          canvas.height = targetH;
+          gl.viewport(0, 0, targetW, targetH);
+        }
+      };
+
+      const renderWebGLFrame = (timeSec: number) => {
+        if (disposed || gl.isContextLost()) return;
+
+        const cfg = configRef.current;
+        const primaryNorm = rgb255ToNorm(parseHexToRgb255(cfg.color, [39, 196, 255]));
+        const highlightNorm = rgb255ToNorm(
+          parseHexToRgb255(cfg.highlightColor, [140, 246, 247])
+        );
+        const baseNorm = rgb255ToNorm(parseHexToRgb255(cfg.baseColor, [5, 8, 16]));
+
+        gl.useProgram(program);
+        gl.uniform1f(uTimeLoc, timeSec * 0.1);
+        gl.uniform3f(uColorLoc, primaryNorm[0], primaryNorm[1], primaryNorm[2]);
+        gl.uniform3f(
+          uHighlightLoc,
+          highlightNorm[0],
+          highlightNorm[1],
+          highlightNorm[2]
+        );
+        gl.uniform3f(uBaseLoc, baseNorm[0], baseNorm[1], baseNorm[2]);
+        gl.uniform1f(uSpeedLoc, cfg.speed);
+        gl.uniform1f(uScaleLoc, cfg.scale);
+        gl.uniform1f(uRotationLoc, cfg.rotation);
+        gl.uniform1f(uNoiseLoc, cfg.noiseIntensity);
+        gl.uniform2f(uResLoc, canvas.width, canvas.height);
+
+        gl.drawArrays(gl.TRIANGLES, 0, 3);
+      };
+
+      const stopLoop = () => {
+        if (rafId !== null) {
+          cancelAnimationFrame(rafId);
+          rafId = null;
+        }
+      };
+
+      const tick = (now: number) => {
+        if (disposed || !isVisible || !isTabVisible || reducedMotion) {
+          rafId = null;
+          return;
+        }
+
+        const rawDeltaMs = lastNow > 0 ? now - lastNow : 16.67;
+        lastNow = now;
+        const clampedDtSec = Math.min(rawDeltaMs, 100) / 1000;
+        elapsedSec += clampedDtSec;
+
+        renderWebGLFrame(elapsedSec);
+        rafId = requestAnimationFrame(tick);
+      };
+
+      const startLoop = () => {
+        if (disposed || rafId !== null || !isVisible || !isTabVisible) return;
+        if (reducedMotion) {
+          renderWebGLFrame(elapsedSec);
+          return;
+        }
+        lastNow = performance.now();
+        rafId = requestAnimationFrame(tick);
+      };
+
+      const onContextLost = (e: Event) => {
+        e.preventDefault();
+        stopLoop();
+        if (forceEngine !== 'webgl') {
+          setEngineMode('canvas2d');
+        }
+      };
+
+      const onVisibilityChange = () => {
+        isTabVisible = !document.hidden;
+        if (!isTabVisible) {
+          stopLoop();
+        } else {
+          startLoop();
+        }
+      };
+
+      const onMotionChange = (e: MediaQueryListEvent) => {
+        reducedMotion = e.matches;
+        if (reducedMotion) {
+          stopLoop();
+          renderWebGLFrame(elapsedSec);
+        } else {
+          startLoop();
+        }
+      };
+
+      const resizeObserver = new ResizeObserver(() => {
+        syncWebGLSize();
+        renderWebGLFrame(elapsedSec);
       });
 
-      if (s.glow > 0) {
-        sizeTarget(Math.max(1, Math.round(canvas.width / 4)), Math.max(1, Math.round(canvas.height / 4)));
-        gl.bindFramebuffer(gl.FRAMEBUFFER, framebuffer);
-        gl.viewport(0, 0, target.width, target.height);
-        gl.useProgram(fieldProgram.program);
-        setShared(fieldProgram.uniforms, target.width, target.height, s, unfold);
-        gl.drawArrays(gl.TRIANGLES, 0, 3);
-        gl.bindTexture(gl.TEXTURE_2D, texture);
-        gl.generateMipmap(gl.TEXTURE_2D);
-      }
+      const intersectionObserver = new IntersectionObserver(
+        (entries) => {
+          const entry = entries[0];
+          isVisible = Boolean(entry?.isIntersecting);
+          if (!isVisible) {
+            stopLoop();
+          } else {
+            startLoop();
+          }
+        },
+        { threshold: 0.01 }
+      );
 
-      const c = compositeProgram.uniforms;
-      gl.bindFramebuffer(gl.FRAMEBUFFER, null);
-      gl.viewport(0, 0, canvas.width, canvas.height);
-      gl.useProgram(compositeProgram.program);
-      setShared(c, canvas.width, canvas.height, s, unfold);
-      gl.uniform3fv(c.uColor, toRgb(s.color));
-      gl.uniform3fv(c.uSheenColor, toRgb(s.sheenColor));
-      gl.uniform1f(c.uNoiseIntensity, s.noiseIntensity);
-      gl.uniform1f(c.uDepth, s.depth);
-      gl.uniform1f(c.uSheen, s.sheen);
-      gl.uniform1f(c.uGlow, s.glow);
-      gl.uniform1f(c.uLightMode, s.lightMode ? 1 : 0);
-      gl.uniform3f(c.uLight, state.lightX, state.lightY, state.touch * s.interactionStrength);
-      gl.uniform2f(c.uStep, view.ratio / Math.max(1, canvas.width), view.ratio / Math.max(1, canvas.height));
-      gl.uniform1f(c.uPresence, presence);
-      gl.uniform1f(c.uFade, s.fade);
-      gl.activeTexture(gl.TEXTURE0);
-      gl.bindTexture(gl.TEXTURE_2D, texture);
-      gl.uniform1i(c.uBloom, 0);
-      gl.drawArrays(gl.TRIANGLES, 0, 3);
+      canvas.addEventListener('webglcontextlost', onContextLost, false);
+      document.addEventListener('visibilitychange', onVisibilityChange);
+      motionQuery?.addEventListener('change', onMotionChange);
+      resizeObserver.observe(container);
+      intersectionObserver.observe(container);
 
-      if (!isReady) setIsReady(true);
-    };
+      syncWebGLSize();
+      renderWebGLFrame(elapsedSec);
+      startLoop();
 
-    const frame = (now: number) => {
-      raf = 0;
-      if (!visible || document.hidden) return;
-      const s = settingsRef.current;
-      const dt = last ? Math.min(0.05, (now - last) / 1000) : 1 / 60;
-      last = now;
-      const flowing = !s.paused && !reduce && s.speed !== 0;
-      if (flowing) state.flow += dt * 0.1 * s.speed;
-      if (!s.intro || reduce) state.intro = 1;
-      else if (state.intro < 1) state.intro = Math.min(1, state.intro + dt / INTRO_SECONDS);
+      return () => {
+        disposed = true;
+        stopLoop();
+        resizeObserver.disconnect();
+        intersectionObserver.disconnect();
+        canvas.removeEventListener('webglcontextlost', onContextLost, false);
+        document.removeEventListener('visibilitychange', onVisibilityChange);
+        motionQuery?.removeEventListener('change', onMotionChange);
 
-      const engaged = s.mouseInteraction && pointer.inside && !reduce;
-      if (engaged && state.touch < 0.01) {
-        state.x = pointer.x;
-        state.y = pointer.y;
-      }
-      const follow = 1 - Math.exp(-dt * 10);
-      const prevX = state.x;
-      const prevY = state.y;
-      state.x += (pointer.x - state.x) * follow;
-      state.y += (pointer.y - state.y) * follow;
-      const velX = (state.x - prevX) / Math.max(dt, 0.001) / Math.max(1, view.height);
-      const velY = (state.y - prevY) / Math.max(dt, 0.001) / Math.max(1, view.height);
-      const dragBlend = 1 - Math.exp(-dt * 4);
-      state.dragX += (clamp(velX * 0.03, -0.06, 0.06) - state.dragX) * dragBlend;
-      state.dragY += (clamp(-velY * 0.03, -0.06, 0.06) - state.dragY) * dragBlend;
-      state.touch += ((engaged ? 1 : 0) - state.touch) * (1 - Math.exp(-dt * (engaged ? 3.5 : 1.4)));
-
-      let lightGoalX = DEFAULT_LIGHT[0];
-      let lightGoalY = DEFAULT_LIGHT[1];
-      if (engaged) {
-        const aimX = (pointer.x / Math.max(1, view.width) - 0.5) * (view.width / Math.max(1, view.height));
-        const aimY = 0.5 - pointer.y / Math.max(1, view.height);
-        const reach = Math.hypot(aimX, aimY);
-        if (reach > 0.04) {
-          lightGoalX = (aimX / reach) * LIGHT_TILT;
-          lightGoalY = (aimY / reach) * LIGHT_TILT;
-        } else {
-          lightGoalX = state.lightX;
-          lightGoalY = state.lightY;
+        if (!gl.isContextLost()) {
+          gl.bindBuffer(gl.ARRAY_BUFFER, null);
+          gl.useProgram(null);
+          if (quadBuffer) gl.deleteBuffer(quadBuffer);
+          gl.deleteProgram(program);
+          gl.deleteShader(vertShader);
+          gl.deleteShader(fragShader);
         }
-      }
-      const lightFollow = 1 - Math.exp(-dt * 3);
-      state.lightX += (lightGoalX - state.lightX) * lightFollow;
-      state.lightY += (lightGoalY - state.lightY) * lightFollow;
+      };
+    }
 
-      for (let i = waves.length - 1; i >= 0; i--) {
-        waves[i].age += dt;
-        if (waves[i].age > WAVE_LIFE * 2.5) waves.splice(i, 1);
-      }
+    // -----------------------------------------------------------------------
+    // ENGINE B: ZERO-LAG CANVAS 2D PROCEDURAL SILK RIBBON ENGINE
+    // -----------------------------------------------------------------------
+    const ctx = canvas.getContext('2d', { alpha: false, desynchronized: true });
+    if (!ctx) return;
 
-      render();
+    // Pre-allocated typed arrays (zero per-frame geometry allocation)
+    const ptCount = CANVAS2D_SEGMENTS + 1;
+    const xCoords = new Float32Array(ptCount);
+    const uCoords = new Float32Array(ptCount);
+    const topY = new Float32Array(ptCount);
+    const botY = new Float32Array(ptCount);
 
-      const settling =
-        state.intro < 1 ||
-        waves.length > 0 ||
-        Math.abs((engaged ? 1 : 0) - state.touch) > 0.002 ||
-        Math.abs(state.dragX) + Math.abs(state.dragY) > 0.0002 ||
-        Math.abs(pointer.x - state.x) + Math.abs(pointer.y - state.y) > 0.3 ||
-        Math.abs(lightGoalX - state.lightX) + Math.abs(lightGoalY - state.lightY) > 0.001;
-      if (flowing || settling) raf = requestAnimationFrame(frame);
-      else last = 0;
-    };
+    let bufW = 800;
+    let bufH = 450;
+    let spanW = 1000;
+    let spanH = 1000;
+    let cachedBgGradient: CanvasGradient | null = null;
+    let cachedBgKey = '';
 
-    const wake = () => {
-      if (!raf && visible && !document.hidden) raf = requestAnimationFrame(frame);
-    };
-
-    const resize = () => {
-      const s = settingsRef.current;
-      const width = Math.max(1, container.clientWidth);
-      const height = Math.max(1, container.clientHeight);
-      // Cap DPR strictly at 1.5 to protect battery & GPU fill-rate on Retina / 4K displays
-      const ratio = Math.min(s.dpr || window.devicePixelRatio || 1, 1.5);
-      view.width = width;
-      view.height = height;
-      view.ratio = ratio;
-      canvas.width = Math.max(1, Math.round(width * ratio));
-      canvas.height = Math.max(1, Math.round(height * ratio));
-      render();
-      wake();
-    };
-
-    const locate = (event: PointerEvent) => {
+    const syncCanvas2DSize = () => {
       const rect = container.getBoundingClientRect();
-      const x = event.clientX - rect.left;
-      const y = event.clientY - rect.top;
-      return { x, y, inside: x >= 0 && y >= 0 && x <= rect.width && y <= rect.height };
+      const cssW = Math.max(1, Math.floor(rect.width));
+      const cssH = Math.max(1, Math.floor(rect.height));
+
+      // Cap internal width while preserving exact aspect ratio
+      const scaleFactor = cssW > CANVAS2D_MAX_WIDTH ? CANVAS2D_MAX_WIDTH / cssW : 1;
+      const targetW = Math.max(160, Math.round(cssW * scaleFactor));
+      const targetH = Math.max(120, Math.round(cssH * scaleFactor));
+
+      if (canvas.width !== targetW || canvas.height !== targetH || cachedBgGradient === null) {
+        canvas.width = targetW;
+        canvas.height = targetH;
+        bufW = targetW;
+        bufH = targetH;
+
+        const diag = Math.hypot(bufW, bufH);
+        spanW = diag * 1.16;
+        spanH = diag * 1.12;
+
+        const halfW = spanW * 0.5;
+        for (let i = 0; i < ptCount; i++) {
+          const u = i / CANVAS2D_SEGMENTS;
+          uCoords[i] = u;
+          xCoords[i] = -halfW + u * spanW;
+        }
+        cachedBgKey = '';
+      }
     };
 
-    const onPointerMove = (event: PointerEvent) => {
-      const point = locate(event);
-      pointer.x = point.x;
-      pointer.y = point.y;
-      pointer.inside = point.inside;
-      wake();
+    const renderCanvas2DFrame = (timeSec: number) => {
+      if (disposed) return;
+
+      const cfg = configRef.current;
+      const baseRgb = parseHexToRgb255(cfg.baseColor, [5, 8, 16]);
+      const midRgb = parseHexToRgb255(cfg.color, [39, 196, 255]);
+      const crestRgb = parseHexToRgb255(cfg.highlightColor, [140, 246, 247]);
+      const deepShadowRgb = mixRgb(baseRgb, midRgb, 0.24);
+      const specularRgb = mixRgb(crestRgb, [235, 255, 255], 0.55);
+
+      // 1. Cached Obsidian Base Fill (zero per-frame gradient allocation)
+      const bgKey = `${cfg.baseColor}|${cfg.color}|${bufW}|${bufH}`;
+      if (bgKey !== cachedBgKey || !cachedBgGradient) {
+        const bgGrad = ctx.createLinearGradient(0, 0, bufW, bufH);
+        bgGrad.addColorStop(0, rgbaStr(baseRgb, 1));
+        bgGrad.addColorStop(0.5, rgbaStr(mixRgb(baseRgb, midRgb, 0.14), 1));
+        bgGrad.addColorStop(1, rgbaStr(baseRgb, 1));
+        cachedBgGradient = bgGrad;
+        cachedBgKey = bgKey;
+      }
+
+      ctx.setTransform(1, 0, 0, 1, 0, 0);
+      ctx.fillStyle = cachedBgGradient;
+      ctx.fillRect(0, 0, bufW, bufH);
+
+      // 2. Transform into diagonal silk drapery space
+      const tiltAngle = -0.38 + cfg.rotation;
+      ctx.translate(bufW * 0.5, bufH * 0.5);
+      ctx.rotate(tiltAngle);
+
+      const t = timeSec * (cfg.speed * 0.14);
+      const freqScale = Math.max(0.5, cfg.scale);
+
+      // 3. Render 9 overlapping domain-warped silk ribbons (ZERO blur filters)
+      for (let rIdx = 0; rIdx < RIBBON_SPECS.length; rIdx++) {
+        const r = RIBBON_SPECS[rIdx];
+        const baseY = r.yRatio * spanH;
+        const baseHalfThick = r.thickRatio * spanH * 0.5;
+        const amp1 = r.amp1Ratio * spanH;
+        const amp2 = r.amp2Ratio * spanH;
+
+        let minY = Infinity;
+        let maxY = -Infinity;
+
+        for (let i = 0; i < ptCount; i++) {
+          const u = uCoords[i];
+          const waveA = Math.sin(u * r.freq1 * freqScale + t * r.speed1 + r.phase1);
+          // Trigonometric domain warp creates organic silk pinching & swirling
+          const waveB = Math.cos(
+            u * r.freq2 * freqScale - t * r.speed2 + r.phase2 + waveA * 0.65
+          );
+          const satinRipple =
+            Math.sin(u * 11.5 * freqScale + t * 0.45 + r.phase1 * 1.7) * 0.16;
+
+          const centerY = baseY + waveA * amp1 + (waveB + satinRipple) * amp2;
+          const breathingThick =
+            baseHalfThick * (0.72 + 0.34 * Math.sin(u * 3.9 - t * 0.38 + r.phase2));
+
+          const ty = centerY - breathingThick;
+          const by = centerY + breathingThick;
+          topY[i] = ty;
+          botY[i] = by;
+
+          if (ty < minY) minY = ty;
+          if (by > maxY) maxY = by;
+        }
+
+        // Silk body 3D fold gradient (bright luminous crest -> turquoise -> deep obsidian trough)
+        const grad = ctx.createLinearGradient(0, minY, 0, maxY);
+        grad.addColorStop(0.0, rgbaStr(crestRgb, 0.0));
+        grad.addColorStop(0.12, rgbaStr(crestRgb, r.crestAlpha * 0.72));
+        grad.addColorStop(0.28, rgbaStr(midRgb, r.bodyAlpha * 0.85));
+        grad.addColorStop(0.58, rgbaStr(deepShadowRgb, 0.74));
+        grad.addColorStop(0.86, rgbaStr(baseRgb, 0.94));
+        grad.addColorStop(1.0, rgbaStr(baseRgb, 0.0));
+
+        // Trace smooth closed silk band
+        ctx.beginPath();
+        ctx.moveTo(xCoords[0], topY[0]);
+        for (let i = 1; i < ptCount - 1; i++) {
+          const mx = (xCoords[i] + xCoords[i + 1]) * 0.5;
+          const my = (topY[i] + topY[i + 1]) * 0.5;
+          ctx.quadraticCurveTo(xCoords[i], topY[i], mx, my);
+        }
+        ctx.lineTo(xCoords[ptCount - 1], topY[ptCount - 1]);
+        ctx.lineTo(xCoords[ptCount - 1], botY[ptCount - 1]);
+
+        for (let i = ptCount - 2; i >= 1; i--) {
+          const mx = (xCoords[i] + xCoords[i - 1]) * 0.5;
+          const my = (botY[i] + botY[i - 1]) * 0.5;
+          ctx.quadraticCurveTo(xCoords[i], botY[i], mx, my);
+        }
+        ctx.lineTo(xCoords[0], botY[0]);
+        ctx.closePath();
+
+        ctx.fillStyle = grad;
+        ctx.fill();
+
+        // Trace luminous specular fold crease locked tightly to top edge (zero blur)
+        ctx.beginPath();
+        ctx.moveTo(xCoords[0], topY[0] + 2);
+        for (let i = 1; i < ptCount - 1; i++) {
+          const mx = (xCoords[i] + xCoords[i + 1]) * 0.5;
+          const my = (topY[i] + topY[i + 1]) * 0.5 + 2;
+          ctx.quadraticCurveTo(xCoords[i], topY[i] + 2, mx, my);
+        }
+        ctx.lineTo(xCoords[ptCount - 1], topY[ptCount - 1] + 2);
+
+        // Soft cyan sheen halo
+        ctx.lineWidth = 4.5;
+        ctx.strokeStyle = rgbaStr(midRgb, r.crestAlpha * 0.28);
+        ctx.stroke();
+
+        // Crisp specular silk highlight filament
+        ctx.lineWidth = 1.4;
+        ctx.strokeStyle = rgbaStr(specularRgb, r.crestAlpha * 0.72);
+        ctx.stroke();
+      }
     };
 
-    const onPointerDown = (event: PointerEvent) => {
-      const s = settingsRef.current;
-      if (!s.clickRipple || reduce) return;
-      const point = locate(event);
-      if (!point.inside) return;
-      waves.push({ x: point.x / view.width, y: 1 - point.y / view.height, age: 0 });
-      if (waves.length > 4) waves.shift();
-      wake();
+    const stopLoop = () => {
+      if (rafId !== null) {
+        cancelAnimationFrame(rafId);
+        rafId = null;
+      }
     };
 
-    const onPointerLeave = () => {
-      pointer.inside = false;
-      wake();
+    const tick = (now: number) => {
+      if (disposed || !isVisible || !isTabVisible || reducedMotion) {
+        rafId = null;
+        return;
+      }
+
+      const rawDeltaMs = lastNow > 0 ? now - lastNow : 16.67;
+      lastNow = now;
+      elapsedSec += Math.min(rawDeltaMs, 100) / 1000;
+
+      renderCanvas2DFrame(elapsedSec);
+      rafId = requestAnimationFrame(tick);
     };
 
-    const onVisibility = () => {
-      last = 0;
-      wake();
+    const startLoop = () => {
+      if (disposed || rafId !== null || !isVisible || !isTabVisible) return;
+      if (reducedMotion) {
+        renderCanvas2DFrame(elapsedSec);
+        return;
+      }
+      lastNow = performance.now();
+      rafId = requestAnimationFrame(tick);
+    };
+
+    const onVisibilityChange = () => {
+      isTabVisible = !document.hidden;
+      if (!isTabVisible) {
+        stopLoop();
+      } else {
+        startLoop();
+      }
+    };
+
+    const onMotionChange = (e: MediaQueryListEvent) => {
+      reducedMotion = e.matches;
+      if (reducedMotion) {
+        stopLoop();
+        renderCanvas2DFrame(elapsedSec);
+      } else {
+        startLoop();
+      }
     };
 
     const resizeObserver = new ResizeObserver(() => {
-      resize();
+      syncCanvas2DSize();
+      renderCanvas2DFrame(elapsedSec);
     });
-    resizeObserver.observe(container);
 
-    const intersection = new IntersectionObserver(entries => {
-      visible = entries.some(entry => entry.isIntersecting);
-      if (visible) {
-        last = 0;
-        wake();
-      } else {
-        if (raf) {
-          cancelAnimationFrame(raf);
-          raf = 0;
+    const intersectionObserver = new IntersectionObserver(
+      (entries) => {
+        const entry = entries[0];
+        isVisible = Boolean(entry?.isIntersecting);
+        if (!isVisible) {
+          stopLoop();
+        } else {
+          startLoop();
         }
-      }
-    }, { rootMargin: '0px', threshold: 0 });
-    intersection.observe(container);
+      },
+      { threshold: 0.01 }
+    );
 
-    window.addEventListener('pointermove', onPointerMove, { passive: true });
-    window.addEventListener('pointerdown', onPointerDown, { passive: true });
-    document.documentElement.addEventListener('pointerleave', onPointerLeave);
-    document.addEventListener('visibilitychange', onVisibility);
+    document.addEventListener('visibilitychange', onVisibilityChange);
+    motionQuery?.addEventListener('change', onMotionChange);
+    resizeObserver.observe(container);
+    intersectionObserver.observe(container);
 
-    resize();
-
-    let lastDpr = settingsRef.current.dpr;
-    wakeRef.current = () => {
-      const s = settingsRef.current;
-      if (s.dpr !== lastDpr) {
-        lastDpr = s.dpr;
-        resize();
-        return;
-      }
-      if (!raf) render();
-      wake();
-    };
+    syncCanvas2DSize();
+    renderCanvas2DFrame(elapsedSec);
+    startLoop();
 
     return () => {
-      cancelAnimationFrame(raf);
-      wakeRef.current = null;
+      disposed = true;
+      stopLoop();
       resizeObserver.disconnect();
-      intersection.disconnect();
-      window.removeEventListener('pointermove', onPointerMove);
-      window.removeEventListener('pointerdown', onPointerDown);
-      document.documentElement.removeEventListener('pointerleave', onPointerLeave);
-      document.removeEventListener('visibilitychange', onVisibility);
-      gl.deleteTexture(texture);
-      gl.deleteFramebuffer(framebuffer);
-      gl.deleteProgram(fieldProgram.program);
-      gl.deleteProgram(compositeProgram.program);
-      gl.deleteBuffer(buffer);
-      gl.deleteVertexArray(vao);
-      // Explicitly lose context on unmount so React HMR / page reloads never leak contexts
-      gl.getExtension('WEBGL_lose_context')?.loseContext();
+      intersectionObserver.disconnect();
+      document.removeEventListener('visibilitychange', onVisibilityChange);
+      motionQuery?.removeEventListener('change', onMotionChange);
     };
-  }, []);
-
-  useEffect(() => {
-    wakeRef.current?.();
-  });
+  }, [engineMode, forceEngine]);
 
   return (
     <div
       ref={containerRef}
-      className={`silk-container ${className}`}
-      style={{
-        backgroundColor: '#050810',
-        ...style
-      }}
+      className={`silk-root ${className}`}
+      style={style}
+      aria-hidden="true"
     >
-      {/* Zero-blackout CSS ambient underlay: visible immediately and serves as the graceful fallback when WebGL is disabled */}
-      <div
-        className="absolute inset-0 pointer-events-none"
-        style={{
-          background: `radial-gradient(ellipse 65% 50% at 35% 45%, ${cleanColor}26 0%, rgba(5, 8, 16, 0) 75%),
-                      radial-gradient(ellipse 55% 40% at 75% 55%, ${cleanSheenColor}1a 0%, rgba(5, 8, 16, 0) 75%)`,
-        }}
-      />
-
-      {/* Non-WebGL High-Fidelity Silk Waves Fallback */}
-      {!hasWebGL && (
-        <div
-          className="absolute inset-0 pointer-events-none overflow-hidden"
-          style={{
-            background: `
-              radial-gradient(ellipse 80% 50% at 30% 40%, ${cleanColor}40 0%, transparent 70%),
-              radial-gradient(ellipse 70% 45% at 75% 60%, ${cleanSheenColor}30 0%, transparent 65%),
-              radial-gradient(circle at 50% 50%, rgba(10, 35, 48, 0.4) 0%, rgba(5, 8, 16, 0.95) 100%)
-            `,
-          }}
-        >
-          {/* Flowing Organic Silk Curtains for non-WebGL */}
-          <div
-            className="absolute -inset-10 silk-fallback-flow motion-reduce:animate-none opacity-60"
-            style={{
-              background: `
-                radial-gradient(ellipse 60% 30% at 40% 40%, ${cleanColor}33 0%, transparent 60%),
-                radial-gradient(ellipse 50% 35% at 65% 60%, ${cleanSheenColor}25 0%, transparent 60%)
-              `,
-              filter: 'blur(30px)',
-            }}
-          />
-        </div>
-      )}
-
       <canvas
+        key={engineMode}
         ref={canvasRef}
         className="silk-canvas"
         aria-hidden="true"
-        style={{
-          opacity: isReady ? 1 : 0,
-          transition: 'opacity 400ms ease-out',
-        }}
       />
+      <div className="silk-vignette" />
     </div>
   );
 };

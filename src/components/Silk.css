@@ -1,31 +1,41 @@
-.silk-container {
-  position: relative;
+/* src/components/Silk.css */
+
+.silk-root {
+  position: absolute;
+  inset: 0;
   width: 100%;
   height: 100%;
   overflow: hidden;
+  pointer-events: none;
+  user-select: none;
+  contain: layout paint style;
+  /* Zero-blur instant SSR base matching the obsidian-to-turquoise palette */
+  background-color: #050810;
+  background-image: linear-gradient(
+    135deg,
+    #050810 0%,
+    #071729 42%,
+    #0b2c47 68%,
+    #050810 100%
+  );
 }
 
 .silk-canvas {
-  position: absolute;
-  inset: 0;
   display: block;
   width: 100%;
   height: 100%;
+  pointer-events: none;
 }
 
-@keyframes silkFallbackFlow {
-  0%, 100% {
-    transform: translate3d(0, 0, 0) scale(1);
-    opacity: 0.55;
-  }
-  50% {
-    transform: translate3d(-15px, -10px, 0) scale(1.06);
-    opacity: 0.75;
-  }
+/* Static (non-animated, zero-blur) luxury obsidian vignette for text legibility */
+.silk-vignette {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(
+    ellipse 85% 75% at 50% 45%,
+    rgba(5, 8, 16, 0) 25%,
+    rgba(5, 8, 16, 0.55) 80%,
+    rgba(5, 8, 16, 0.88) 100%
+  );
 }
-
-.silk-fallback-flow {
-  animation: silkFallbackFlow 12s ease-in-out infinite;
-  will-change: transform, opacity;
-}
-
