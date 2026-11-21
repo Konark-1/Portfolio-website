@@ -1,63 +1,9 @@
 "use client";
 
-import dynamic from "next/dynamic";
-import React, { useEffect, useRef, useState, type ReactNode } from "react";
-
-const SECTION_HEIGHTS = {
-  projects: "min-h-[1420px] md:min-h-[980px] lg:min-h-[860px]",
-  certificates: "min-h-[680px] md:min-h-[620px]",
-  contact: "min-h-[760px] md:min-h-[640px]",
-} as const;
-
-function SectionSkeleton({
-  heightClass,
-  label,
-}: {
-  heightClass: string;
-  label: string;
-}) {
-  return (
-    <div
-      role="status"
-      aria-busy="true"
-      aria-label={`Loading ${label}`}
-      className={`w-full ${heightClass} rounded-2xl border border-[#27CBCE]/10 bg-[#050810] contain-layout`}
-    />
-  );
-}
-
-const ProjectsSection = dynamic(
-  () => import("@/components/sections/ProjectsSection"),
-  {
-    ssr: false,
-    loading: () => (
-      <SectionSkeleton heightClass={SECTION_HEIGHTS.projects} label="Projects" />
-    ),
-  }
-);
-
-const StackedCardCertificates = dynamic(
-  () => import("@/components/ui/stacked-card-certificates").then((m) => m.StackedCardCertificates),
-  {
-    ssr: false,
-    loading: () => (
-      <SectionSkeleton
-        heightClass={SECTION_HEIGHTS.certificates}
-        label="Certificates"
-      />
-    ),
-  }
-);
-
-const ContactSection = dynamic(
-  () => import("@/components/sections/ContactSection"),
-  {
-    ssr: false,
-    loading: () => (
-      <SectionSkeleton heightClass={SECTION_HEIGHTS.contact} label="Contact" />
-    ),
-  }
-);
+import React from "react";
+import ProjectsSection from "@/components/sections/ProjectsSection";
+import { StackedCardCertificates } from "@/components/ui/stacked-card-certificates";
+import ContactSection from "@/components/sections/ContactSection";
 
 const CERTIFICATES_DATA = [
   {
@@ -134,129 +80,20 @@ const CERTIFICATES_DATA = [
   },
 ];
 
-function ViewportGate({
-  id,
-  heightClass,
-  cvHeight,
-  rootMargin = "350px 0px",
-  disableContentVisibility = false,
-  children,
-}: {
-  id: string;
-  heightClass: string;
-  cvHeight: string;
-  rootMargin?: string;
-  disableContentVisibility?: boolean;
-  children: ReactNode;
-}) {
-  const hostRef = useRef<HTMLDivElement>(null);
-  const [shouldMount, setShouldMount] = useState(false);
-
-  useEffect(() => {
-    // Immediate mount if user arrived via deep link (#projects, #certificates, #contact)
-    if (typeof window !== "undefined" && window.location.hash === `#${id}`) {
-      setShouldMount(true);
-      return;
-    }
-
-    const onHashChange = () => {
-      if (typeof window !== "undefined" && window.location.hash === `#${id}`) {
-        setShouldMount(true);
-      }
-    };
-    window.addEventListener("hashchange", onHashChange);
-
-    const onMountSection = (e: Event) => {
-      const customEvent = e as CustomEvent<string>;
-      if (customEvent.detail === id) {
-        setShouldMount(true);
-      }
-    };
-    window.addEventListener("mount-section", onMountSection);
-
-    const el = hostRef.current;
-    if (!el) {
-      return () => {
-        window.removeEventListener("hashchange", onHashChange);
-        window.removeEventListener("mount-section", onMountSection);
-      };
-    }
-
-    const observer = new IntersectionObserver(
-      (entries) => {
-        if (entries[0]?.isIntersecting) {
-          setShouldMount(true);
-          observer.disconnect();
-        }
-      },
-      { rootMargin, threshold: 0.01 }
-    );
-    observer.observe(el);
-
-    return () => {
-      observer.disconnect();
-      window.removeEventListener("hashchange", onHashChange);
-      window.removeEventListener("mount-section", onMountSection);
-    };
-  }, [id, rootMargin]);
-
-  return (
-    <div
-      id={id}
-      ref={hostRef}
-      className={`w-full ${heightClass} ${disableContentVisibility ? "" : "cv-auto"} scroll-mt-24`}
-      style={{ "--cv-height": cvHeight } as React.CSSProperties}
-    >
-      {shouldMount ? children : <SectionSkeleton heightClass={heightClass} label={id} />}
-    </div>
-  );
-}
-
 export default function DynamicSections() {
-  // Prewarm dynamic chunks during browser idle time so mobile users experience zero load latency
-  useEffect(() => {
-    const prewarm = () => {
-      import("@/components/ui/stacked-card-certificates");
-      import("@/components/sections/ProjectsSection");
-    };
-    if (typeof window !== "undefined") {
-      if ("requestIdleCallback" in window) {
-        (window as any).requestIdleCallback(prewarm);
-      } else {
-        setTimeout(prewarm, 1000);
-      }
-    }
-  }, []);
-
   return (
     <>
-      <ViewportGate
-        id="projects"
-        heightClass={SECTION_HEIGHTS.projects}
-        cvHeight="980px"
-        rootMargin="500px 0px"
-        disableContentVisibility
-      >
+      <div id="projects" className="scroll-mt-24">
         <ProjectsSection />
-      </ViewportGate>
+      </div>
 
-      <ViewportGate
-        id="certificates"
-        heightClass={SECTION_HEIGHTS.certificates}
-        cvHeight="640px"
-        rootMargin="800px 0px"
-        disableContentVisibility
-      >
+      <div id="certificates" className="scroll-mt-24">
         <StackedCardCertificates certificates={CERTIFICATES_DATA} />
-      </ViewportGate>
+      </div>
 
-      <ViewportGate
-        id="contact"
-        heightClass={SECTION_HEIGHTS.contact}
-        cvHeight="680px"
-      >
+      <div id="contact" className="scroll-mt-24">
         <ContactSection />
-      </ViewportGate>
+      </div>
     </>
   );
 }

@@ -27,8 +27,12 @@ export function StackedCardCertificates({ certificates }: StackedCardCertificate
     const [isHovered, setIsHovered] = useState(false);
     const [isInView, setIsInView] = useState(false);
     const containerRef = useRef<HTMLDivElement>(null);
+    const sliderRef = useRef<HTMLDivElement>(null);
     const isSwipingRef = useRef(false);
+    const isDraggingRef = useRef(false);
     const didMoveRef = useRef(false);
+    const activeIndexRef = useRef(activeIndex);
+    activeIndexRef.current = activeIndex;
     const touchStartX = useRef<number | null>(null);
     const touchStartY = useRef<number | null>(null);
     const touchEndX = useRef<number | null>(null);
@@ -67,6 +71,14 @@ export function StackedCardCertificates({ certificates }: StackedCardCertificate
         setActiveIndex((prev) => (prev - 1 + certificates.length) % certificates.length);
     }, [certificates.length]);
 
+    // Keep slider transform in sync when activeIndex updates
+    useEffect(() => {
+        if (sliderRef.current && !isDraggingRef.current) {
+            sliderRef.current.style.transition = 'transform 360ms cubic-bezier(0.16, 1, 0.3, 1)';
+            sliderRef.current.style.transform = `translate3d(-${activeIndex * 100}%, 0, 0)`;
+        }
+    }, [activeIndex]);
+
     // Keyboard navigation
     useEffect(() => {
         const handleKeyDown = (e: KeyboardEvent) => {
@@ -77,61 +89,80 @@ export function StackedCardCertificates({ certificates }: StackedCardCertificate
         return () => window.removeEventListener("keydown", handleKeyDown);
     }, [goToNext, goToPrev]);
 
-    // Touch swipe navigation for mobile with strict tap vs swipe vs vertical scroll disambiguation
+    // Ultra-responsive 1:1 physical touch tracking on iOS / mobile
     const handleTouchStart = (e: React.TouchEvent) => {
         const touch = e.targetTouches[0];
         isSwipingRef.current = false;
         didMoveRef.current = false;
+        isDraggingRef.current = true;
         touchStartX.current = touch.clientX;
         touchStartY.current = touch.clientY;
         touchEndX.current = touch.clientX;
         touchEndY.current = touch.clientY;
+        if (sliderRef.current) {
+            sliderRef.current.style.transition = 'none';
+        }
     };
 
     const handleTouchMove = (e: React.TouchEvent) => {
+        if (!isDraggingRef.current || touchStartX.current === null || touchStartY.current === null) return;
         const touch = e.targetTouches[0];
         touchEndX.current = touch.clientX;
         touchEndY.current = touch.clientY;
-        if (touchStartX.current !== null && touchStartY.current !== null) {
-            const deltaX = Math.abs(touchStartX.current - touch.clientX);
-            const deltaY = Math.abs(touchStartY.current - touch.clientY);
-            if (deltaX > 8 || deltaY > 8) {
-                didMoveRef.current = true;
+
+        let deltaX = touch.clientX - touchStartX.current;
+        const deltaY = Math.abs(touch.clientY - touchStartY.current);
+
+        if (Math.abs(deltaX) > 6 || deltaY > 6) {
+            didMoveRef.current = true;
+        }
+
+        // Only lock into horizontal swipe when horizontal motion exceeds vertical motion
+        if (Math.abs(deltaX) > deltaY && Math.abs(deltaX) > 8) {
+            isSwipingRef.current = true;
+            const idx = activeIndexRef.current;
+            // Damped elastic resistance at first/last slide boundaries
+            if ((idx === 0 && deltaX > 0) || (idx === certificates.length - 1 && deltaX < 0)) {
+                deltaX *= 0.32;
             }
-            if (deltaX > 15) {
-                isSwipingRef.current = true;
+            if (sliderRef.current) {
+                sliderRef.current.style.transform = `translate3d(calc(-${idx * 100}% + ${deltaX}px), 0, 0)`;
             }
         }
     };
 
     const handleTouchEnd = (e: React.TouchEvent) => {
+        isDraggingRef.current = false;
         let finalX = touchEndX.current;
-        let finalY = touchEndY.current;
 
         if (e.changedTouches && e.changedTouches.length > 0) {
             finalX = e.changedTouches[0].clientX;
-            finalY = e.changedTouches[0].clientY;
         }
 
-        if (
-            touchStartX.current !== null &&
-            finalX !== null &&
-            touchStartY.current !== null &&
-            finalY !== null
-        ) {
-            const deltaX = touchStartX.current - finalX;
-            const deltaY = touchStartY.current - finalY;
+        const startX = touchStartX.current;
+        const startY = touchStartY.current;
+        const finalY = touchEndY.current;
 
-            // Disambiguate swipe:
-            // Horizontal movement must exceed 25px and be greater than vertical movement.
-            // Vertical page scroll is never trapped and horizontal swipe triggers smoothly.
-            if (Math.abs(deltaX) > 25 && Math.abs(deltaX) > Math.abs(deltaY)) {
+        if (sliderRef.current) {
+            sliderRef.current.style.transition = 'transform 360ms cubic-bezier(0.16, 1, 0.3, 1)';
+        }
+
+        if (startX !== null && finalX !== null && startY !== null && finalY !== null) {
+            const deltaX = startX - finalX;
+            const deltaY = Math.abs(startY - finalY);
+
+            // 35px threshold dominating vertical motion to flip card
+            if (Math.abs(deltaX) > 35 && Math.abs(deltaX) > deltaY) {
                 if (deltaX > 0) {
                     goToNext();
                 } else {
                     goToPrev();
                 }
+            } else if (sliderRef.current) {
+                sliderRef.current.style.transform = `translate3d(-${activeIndexRef.current * 100}%, 0, 0)`;
             }
+        } else if (sliderRef.current) {
+            sliderRef.current.style.transform = `translate3d(-${activeIndexRef.current * 100}%, 0, 0)`;
         }
 
         touchStartX.current = null;
@@ -141,12 +172,13 @@ export function StackedCardCertificates({ certificates }: StackedCardCertificate
         setTimeout(() => {
             isSwipingRef.current = false;
             didMoveRef.current = false;
-        }, 150);
+        }, 80);
     };
 
-    // Auto-scroll logic: only when in view, on desktop (disabled on mobile), and not hovered
+    // Auto-scroll logic: only when in view, on non-touch desktop, and not hovered
     useEffect(() => {
-        if (isMobile || !isInView || isHovered) return;
+        const isTouch = typeof window !== 'undefined' && ('ontouchstart' in window || navigator.maxTouchPoints > 0);
+        if (isMobile || isTouch || !isInView || isHovered) return;
         const interval = setInterval(() => {
             goToNext();
         }, 6000);
@@ -255,17 +287,18 @@ export function StackedCardCertificates({ certificates }: StackedCardCertificate
                         }}
                     >
                         <div
+                            ref={sliderRef}
                             className="flex w-full will-change-transform"
                             style={{
                                 transform: `translate3d(-${activeIndex * 100}%, 0, 0)`,
-                                transition: 'transform 450ms cubic-bezier(0.16, 1, 0.3, 1)',
+                                transition: 'transform 360ms cubic-bezier(0.16, 1, 0.3, 1)',
                             }}
                         >
                             {certificates.map((cert, index) => (
                                 <div key={index} className="w-full flex-shrink-0 select-none">
                                     <CertificateCard
                                         certificate={cert}
-                                        priority={index === 0 || index === 1}
+                                        priority={true}
                                         isSwipingRef={isSwipingRef}
                                         didMoveRef={didMoveRef}
                                     />
@@ -374,12 +407,12 @@ function CertificateCard({
                         src={certificate.imagePath!}
                         alt={certificate.title}
                         fill
-                        sizes="(max-width: 768px) 94vw, 560px"
-                        quality={75}
+                        sizes="(max-width: 768px) 100vw, 560px"
+                        quality={80}
                         className="object-contain p-4 sm:p-6 transition-transform duration-500 group-hover:scale-105"
                         onError={() => setImageError(true)}
-                        priority={priority}
-                        loading={priority ? undefined : "lazy"}
+                        priority={true}
+                        loading="eager"
                     />
                 ) : (
                     <div className="w-full h-full flex items-center justify-center p-6 min-h-[280px]">
