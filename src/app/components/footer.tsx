@@ -263,7 +263,7 @@ export default function Footer() {
           {/* Main Center Content - Social Pills only */}
           <div className="relative z-10 flex flex-1 flex-col items-center justify-center px-6 w-full max-w-6xl mx-auto overflow-visible">
             {/* Interactive Magnetic Social Pills */}
-            <div ref={linksRef} className="flex flex-wrap justify-center gap-4 md:gap-8 w-full py-16 overflow-visible">
+            <div ref={linksRef} className="flex flex-wrap justify-center gap-4 md:gap-8 w-full py-8 sm:py-12 md:py-16 overflow-visible">
               <MagneticButton 
                 href="https://www.linkedin.com/in/konarkparihar" 
                 target="_blank"

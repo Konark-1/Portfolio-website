@@ -272,10 +272,10 @@ function Header() {
         </div>
       </div>
 
-      {/* Backdrop overlay - no blur */}
+      {/* Backdrop overlay - crisp zero-blur obsidian to prevent iOS composite stutter */}
       {isMobileMenuOpen && (
         <div
-          className="fixed inset-0 bg-black/70 backdrop-blur-sm z-40 md:hidden transition-opacity duration-300"
+          className="fixed inset-0 bg-black/80 z-40 md:hidden transition-opacity duration-300"
           onClick={() => setIsMobileMenuOpen(false)}
         />
       )}
