@@ -866,10 +866,19 @@ body::-webkit-scrollbar {
   }
 }
 
-/* Performance utility: defer offscreen layout/paint */
+/* Performance utility: defer offscreen layout/paint on desktop only.
+   On mobile WebKit (<1024px), content-visibility: auto combined with
+   dynamic imports and Framer Motion triggers compositor reflow crashes. */
 .cv-auto {
-  content-visibility: auto;
-  contain-intrinsic-size: 1000px;
+  content-visibility: visible;
+  contain-intrinsic-block-size: auto;
+}
+
+@media (min-width: 1024px) {
+  .cv-auto {
+    content-visibility: auto;
+    contain-intrinsic-block-size: auto var(--cv-height, 800px);
+  }
 }
 
 /* Certificate carousel smooth infinite scroll */
@@ -1023,11 +1032,6 @@ body::-webkit-scrollbar {
   scrollbar-width: none;
 }
 
-/* Offscreen layout containment and style computation skip */
-.cv-auto {
-  content-visibility: auto;
-  contain-intrinsic-block-size: auto var(--cv-height, 800px);
-}
 
 /* Universal utility to hide scrollbars while preserving touch/trackpad scroll */
 .no-scrollbar::-webkit-scrollbar {

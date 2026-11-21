@@ -1,6 +1,8 @@
 'use client';
 
-import React, { useState, useEffect, useCallback, useRef } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
+import { createPortal } from 'react-dom';
+import Image from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   BarChart3,
@@ -20,12 +22,17 @@ import {
   Webhook,
   MessageSquare,
   Cpu,
-  MonitorPlay,
   Play,
   GitBranch,
   X,
+  ZoomIn,
+  Move,
+  Expand,
+  ChevronDown,
+  ChevronUp,
+  MonitorPlay,
 } from 'lucide-react';
-import { useIsMobile } from '@/hooks/useIsMobile';
+import { useIsDesktop } from '@/hooks/useIsDesktop';
 
 export interface ProjectMetric {
   label: string;
@@ -244,8 +251,450 @@ function getPipelineIcon(icon: PipelineNode['icon']) {
   }
 }
 
-export default function ProjectsSection() {
-  const isMobile = useIsMobile();
+/* ============================================================================
+ * MOBILE LIGHTBOX INSPECTOR MODAL (Full Resolution Zoom & Pan + Opt-in Live)
+ * ========================================================================== */
+
+type ZoomLevel = 1 | 1.75 | 2.5;
+
+interface ProjectVisualModalProps {
+  project: ProjectSpec | null;
+  onClose: () => void;
+}
+
+function ProjectVisualModal({ project, onClose }: ProjectVisualModalProps) {
+  const [zoom, setZoom] = useState<ZoomLevel>(1.75);
+  const [showLiveEmbed, setShowLiveEmbed] = useState(false);
+
+  useEffect(() => {
+    if (project) {
+      setZoom(1.75);
+      setShowLiveEmbed(false);
+    }
+  }, [project]);
+
+  // Lock background scroll when modal is active
+  useEffect(() => {
+    if (!project) return;
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onClose();
+    };
+    window.addEventListener('keydown', handleKeyDown);
+
+    return () => {
+      document.body.style.overflow = prev;
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [project, onClose]);
+
+  if (!project || typeof document === 'undefined') return null;
+
+  const zoomOptions: Array<{ level: ZoomLevel; label: string }> = [
+    { level: 1, label: 'Fit' },
+    { level: 1.75, label: '1.75×' },
+    { level: 2.5, label: '2.5×' },
+  ];
+
+  return createPortal(
+    <div
+      role="dialog"
+      aria-modal="true"
+      aria-label={`${project.title} Fullscreen HD Visual Inspector`}
+      className="fixed inset-0 z-[100] flex flex-col bg-[#050810] text-white h-[100dvh] w-screen"
+    >
+      {/* Top Header Bar */}
+      <div className="flex items-center justify-between gap-3 border-b border-white/10 px-4 py-3 shrink-0 bg-[#070B14]">
+        <div className="min-w-0">
+          <p className="text-[10px] sm:text-xs font-mono font-bold uppercase tracking-widest text-[#8CF6F7]">
+            {project.index} · {project.domain}
+          </p>
+          <h3 className="truncate text-sm sm:text-base font-bold text-white font-serif mt-0.5">
+            {project.title}
+          </h3>
+        </div>
+        <button
+          type="button"
+          onClick={onClose}
+          aria-label="Close inspector"
+          className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-white/15 bg-white/10 text-white active:scale-95 cursor-pointer"
+        >
+          <X className="h-5 w-5" />
+        </button>
+      </div>
+
+      {/* Main Viewport: Opt-in Live Embed OR Native Pan & Width-Scaled Zoom */}
+      {showLiveEmbed && (project.embedUrl || project.liveUrl) ? (
+        <div className="relative flex-1 bg-black">
+          <iframe
+            src={project.embedUrl || project.liveUrl}
+            title={`${project.title} interactive view`}
+            className="h-full w-full border-0"
+            allowFullScreen
+            loading="eager"
+            referrerPolicy="no-referrer-when-downgrade"
+          />
+        </div>
+      ) : (
+        <div className="relative flex-1 overflow-auto overscroll-contain bg-[#050810] p-3">
+          {/* Pan hint when zoomed */}
+          {zoom > 1 && (
+            <div className="pointer-events-none sticky left-2 top-2 z-10 inline-flex items-center gap-1.5 rounded-full bg-[#0a0e1a]/90 backdrop-blur-md px-3 py-1 text-[11px] font-sans font-medium text-slate-200 border border-[#27CBCE]/30 shadow-lg">
+              <Move className="h-3.5 w-3.5 text-[#8CF6F7]" />
+              Drag to pan across charts &amp; KPIs
+            </div>
+          )}
+
+          {/* Width-based layout scaling enables crisp rendering & native iOS momentum pan */}
+          <div
+            style={{ width: `${zoom * 100}%` }}
+            className="min-w-full transition-[width] duration-200 ease-out py-2"
+            onDoubleClick={() =>
+              setZoom((prev) => (prev === 1 ? 1.75 : prev === 1.75 ? 2.5 : 1))
+            }
+          >
+            <div className="relative aspect-[16/9] w-full overflow-hidden rounded-xl border border-white/15 bg-[#070B14] shadow-2xl">
+              <Image
+                src={project.previewImage}
+                alt={`${project.title} HD preview`}
+                fill
+                sizes="(max-width: 768px) 1600px, 1920px"
+                quality={85}
+                priority
+                className="object-contain"
+              />
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Bottom Control Dock (Safe Area Aware) */}
+      <div className="shrink-0 border-t border-white/10 bg-[#070B14] px-4 pt-3 pb-[max(0.75rem,env(safe-area-inset-bottom))]">
+        <div className="flex flex-wrap items-center justify-between gap-2.5">
+          {/* Zoom Buttons */}
+          {!showLiveEmbed ? (
+            <div
+              className="inline-flex items-center rounded-xl border border-white/15 bg-white/[0.04] p-1"
+              role="group"
+              aria-label="Zoom level"
+            >
+              {zoomOptions.map((opt) => {
+                const active = zoom === opt.level;
+                return (
+                  <button
+                    key={opt.level}
+                    type="button"
+                    onClick={() => setZoom(opt.level)}
+                    className={`min-h-[36px] rounded-lg px-3 text-xs font-semibold font-mono transition-colors cursor-pointer ${
+                      active
+                        ? 'bg-[#27CBCE] text-[#050810] shadow-[0_0_12px_rgba(39,203,206,0.6)]'
+                        : 'text-slate-300 hover:text-white active:bg-white/10'
+                    }`}
+                  >
+                    {opt.label}
+                  </button>
+                );
+              })}
+            </div>
+          ) : (
+            <button
+              type="button"
+              onClick={() => setShowLiveEmbed(false)}
+              className="min-h-[38px] rounded-xl border border-white/15 bg-white/10 px-3.5 text-xs font-semibold text-white cursor-pointer"
+            >
+              Back to HD Snapshot
+            </button>
+          )}
+
+          {/* Opt-in Live Interactive Embed Toggle */}
+          {project.embedUrl && !showLiveEmbed && (
+            <button
+              type="button"
+              onClick={() => setShowLiveEmbed(true)}
+              className="inline-flex min-h-[38px] items-center gap-1.5 rounded-xl bg-gradient-to-r from-[#27CBCE] to-[#8CF6F7] px-3.5 text-xs font-bold text-[#050810] shadow-[0_0_16px_rgba(39,203,206,0.5)] active:scale-[0.98] cursor-pointer"
+            >
+              <MonitorPlay className="h-4 w-4" />
+              Launch Live Report
+            </button>
+          )}
+
+          {project.liveUrl && !project.embedUrl && (
+            <a
+              href={project.liveUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex min-h-[38px] items-center gap-1.5 rounded-xl bg-gradient-to-r from-[#27CBCE] to-[#8CF6F7] px-3.5 text-xs font-bold text-[#050810] shadow-[0_0_16px_rgba(39,203,206,0.5)] cursor-pointer"
+            >
+              Open Live App
+              <ExternalLink className="h-3.5 w-3.5" />
+            </a>
+          )}
+        </div>
+      </div>
+    </div>,
+    document.body
+  );
+}
+
+/* ============================================================================
+ * MOBILE EDITORIAL CASE-STUDY CARD (< 1024px)
+ * ========================================================================== */
+
+interface MobileProjectCardProps {
+  project: ProjectSpec;
+  totalCount: number;
+  onInspect: (project: ProjectSpec) => void;
+}
+
+function MobileProjectCard({ project, totalCount, onInspect }: MobileProjectCardProps) {
+  const [stackExpanded, setStackExpanded] = useState(false);
+
+  return (
+    <article className="overflow-hidden rounded-2xl border border-white/12 bg-[#080D1A]/95 shadow-xl">
+      {/* 1. Header: Index, Category Pill, Title */}
+      <div className="p-4 sm:p-5 pb-3">
+        <div className="mb-2.5 flex items-center justify-between gap-2">
+          <span className="inline-flex items-center gap-1.5 rounded-full border border-[#27CBCE]/35 bg-[#27CBCE]/10 px-2.5 py-1 text-[10px] font-mono font-bold uppercase tracking-wider text-[#8CF6F7]">
+            {project.badgeText}
+          </span>
+          <span className="font-mono text-xs font-bold text-slate-400">
+            {project.index} / 0{totalCount}
+          </span>
+        </div>
+
+        <h3 className="text-xl sm:text-2xl font-bold leading-snug tracking-tight text-white font-serif">
+          {project.title}
+        </h3>
+        <p className="mt-1 text-xs text-slate-400 font-sans">{project.domain}</p>
+      </div>
+
+      {/* 2. Executive KPI Block */}
+      <div className="px-4 sm:px-5 pb-4">
+        <div className="rounded-xl border border-[#27CBCE]/25 bg-[#050912] p-3.5 flex items-baseline justify-between gap-3">
+          <div>
+            <div className="text-2xl sm:text-3xl font-bold font-mono tabular-nums text-transparent bg-clip-text bg-gradient-to-r from-[#27CBCE] to-[#8CF6F7]">
+              {project.headlineMetric.value}
+            </div>
+            <div className="mt-0.5 text-xs font-semibold text-slate-200">
+              {project.headlineMetric.label}
+            </div>
+            <p className="text-[11px] text-slate-400 mt-0.5 leading-snug">
+              {project.headlineMetric.context}
+            </p>
+          </div>
+        </div>
+      </div>
+
+      {/* 3. Full-Bleed Visual Preview with Zoom & Pan Affordance */}
+      <div className="px-4 sm:px-5 pb-4">
+        <button
+          type="button"
+          onClick={() => onInspect(project)}
+          aria-label={`Inspect ${project.title} dashboard in fullscreen zoom mode`}
+          className="group relative block w-full overflow-hidden rounded-xl border border-white/15 bg-[#050810] text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-[#8CF6F7] cursor-pointer"
+        >
+          <div className="relative aspect-[16/10] w-full">
+            <Image
+              src={project.previewImage}
+              alt={`${project.title} preview`}
+              fill
+              sizes="(max-width: 768px) 94vw, 640px"
+              quality={75}
+              loading="lazy"
+              decoding="async"
+              className="object-cover object-top transition-transform duration-300 group-active:scale-[1.02]"
+            />
+            {/* Bottom gradient ensures action badge is always high-contrast */}
+            <div className="pointer-events-none absolute inset-x-0 bottom-0 h-20 bg-gradient-to-t from-black/90 via-black/45 to-transparent" />
+          </div>
+
+          <div className="absolute inset-x-3 bottom-3 flex items-center justify-between gap-2">
+            <span className="inline-flex items-center gap-1.5 rounded-full bg-white px-3.5 py-2 text-xs font-bold text-[#050810] shadow-[0_2px_12px_rgba(0,0,0,0.6)] font-sans">
+              <ZoomIn className="h-3.5 w-3.5 text-[#050810]" />
+              Tap to Zoom &amp; Pan HD
+            </span>
+            <span className="flex h-8 w-8 items-center justify-center rounded-full bg-black/75 text-white border border-white/20">
+              <Expand className="h-4 w-4" />
+            </span>
+          </div>
+        </button>
+      </div>
+
+      {/* 4. Business Problem -> Engineered Resolution Narrative */}
+      <div className="space-y-3 px-4 sm:px-5 pb-4">
+        <div className="rounded-xl border-l-2 border-amber-400/80 bg-amber-500/[0.04] p-3.5 border border-amber-500/15">
+          <div className="mb-1 flex items-center gap-1.5 text-[11px] font-mono font-bold uppercase tracking-wider text-amber-300">
+            <AlertCircle className="w-3.5 h-3.5 text-amber-400 shrink-0" />
+            <span>Business Problem</span>
+          </div>
+          <p className="text-sm leading-relaxed text-slate-200 font-sans">
+            {project.problem}
+          </p>
+        </div>
+
+        <div className="rounded-xl border-l-2 border-[#27CBCE]/80 bg-[#27CBCE]/[0.04] p-3.5 border border-[#27CBCE]/20">
+          <div className="mb-1 flex items-center gap-1.5 text-[11px] font-mono font-bold uppercase tracking-wider text-[#8CF6F7]">
+            <CheckCircle2 className="w-3.5 h-3.5 text-[#27CBCE] shrink-0" />
+            <span>Engineered Resolution</span>
+          </div>
+          <p className="text-sm leading-relaxed text-slate-200 font-sans">
+            {project.solution}
+          </p>
+        </div>
+      </div>
+
+      {/* 5. Collapsible Tech Stack */}
+      <div className="border-t border-white/10 px-4 sm:px-5 py-3">
+        <button
+          type="button"
+          onClick={() => setStackExpanded((v) => !v)}
+          aria-expanded={stackExpanded}
+          className="flex w-full items-center justify-between py-1 text-left text-xs font-semibold uppercase tracking-wider text-slate-300 cursor-pointer"
+        >
+          <span className="inline-flex items-center gap-2">
+            <Layers className="h-3.5 w-3.5 text-[#8CF6F7]" />
+            Tech Stack ({project.stack.length})
+          </span>
+          {stackExpanded ? (
+            <ChevronUp className="h-4 w-4 text-slate-400" />
+          ) : (
+            <ChevronDown className="h-4 w-4 text-slate-400" />
+          )}
+        </button>
+
+        {stackExpanded && (
+          <div className="mt-2.5 flex flex-wrap gap-1.5">
+            {project.stack.map((tech) => (
+              <span
+                key={tech}
+                className="rounded-lg border border-white/10 bg-[#050810] px-2.5 py-1 text-xs font-mono text-slate-300"
+              >
+                {tech}
+              </span>
+            ))}
+          </div>
+        )}
+      </div>
+
+      {/* 6. Action Row (min 48px tap targets) */}
+      <div className="grid grid-cols-2 gap-2.5 border-t border-white/10 bg-[#050912]/80 p-4 sm:p-5">
+        <button
+          type="button"
+          onClick={() => onInspect(project)}
+          className="inline-flex min-h-[46px] items-center justify-center gap-1.5 rounded-xl bg-gradient-to-r from-[#27CBCE] to-[#8CF6F7] px-3.5 text-xs sm:text-sm font-bold text-[#050810] shadow-[0_0_20px_-4px_rgba(39,203,206,0.6)] active:scale-[0.98] cursor-pointer"
+        >
+          <ZoomIn className="h-4 w-4" />
+          Inspect Visual
+        </button>
+
+        <a
+          href={project.liveUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="inline-flex min-h-[46px] items-center justify-center gap-1.5 rounded-xl border border-white/15 bg-white/5 px-3.5 text-xs sm:text-sm font-semibold text-white hover:bg-white/10 active:bg-white/15 transition-colors cursor-pointer"
+        >
+          <span>{project.isCapstone ? 'Launch App' : 'Full Report'}</span>
+          <ArrowUpRight className="h-4 w-4" />
+        </a>
+      </div>
+    </article>
+  );
+}
+
+/* ============================================================================
+ * MOBILE PROJECTS VIEW CONTAINER (< 1024px)
+ * ========================================================================== */
+
+function MobileProjectsView() {
+  const [inspectedProject, setInspectedProject] = useState<ProjectSpec | null>(null);
+
+  return (
+    <section
+      id="projects-section-content"
+      aria-labelledby="projects-heading-mobile"
+      className="relative py-14 px-4 sm:px-6 bg-[#050810] text-slate-100 overflow-hidden border-t scroll-mt-24"
+      style={{ borderColor: 'var(--border-color)' }}
+    >
+      {/* Ambient glow */}
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-lg h-64 bg-[#27CBCE]/10 blur-[100px] rounded-full"
+      />
+
+      <div className="relative mx-auto max-w-xl">
+        {/* Header */}
+        <div className="mb-8">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#27CBCE]/10 border border-[#27CBCE]/25 text-[#8CF6F7] text-xs font-mono uppercase tracking-widest mb-3">
+            <Layers className="w-3.5 h-3.5" />
+            <span>Engineered Systems Catalog</span>
+          </div>
+          <h2
+            id="projects-heading-mobile"
+            className="text-3xl sm:text-4xl font-bold tracking-tight text-white leading-tight font-serif"
+          >
+            Data Intelligence &amp;{' '}
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#27CBCE] via-[#20B2AA] to-[#8CF6F7]">
+              Autonomous Systems
+            </span>
+          </h2>
+          <p className="mt-2 text-xs sm:text-sm text-slate-400 font-sans leading-relaxed">
+            All 4 verified analytics models and autonomous engines. Tap any preview to inspect HD charts and zoom into metrics.
+          </p>
+        </div>
+
+        {/* Vertical Stack of All 4 Project Cards */}
+        <div className="space-y-6">
+          {PROJECTS.map((project) => (
+            <MobileProjectCard
+              key={project.id}
+              project={project}
+              totalCount={PROJECTS.length}
+              onInspect={setInspectedProject}
+            />
+          ))}
+        </div>
+
+        {/* Technical Implementation Highlights */}
+        <div className="mt-12 p-5 rounded-2xl border border-accent-cyan/20 bg-gradient-to-br from-accent-cyan/5 to-transparent">
+          <h3 className="font-serif text-xl font-bold mb-4 flex items-center gap-2.5 text-text-primary tracking-tight">
+            <span className="text-accent-cyan text-2xl">⚡</span>
+            Technical Highlights
+          </h3>
+          <div className="space-y-4">
+            {techHighlights.map((highlight) => (
+              <div
+                key={highlight.title}
+                className="rounded-xl border border-white/10 bg-[#0a0e1a]/90 p-4"
+              >
+                <div className="text-2xl mb-1.5">{highlight.icon}</div>
+                <h4 className="text-base font-bold text-text-primary mb-1 font-serif tracking-tight">
+                  {highlight.title}
+                </h4>
+                <p className="text-xs text-text-muted leading-relaxed font-sans">
+                  {highlight.description}
+                </p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* Fullscreen HD Portal Modal */}
+      <ProjectVisualModal
+        project={inspectedProject}
+        onClose={() => setInspectedProject(null)}
+      />
+    </section>
+  );
+}
+
+/* ============================================================================
+ * DESKTOP PROJECTS VIEW (>= 1024px — 100% UNTOUCHED DESKTOP EXPERIENCE)
+ * ========================================================================== */
+
+function DesktopProjectsView() {
   const [activeId, setActiveId] = useState<string>(PROJECTS[0].id);
   const [isFullscreen, setIsFullscreen] = useState<boolean>(false);
   const [showInteractiveIframe, setShowInteractiveIframe] = useState<boolean>(false);
@@ -262,7 +711,6 @@ export default function ProjectsSection() {
     setRescueViewMode('architecture');
   }, []);
 
-  // Keyboard navigation across the 4-tab index + Escape key for fullscreen
   useEffect(() => {
     const onKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape' && isFullscreen) {
@@ -273,7 +721,6 @@ export default function ProjectsSection() {
     return () => window.removeEventListener('keydown', onKeyDown);
   }, [isFullscreen]);
 
-  // Prevent background scroll when Fullscreen Sandbox is open
   useEffect(() => {
     if (!isFullscreen) return;
     const prevOverflow = document.body.style.overflow;
@@ -296,12 +743,11 @@ export default function ProjectsSection() {
   };
 
   const renderInteractiveStage = (fullscreenMode = false) => {
-    // CASE A: Project 04 — RescueShip Capstone
     if (activeProject.type === 'fullstack') {
       return (
         <div
           className={`relative flex flex-col bg-[#070B14] border border-[#27CBCE]/30 rounded-2xl overflow-hidden shadow-[0_0_50px_-15px_rgba(39,203,206,0.22)] ${
-            fullscreenMode ? 'h-full w-full' : 'min-h-[420px] sm:min-h-[460px] lg:h-full lg:min-h-[540px]'
+            fullscreenMode ? 'h-full w-full' : 'h-full min-h-[540px]'
           }`}
         >
           {/* Chrome Header */}
@@ -355,24 +801,24 @@ export default function ProjectsSection() {
 
           {/* Stage Body */}
           {rescueViewMode === 'architecture' ? (
-            <div className="relative flex-1 p-4 sm:p-6 lg:p-7 flex flex-col justify-between overflow-y-auto bg-[radial-gradient(ellipse_at_top_right,rgba(39,203,206,0.14),transparent_65%)]">
+            <div className="relative flex-1 p-6 lg:p-7 flex flex-col justify-between overflow-y-auto bg-[radial-gradient(ellipse_at_top_right,rgba(39,203,206,0.14),transparent_65%)]">
               <div className="flex items-center justify-between gap-3 mb-4">
                 <div className="min-w-0 flex-1">
                   <p className="text-xs font-mono uppercase tracking-widest text-[#27CBCE] font-semibold">
                     Autonomous NDR Recovery Loop
                   </p>
-                  <h4 className="text-base sm:text-lg lg:text-xl font-bold text-white mt-1 break-words">
+                  <h4 className="text-lg lg:text-xl font-bold text-white mt-1 break-words">
                     Event-Driven RTO Interception Pipeline
                   </h4>
                 </div>
-                <span className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-mono bg-emerald-500/10 text-emerald-300 border border-emerald-500/25 shrink-0">
+                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-mono bg-emerald-500/10 text-emerald-300 border border-emerald-500/25 shrink-0">
                   <Activity className="w-3.5 h-3.5" />
                   Production Live
                 </span>
               </div>
 
               {/* 4-Stage Pipeline Grid */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5 my-auto">
+              <div className="grid grid-cols-2 gap-3.5 my-auto">
                 {activeProject.pipelineNodes?.map((node) => (
                   <div
                     key={node.step}
@@ -393,7 +839,7 @@ export default function ProjectsSection() {
               </div>
 
               {/* Direct Production Launch Footer */}
-              <div className="mt-6 pt-4 border-t border-white/10 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+              <div className="mt-6 pt-4 border-t border-white/10 flex items-center justify-between gap-3">
                 <div className="flex items-center gap-2 text-xs text-slate-400">
                   <GitBranch className="w-4 h-4 text-[#27CBCE] shrink-0" />
                   <span className="truncate font-mono text-xs text-slate-300">
@@ -443,11 +889,11 @@ export default function ProjectsSection() {
       );
     }
 
-    // CASE B: Projects 01-03 — Power BI Sandbox Stage
+    // Projects 01-03: Power BI Sandbox Stage
     return (
       <div
         className={`relative flex flex-col bg-[#070B14] border border-white/10 rounded-2xl overflow-hidden shadow-[0_20px_60px_-20px_rgba(0,0,0,0.8)] ${
-          fullscreenMode ? 'h-full w-full' : 'aspect-[16/10] sm:aspect-[16/9] lg:aspect-auto lg:h-full lg:min-h-[540px]'
+          fullscreenMode ? 'h-full w-full' : 'h-full min-h-[540px]'
         }`}
       >
         {/* Sandbox Chrome Bar */}
@@ -505,15 +951,8 @@ export default function ProjectsSection() {
           ) : (
             <div
               className="group/stage relative w-full h-full flex flex-col items-center justify-center cursor-pointer"
-              onClick={() => {
-                if (isMobile) {
-                  window.open(activeProject.liveUrl, '_blank', 'noopener,noreferrer');
-                } else {
-                  setShowInteractiveIframe(true);
-                }
-              }}
+              onClick={() => setShowInteractiveIframe(true)}
             >
-              {/* Preview Image */}
               <img
                 src={activeProject.previewImage}
                 alt={`${activeProject.title} preview`}
@@ -522,12 +961,10 @@ export default function ProjectsSection() {
               />
               <div className="absolute inset-0 bg-black/45 group-hover/stage:bg-black/25 transition-colors duration-500" />
 
-              {/* Center Launch CTA Pill */}
               <div className="relative z-10 flex items-center gap-3 px-6 py-3.5 rounded-2xl border border-accent-cyan/50 bg-[#0a0e1a]/95 text-accent-cyan shadow-[0_0_25px_rgba(39,203,206,0.3)] group-hover/stage:shadow-[0_0_35px_rgba(39,203,206,0.55)] group-hover/stage:scale-105 transition-all">
                 <Play className="h-4 w-4 fill-accent-cyan/30 text-accent-cyan" />
-                <span className="text-xs sm:text-sm font-semibold font-sans tracking-wide">
-                  <span className="inline md:hidden">Tap to view live report</span>
-                  <span className="hidden md:inline">Click to launch interactive view</span>
+                <span className="text-sm font-semibold font-sans tracking-wide">
+                  Click to launch interactive view
                 </span>
               </div>
             </div>
@@ -541,10 +978,8 @@ export default function ProjectsSection() {
     <section
       id="projects-section-content"
       aria-labelledby="projects-heading"
-      className="relative py-14 sm:py-20 lg:py-28 px-4 sm:px-6 lg:px-8 bg-[#050810] text-slate-100 overflow-hidden border-t scroll-mt-24"
-      style={{
-        borderColor: 'var(--border-color)',
-      }}
+      className="relative py-20 lg:py-28 px-4 sm:px-6 lg:px-8 bg-[#050810] text-slate-100 overflow-hidden border-t scroll-mt-24"
+      style={{ borderColor: 'var(--border-color)' }}
     >
       {/* Subtle Ambient Glow */}
       <div
@@ -554,14 +989,14 @@ export default function ProjectsSection() {
 
       <div className="relative max-w-7xl 2xl:max-w-[1440px] mx-auto">
         {/* Section Header */}
-        <div className="mb-8 sm:mb-12 lg:mb-16">
+        <div className="mb-12 lg:mb-16">
           <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#27CBCE]/10 border border-[#27CBCE]/25 text-[#8CF6F7] text-xs sm:text-sm font-mono uppercase tracking-widest mb-4">
             <Layers className="w-3.5 h-3.5" />
             <span>Engineered Systems Catalog</span>
           </div>
           <h2
             id="projects-heading"
-            className="text-3xl sm:text-5xl md:text-6xl lg:text-7xl font-bold tracking-tight text-white leading-[1.12] font-serif max-w-5xl"
+            className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold tracking-tight text-white leading-[1.12] font-serif max-w-5xl"
           >
             Data Intelligence &amp;{' '}
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#27CBCE] via-[#20B2AA] to-[#8CF6F7]">
@@ -570,55 +1005,11 @@ export default function ProjectsSection() {
           </h2>
         </div>
 
-        {/* =====================================================================
-            ZONE 1: THE 10-SECOND INDEX (All 4 Projects Visible Without Scrolling)
-           ===================================================================== */}
-        {/* MOBILE SELECTOR TABS: Horizontal Swipeable Pill Bar (< lg) */}
+        {/* Desktop 4-Column Tabs */}
         <div
           role="tablist"
-          aria-label="Portfolio Projects Selector"
-          className="flex lg:hidden items-center gap-2 overflow-x-auto no-scrollbar pb-3 mb-6 -mx-4 px-4 scroll-smooth snap-x"
-        >
-          {PROJECTS.map((project) => {
-            const isActive = project.id === activeProject.id;
-            return (
-              <button
-                key={`mobile-tab-${project.id}`}
-                role="tab"
-                type="button"
-                aria-selected={isActive}
-                aria-controls={`panel-${project.id}`}
-                id={`mobile-tab-${project.id}`}
-                onClick={() => handleSelectProject(project.id)}
-                className={`flex-shrink-0 snap-start flex items-center gap-2 px-3.5 py-2.5 rounded-full border transition-all duration-200 cursor-pointer text-xs font-sans focus:outline-none focus-visible:ring-2 focus-visible:ring-[#8CF6F7] ${
-                  isActive
-                    ? 'bg-[#27CBCE]/15 border-[#27CBCE] text-white shadow-[0_0_18px_rgba(39,203,206,0.45)]'
-                    : 'bg-[#090E1A]/80 border-white/10 text-slate-400 hover:text-white hover:border-white/20'
-                }`}
-              >
-                <span className={`font-mono font-bold text-xs ${isActive ? 'text-[#8CF6F7]' : 'text-slate-500'}`}>
-                  {project.index}
-                </span>
-                <span className="font-semibold whitespace-nowrap">
-                  {project.shortTitle}
-                </span>
-                {project.isCapstone ? (
-                  <span className="px-1.5 py-0.5 rounded text-[10px] font-mono font-bold bg-[#27CBCE]/25 text-[#8CF6F7] border border-[#27CBCE]/35">
-                    CAPSTONE
-                  </span>
-                ) : isActive ? (
-                  <span className="w-1.5 h-1.5 rounded-full bg-[#8CF6F7] animate-pulse" />
-                ) : null}
-              </button>
-            );
-          })}
-        </div>
-
-        {/* DESKTOP SELECTOR TABS: 4-Column Cards (>= lg) */}
-        <div
-          role="tablist"
-          aria-label="Portfolio Projects Desktop Index"
-          className="hidden lg:grid lg:grid-cols-4 gap-4 mb-8"
+          aria-label="Portfolio Projects Index"
+          className="grid grid-cols-4 gap-4 mb-8"
         >
           {PROJECTS.map((project, idx) => {
             const isActive = project.id === activeProject.id;
@@ -630,110 +1021,80 @@ export default function ProjectsSection() {
                 aria-selected={isActive}
                 aria-controls={`panel-${project.id}`}
                 id={`tab-${project.id}`}
+                tabIndex={isActive ? 0 : -1}
                 onClick={() => handleSelectProject(project.id)}
                 onKeyDown={(e) => handleTabKeyDown(e, idx)}
-                className={`group relative text-left p-4 sm:p-5 rounded-2xl border transition-all duration-300 cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-[#8CF6F7] ${
+                className={`relative text-left p-4 rounded-2xl border transition-all duration-300 cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-[#8CF6F7] ${
                   isActive
-                    ? project.isCapstone
-                      ? 'bg-[#0B1526]/95 border-[#8CF6F7]/80 shadow-[0_0_36px_-6px_rgba(39,203,206,0.45)]'
-                      : 'bg-[#0B1220]/95 border-[#27CBCE]/70 shadow-[0_0_28px_-8px_rgba(39,203,206,0.35)]'
-                    : project.isCapstone
-                    ? 'bg-[#09101D]/80 border-[#27CBCE]/35 hover:border-[#8CF6F7]/60 hover:bg-[#0D1628]'
-                    : 'bg-[#090E1A]/80 border-white/10 hover:border-white/30 hover:bg-[#0D1424]'
+                    ? 'bg-[#090E1A] border-[#27CBCE] shadow-[0_0_30px_-5px_rgba(39,203,206,0.35)] scale-[1.01]'
+                    : 'bg-[#060A12]/80 border-white/10 hover:border-white/20 hover:bg-[#090E1A]/60'
                 }`}
               >
-                {/* Top Row: Number + Badge */}
-                <div className="flex items-center justify-between gap-2 mb-3">
+                <div className="flex items-center justify-between mb-3">
                   <span
-                    className={`inline-flex items-center gap-1.5 text-xs font-mono font-bold ${
-                      isActive ? 'text-[#8CF6F7]' : 'text-slate-400 group-hover:text-slate-200'
+                    className={`font-mono text-sm font-bold tracking-wider ${
+                      isActive ? 'text-[#8CF6F7]' : 'text-slate-400'
                     }`}
                   >
-                    {getProjectIcon(project.index, 'w-3.5 h-3.5')}
-                    <span>{project.index}</span>
+                    {project.index}
                   </span>
-
-                  <div className="flex items-center gap-1.5">
-                    {isActive && (
-                      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-mono font-bold bg-[#27CBCE]/20 text-[#8CF6F7] border border-[#27CBCE]/40">
-                        <span className="w-1.5 h-1.5 rounded-full bg-[#8CF6F7] animate-pulse" />
-                        ACTIVE
-                      </span>
-                    )}
-                    <span
-                      className={`px-2.5 py-0.5 rounded-full text-[11px] font-mono uppercase tracking-wider truncate font-semibold ${
-                        project.isCapstone
-                          ? 'bg-[#27CBCE]/20 text-[#8CF6F7] border border-[#27CBCE]/40'
-                          : isActive
-                          ? 'bg-white/15 text-white'
-                          : 'bg-white/5 text-slate-400'
-                      }`}
-                    >
-                      {project.badgeText}
-                    </span>
+                  <div
+                    className={`p-2 rounded-xl border transition-colors ${
+                      isActive
+                        ? 'bg-[#27CBCE]/15 border-[#27CBCE]/40 text-[#8CF6F7]'
+                        : 'bg-white/5 border-white/10 text-slate-400'
+                    }`}
+                  >
+                    {getProjectIcon(project.index, 'w-4 h-4')}
                   </div>
                 </div>
 
-                {/* Title */}
-                <h3
-                  className={`text-base sm:text-lg font-bold leading-snug line-clamp-1 ${
-                    isActive ? 'text-white' : 'text-slate-200 group-hover:text-white'
-                  }`}
-                >
-                  {project.shortTitle}
-                </h3>
-
-                {/* Quick Recruiter Metric */}
-                <div className="mt-2.5 flex items-baseline gap-2 text-xs">
-                  <span className="font-mono font-bold text-[#8CF6F7] text-sm tabular-nums">
-                    {project.headlineMetric.value}
-                  </span>
-                  <span className="text-slate-300 truncate text-xs">
-                    {project.headlineMetric.label}
+                <div className="mb-2">
+                  <span
+                    className={`inline-block px-2 py-0.5 rounded text-[10px] font-mono uppercase tracking-wider font-semibold ${
+                      project.isCapstone
+                        ? 'bg-[#27CBCE]/20 text-[#8CF6F7] border border-[#27CBCE]/30'
+                        : 'bg-white/5 text-slate-300'
+                    }`}
+                  >
+                    {project.badgeText}
                   </span>
                 </div>
 
-                {/* Active Seamless Inset Contour (Eliminates Glitchy Exterior Bottom Line) */}
+                <h3 className="font-serif font-bold text-base text-white leading-snug line-clamp-2">
+                  {project.shortTitle}
+                </h3>
+
                 {isActive && (
-                  <>
-                    <motion.div
-                      layoutId="activeProjectPill"
-                      transition={{ type: 'spring', stiffness: 420, damping: 36 }}
-                      className="absolute inset-0 rounded-2xl border-2 border-[#27CBCE] bg-gradient-to-b from-[#27CBCE]/12 via-[#27CBCE]/[0.02] to-transparent pointer-events-none shadow-[0_0_28px_-6px_rgba(39,203,206,0.35)]"
-                    />
-                    <div className="absolute top-0 inset-x-8 h-[2px] rounded-full bg-gradient-to-r from-transparent via-[#8CF6F7] to-transparent pointer-events-none" />
-                  </>
+                  <motion.div
+                    layoutId="desktop-active-indicator"
+                    className="absolute bottom-0 left-4 right-4 h-0.5 bg-gradient-to-r from-transparent via-[#8CF6F7] to-transparent"
+                    transition={{ type: 'spring', stiffness: 350, damping: 30 }}
+                  />
                 )}
               </button>
             );
           })}
         </div>
 
-        {/* =====================================================================
-            ZONE 2: MASTER-DETAIL EXECUTIVE STAGE
-           ===================================================================== */}
+        {/* Desktop Dual-Column Stage */}
         <AnimatePresence mode="wait">
           <motion.div
             key={activeProject.id}
-            role="tabpanel"
             id={`panel-${activeProject.id}`}
+            role="tabpanel"
             aria-labelledby={`tab-${activeProject.id}`}
             initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -10 }}
+            exit={{ opacity: 0, y: -12 }}
             transition={{ duration: 0.25, ease: 'easeOut' }}
-            className={`grid grid-cols-1 lg:grid-cols-12 gap-6 sm:gap-8 p-5 sm:p-8 rounded-3xl border backdrop-blur-xl ${
-              activeProject.isCapstone
-                ? 'bg-[#091221]/95 border-[#27CBCE]/45 shadow-[0_0_80px_-20px_rgba(39,203,206,0.3)]'
-                : 'bg-[#0A101D]/90 border-white/10 shadow-[0_25px_70px_-25px_rgba(0,0,0,0.85)]'
-            }`}
+            className="grid grid-cols-12 gap-8 items-stretch"
           >
-            {/* LEFT PANEL (5 Cols): 10-Second Recruiter Business Brief */}
-            <div className="lg:col-span-5 flex flex-col justify-between gap-6">
+            {/* LEFT PANEL (5 Cols) */}
+            <div className="col-span-5 flex flex-col justify-between p-6 lg:p-8 rounded-3xl bg-[#090E1A]/90 border border-white/10 shadow-2xl backdrop-blur-sm">
               <div>
-                {/* Domain + Capstone Callout */}
-                <div className="flex flex-wrap items-center gap-2 mb-3.5">
-                  <span className="text-xs font-mono uppercase tracking-widest text-[#27CBCE] font-semibold">
+                <div className="flex items-center gap-2 mb-3">
+                  <span className="text-xs font-mono font-bold uppercase tracking-wider text-[#27CBCE]">
                     {activeProject.domain}
                   </span>
                   {activeProject.isCapstone && (
@@ -744,16 +1105,15 @@ export default function ProjectsSection() {
                   )}
                 </div>
 
-                {/* Full Project Title */}
-                <h3 className="text-2xl sm:text-3xl font-bold text-white tracking-tight leading-tight font-serif">
+                <h3 className="text-2xl lg:text-3xl font-bold text-white tracking-tight leading-tight font-serif">
                   {activeProject.title}
                 </h3>
 
                 {/* Hero KPI Banner */}
-                <div className="mt-5 p-4 rounded-2xl bg-[#060B14]/90 border border-[#27CBCE]/30 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                <div className="mt-5 p-4 rounded-2xl bg-[#060B14]/90 border border-[#27CBCE]/30 flex items-center justify-between gap-3">
                   <div>
                     <div className="flex items-baseline gap-2.5">
-                      <span className="text-2xl sm:text-3xl font-bold font-mono tabular-nums text-transparent bg-clip-text bg-gradient-to-r from-[#27CBCE] to-[#8CF6F7]">
+                      <span className="text-2xl lg:text-3xl font-bold font-mono tabular-nums text-transparent bg-clip-text bg-gradient-to-r from-[#27CBCE] to-[#8CF6F7]">
                         {activeProject.headlineMetric.value}
                       </span>
                       <span className="text-xs sm:text-sm font-semibold text-slate-200">
@@ -766,14 +1126,8 @@ export default function ProjectsSection() {
                   </div>
                 </div>
 
-                {/* MOBILE VISUAL STAGE: Placed immediately below KPI banner on phone screens (< lg) */}
-                <div className="block lg:hidden my-5">
-                  {renderInteractiveStage(false)}
-                </div>
-
-                {/* Expanded Problem & Resolution Cards (Spacious, Clear, Authoritative) */}
+                {/* Problem & Resolution Cards */}
                 <div className="mt-5 space-y-4">
-                  {/* Business Problem Card */}
                   <div className="p-4 sm:p-5 rounded-2xl bg-amber-500/[0.03] border border-amber-500/20 hover:border-amber-500/35 transition-colors">
                     <div className="flex items-center gap-2 text-xs font-mono font-bold uppercase tracking-wider text-amber-400/90 mb-2">
                       <AlertCircle className="w-3.5 h-3.5 text-amber-400 shrink-0" />
@@ -784,7 +1138,6 @@ export default function ProjectsSection() {
                     </p>
                   </div>
 
-                  {/* Engineered Resolution Card */}
                   <div className="p-4 sm:p-5 rounded-2xl bg-[#27CBCE]/[0.04] border border-[#27CBCE]/25 hover:border-[#27CBCE]/40 transition-colors">
                     <div className="flex items-center gap-2 text-xs font-mono font-bold uppercase tracking-wider text-[#8CF6F7] mb-2">
                       <CheckCircle2 className="w-3.5 h-3.5 text-[#27CBCE] shrink-0" />
@@ -797,8 +1150,8 @@ export default function ProjectsSection() {
                 </div>
               </div>
 
-              {/* Bottom Stack + Single Primary Action CTA */}
-              <div className="pt-4 border-t border-white/10 space-y-4">
+              {/* Bottom Stack + Single Action CTA */}
+              <div className="pt-6 border-t border-white/10 space-y-4">
                 <div className="flex flex-wrap gap-2">
                   {activeProject.stack.map((tech) => (
                     <span
@@ -815,7 +1168,7 @@ export default function ProjectsSection() {
                     href={activeProject.liveUrl}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex w-full sm:w-auto items-center justify-center gap-2 px-5 py-3 rounded-xl text-xs sm:text-sm font-bold bg-gradient-to-r from-[#27CBCE] to-[#8CF6F7] text-[#050810] hover:brightness-110 shadow-[0_0_24px_-6px_rgba(39,203,206,0.7)] transition-all cursor-pointer"
+                    className="inline-flex items-center justify-center gap-2 px-5 py-3 rounded-xl text-xs sm:text-sm font-bold bg-gradient-to-r from-[#27CBCE] to-[#8CF6F7] text-[#050810] hover:brightness-110 shadow-[0_0_24px_-6px_rgba(39,203,206,0.7)] transition-all cursor-pointer"
                   >
                     <span>{activeProject.liveCtaLabel}</span>
                     <ArrowUpRight className="w-4 h-4" />
@@ -824,28 +1177,28 @@ export default function ProjectsSection() {
               </div>
             </div>
 
-            {/* RIGHT PANEL (7 Cols): Live Interactive Sandbox (Desktop Only, Mobile is hoisted above) */}
-            <div className="hidden lg:block lg:col-span-7">{renderInteractiveStage(false)}</div>
+            {/* RIGHT PANEL (7 Cols) — Mounted EXACTLY ONCE on Desktop */}
+            <div className="col-span-7">{renderInteractiveStage(false)}</div>
           </motion.div>
         </AnimatePresence>
 
-        {/* Technical Implementation Highlights (Retained Competencies) */}
-        <div className="mt-12 sm:mt-16 p-5 sm:p-8 lg:p-10 rounded-2xl sm:rounded-3xl border border-accent-cyan/20 bg-gradient-to-br from-accent-cyan/5 to-transparent">
-          <h3 className="font-serif text-xl sm:text-2xl lg:text-3xl font-bold mb-6 flex items-center gap-3 text-text-primary tracking-tight">
-            <span className="text-accent-cyan text-2xl sm:text-3xl">⚡</span>
+        {/* Technical Implementation Highlights */}
+        <div className="mt-16 p-8 lg:p-10 rounded-3xl border border-accent-cyan/20 bg-gradient-to-br from-accent-cyan/5 to-transparent">
+          <h3 className="font-serif text-2xl lg:text-3xl font-bold mb-6 flex items-center gap-3 text-text-primary tracking-tight">
+            <span className="text-accent-cyan text-3xl">⚡</span>
             Technical Architecture Highlights
           </h3>
-          <div className="grid gap-4 sm:gap-6 md:grid-cols-3">
+          <div className="grid gap-6 md:grid-cols-3">
             {techHighlights.map((highlight) => (
               <div
                 key={highlight.title}
-                className="rounded-xl sm:rounded-2xl border border-white/10 hover:border-accent-cyan/30 bg-[#0a0e1a]/90 p-4 sm:p-6 transition-all duration-300"
+                className="rounded-2xl border border-white/10 hover:border-accent-cyan/30 bg-[#0a0e1a]/90 p-6 transition-all duration-300"
               >
-                <div className="text-2xl sm:text-3xl mb-2 sm:mb-3">{highlight.icon}</div>
-                <h4 className="text-base sm:text-lg lg:text-xl font-bold text-text-primary mb-2 font-serif tracking-tight">
+                <div className="text-3xl mb-3">{highlight.icon}</div>
+                <h4 className="text-lg lg:text-xl font-bold text-text-primary mb-2 font-serif tracking-tight">
                   {highlight.title}
                 </h4>
-                <p className="text-xs sm:text-sm text-text-muted leading-relaxed font-sans">
+                <p className="text-sm text-text-muted leading-relaxed font-sans">
                   {highlight.description}
                 </p>
               </div>
@@ -854,45 +1207,45 @@ export default function ProjectsSection() {
         </div>
       </div>
 
-      {/* =====================================================================
-          FULLSCREEN SANDBOX MODAL
-         ===================================================================== */}
+      {/* FULLSCREEN SANDBOX MODAL (Desktop Only) */}
       <AnimatePresence>
         {isFullscreen && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: 0.18 }}
-            role="dialog"
-            aria-modal="true"
-            aria-label={`${activeProject.title} fullscreen view`}
-            className="fixed inset-0 z-50 bg-[#050810]/95 backdrop-blur-md p-3 sm:p-6 flex flex-col"
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/95 backdrop-blur-xl p-4 sm:p-8"
           >
-            <div className="flex items-center justify-between mb-3">
-              <div className="flex items-center gap-3">
-                <span className="px-2.5 py-1 rounded-md bg-[#27CBCE]/15 border border-[#27CBCE]/35 text-[#8CF6F7] text-xs font-mono font-bold">
-                  {activeProject.index}
-                </span>
-                <span className="text-sm sm:text-base font-bold text-white truncate">
-                  {activeProject.title}
-                </span>
-              </div>
+            <div className="relative w-full h-full max-w-[1600px] max-h-[92vh] flex flex-col">
               <button
                 type="button"
                 onClick={() => setIsFullscreen(false)}
                 aria-label="Close fullscreen view"
-                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/10 hover:bg-white/20 text-xs font-medium text-white border border-white/15 transition-colors cursor-pointer"
+                className="absolute -top-3 -right-3 sm:-top-4 sm:-right-4 z-50 p-2.5 rounded-full bg-[#0a0e1a] border border-[#27CBCE]/50 text-white hover:text-[#8CF6F7] hover:scale-110 active:scale-95 transition-all shadow-[0_0_20px_rgba(39,203,206,0.5)] cursor-pointer"
               >
-                <X className="w-4 h-4" />
-                <span className="hidden sm:inline">Close (Esc)</span>
+                <X className="w-5 h-5" />
               </button>
+              <div className="flex-1 w-full h-full overflow-hidden rounded-2xl">
+                {renderInteractiveStage(true)}
+              </div>
             </div>
-
-            <div className="flex-1 min-h-0">{renderInteractiveStage(true)}</div>
           </motion.div>
         )}
       </AnimatePresence>
     </section>
   );
+}
+
+/* ============================================================================
+ * ROOT COMPONENT — SINGLE BRANCH RENDERING (ZERO DUPLICATE DOM / IFRAMES)
+ * ========================================================================== */
+
+export default function ProjectsSection() {
+  const isDesktop = useIsDesktop();
+
+  if (isDesktop) {
+    return <DesktopProjectsView />;
+  }
+
+  return <MobileProjectsView />;
 }

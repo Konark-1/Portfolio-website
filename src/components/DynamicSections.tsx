@@ -138,11 +138,15 @@ function ViewportGate({
   id,
   heightClass,
   cvHeight,
+  rootMargin = "350px 0px",
+  disableContentVisibility = false,
   children,
 }: {
   id: string;
   heightClass: string;
   cvHeight: string;
+  rootMargin?: string;
+  disableContentVisibility?: boolean;
   children: ReactNode;
 }) {
   const hostRef = useRef<HTMLDivElement>(null);
@@ -185,7 +189,7 @@ function ViewportGate({
           observer.disconnect();
         }
       },
-      { rootMargin: "450px 0px", threshold: 0 }
+      { rootMargin, threshold: 0.01 }
     );
     observer.observe(el);
 
@@ -194,13 +198,13 @@ function ViewportGate({
       window.removeEventListener("hashchange", onHashChange);
       window.removeEventListener("mount-section", onMountSection);
     };
-  }, [id]);
+  }, [id, rootMargin]);
 
   return (
     <div
       id={id}
       ref={hostRef}
-      className={`w-full ${heightClass} cv-auto scroll-mt-24`}
+      className={`w-full ${heightClass} ${disableContentVisibility ? "" : "cv-auto"} scroll-mt-24`}
       style={{ "--cv-height": cvHeight } as React.CSSProperties}
     >
       {shouldMount ? children : <SectionSkeleton heightClass={heightClass} label={id} />}
@@ -215,6 +219,8 @@ export default function DynamicSections() {
         id="projects"
         heightClass={SECTION_HEIGHTS.projects}
         cvHeight="980px"
+        rootMargin="300px 0px"
+        disableContentVisibility
       >
         <ProjectsSection />
       </ViewportGate>
@@ -223,6 +229,8 @@ export default function DynamicSections() {
         id="certificates"
         heightClass={SECTION_HEIGHTS.certificates}
         cvHeight="640px"
+        rootMargin="200px 0px"
+        disableContentVisibility
       >
         <StackedCardCertificates certificates={CERTIFICATES_DATA} />
       </ViewportGate>

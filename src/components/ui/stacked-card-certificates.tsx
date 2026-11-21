@@ -260,7 +260,7 @@ export function StackedCardCertificates({ certificates }: StackedCardCertificate
                                 <div key={index} className="w-full flex-shrink-0 select-none">
                                     <CertificateCard
                                         certificate={cert}
-                                        priority={index < 2}
+                                        priority={index === 0}
                                         isSwipingRef={isSwipingRef}
                                     />
                                 </div>
@@ -366,11 +366,12 @@ function CertificateCard({
                         src={certificate.imagePath!}
                         alt={certificate.title}
                         fill
-                        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                        sizes="(max-width: 768px) 94vw, 560px"
+                        quality={80}
                         className="object-contain p-4 sm:p-6 transition-transform duration-500 group-hover:scale-105"
                         onError={() => setImageError(true)}
                         priority={priority}
-                        unoptimized
+                        loading={priority ? undefined : "lazy"}
                     />
                 ) : (
                     <div className="w-full h-full flex items-center justify-center p-6 min-h-[280px]">
