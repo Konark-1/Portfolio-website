@@ -213,13 +213,28 @@ function ViewportGate({
 }
 
 export default function DynamicSections() {
+  // Prewarm dynamic chunks during browser idle time so mobile users experience zero load latency
+  useEffect(() => {
+    const prewarm = () => {
+      import("@/components/ui/stacked-card-certificates");
+      import("@/components/sections/ProjectsSection");
+    };
+    if (typeof window !== "undefined") {
+      if ("requestIdleCallback" in window) {
+        (window as any).requestIdleCallback(prewarm);
+      } else {
+        setTimeout(prewarm, 1000);
+      }
+    }
+  }, []);
+
   return (
     <>
       <ViewportGate
         id="projects"
         heightClass={SECTION_HEIGHTS.projects}
         cvHeight="980px"
-        rootMargin="300px 0px"
+        rootMargin="500px 0px"
         disableContentVisibility
       >
         <ProjectsSection />
@@ -229,7 +244,7 @@ export default function DynamicSections() {
         id="certificates"
         heightClass={SECTION_HEIGHTS.certificates}
         cvHeight="640px"
-        rootMargin="200px 0px"
+        rootMargin="800px 0px"
         disableContentVisibility
       >
         <StackedCardCertificates certificates={CERTIFICATES_DATA} />

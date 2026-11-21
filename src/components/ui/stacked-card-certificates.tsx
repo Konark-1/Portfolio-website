@@ -28,6 +28,7 @@ export function StackedCardCertificates({ certificates }: StackedCardCertificate
     const [isInView, setIsInView] = useState(false);
     const containerRef = useRef<HTMLDivElement>(null);
     const isSwipingRef = useRef(false);
+    const didMoveRef = useRef(false);
     const touchStartX = useRef<number | null>(null);
     const touchStartY = useRef<number | null>(null);
     const touchEndX = useRef<number | null>(null);
@@ -76,21 +77,28 @@ export function StackedCardCertificates({ certificates }: StackedCardCertificate
         return () => window.removeEventListener("keydown", handleKeyDown);
     }, [goToNext, goToPrev]);
 
-    // Touch swipe navigation for mobile with strict axis disambiguation
+    // Touch swipe navigation for mobile with strict tap vs swipe vs vertical scroll disambiguation
     const handleTouchStart = (e: React.TouchEvent) => {
+        const touch = e.targetTouches[0];
         isSwipingRef.current = false;
-        touchStartX.current = e.targetTouches[0].clientX;
-        touchStartY.current = e.targetTouches[0].clientY;
-        touchEndX.current = e.targetTouches[0].clientX;
-        touchEndY.current = e.targetTouches[0].clientY;
+        didMoveRef.current = false;
+        touchStartX.current = touch.clientX;
+        touchStartY.current = touch.clientY;
+        touchEndX.current = touch.clientX;
+        touchEndY.current = touch.clientY;
     };
 
     const handleTouchMove = (e: React.TouchEvent) => {
-        touchEndX.current = e.targetTouches[0].clientX;
-        touchEndY.current = e.targetTouches[0].clientY;
-        if (touchStartX.current !== null) {
-            const deltaX = Math.abs(touchStartX.current - e.targetTouches[0].clientX);
-            if (deltaX > 10) {
+        const touch = e.targetTouches[0];
+        touchEndX.current = touch.clientX;
+        touchEndY.current = touch.clientY;
+        if (touchStartX.current !== null && touchStartY.current !== null) {
+            const deltaX = Math.abs(touchStartX.current - touch.clientX);
+            const deltaY = Math.abs(touchStartY.current - touch.clientY);
+            if (deltaX > 8 || deltaY > 8) {
+                didMoveRef.current = true;
+            }
+            if (deltaX > 15) {
                 isSwipingRef.current = true;
             }
         }
@@ -106,26 +114,23 @@ export function StackedCardCertificates({ certificates }: StackedCardCertificate
         }
 
         if (
-            touchStartX.current === null ||
-            finalX === null ||
-            touchStartY.current === null ||
-            finalY === null
+            touchStartX.current !== null &&
+            finalX !== null &&
+            touchStartY.current !== null &&
+            finalY !== null
         ) {
-            isSwipingRef.current = false;
-            return;
-        }
+            const deltaX = touchStartX.current - finalX;
+            const deltaY = touchStartY.current - finalY;
 
-        const deltaX = touchStartX.current - finalX;
-        const deltaY = touchStartY.current - finalY;
-
-        // Disambiguate swipe:
-        // Must exceed 35px horizontal AND be at least 1.3x more horizontal than vertical.
-        // This guarantees vertical page scrolling is NEVER hijacked as a carousel flip!
-        if (Math.abs(deltaX) > 35 && Math.abs(deltaX) > Math.abs(deltaY) * 1.3) {
-            if (deltaX > 0) {
-                goToNext();
-            } else {
-                goToPrev();
+            // Disambiguate swipe:
+            // Horizontal movement must exceed 25px and be greater than vertical movement.
+            // Vertical page scroll is never trapped and horizontal swipe triggers smoothly.
+            if (Math.abs(deltaX) > 25 && Math.abs(deltaX) > Math.abs(deltaY)) {
+                if (deltaX > 0) {
+                    goToNext();
+                } else {
+                    goToPrev();
+                }
             }
         }
 
@@ -135,7 +140,8 @@ export function StackedCardCertificates({ certificates }: StackedCardCertificate
         touchEndY.current = null;
         setTimeout(() => {
             isSwipingRef.current = false;
-        }, 120);
+            didMoveRef.current = false;
+        }, 150);
     };
 
     // Auto-scroll logic: only when in view, on desktop (disabled on mobile), and not hovered
@@ -150,10 +156,9 @@ export function StackedCardCertificates({ certificates }: StackedCardCertificate
     return (
         <section
             id="certificates-section-content"
-            className="relative z-20 text-white border-t"
+            className="relative z-20 text-white scroll-mt-24"
             style={{
-                backgroundColor: 'var(--background-experience)',
-                borderColor: 'var(--border-color)'
+                backgroundColor: 'var(--background)',
             }}
         >
             {/* Ambient Transition Glow */}
@@ -260,8 +265,9 @@ export function StackedCardCertificates({ certificates }: StackedCardCertificate
                                 <div key={index} className="w-full flex-shrink-0 select-none">
                                     <CertificateCard
                                         certificate={cert}
-                                        priority={index === 0}
+                                        priority={index === 0 || index === 1}
                                         isSwipingRef={isSwipingRef}
+                                        didMoveRef={didMoveRef}
                                     />
                                 </div>
                             ))}
@@ -337,10 +343,12 @@ function CertificateCard({
     certificate,
     priority = false,
     isSwipingRef,
+    didMoveRef,
 }: {
     certificate: Certificate;
     priority?: boolean;
     isSwipingRef?: React.RefObject<boolean>;
+    didMoveRef?: React.RefObject<boolean>;
 }) {
     const [imageError, setImageError] = useState(false);
 
@@ -350,7 +358,7 @@ function CertificateCard({
     const showImage = hasImage && !imageError;
 
     const handleClick = () => {
-        if (isSwipingRef?.current) return;
+        if (didMoveRef?.current || isSwipingRef?.current) return;
         window.open(certificate.filePath, '_blank');
     };
 
@@ -367,7 +375,7 @@ function CertificateCard({
                         alt={certificate.title}
                         fill
                         sizes="(max-width: 768px) 94vw, 560px"
-                        quality={80}
+                        quality={75}
                         className="object-contain p-4 sm:p-6 transition-transform duration-500 group-hover:scale-105"
                         onError={() => setImageError(true)}
                         priority={priority}

@@ -40,24 +40,14 @@ export default function AboutSection(): React.JSX.Element {
             id="about"
             className="relative z-10 min-h-[100svh] flex items-center justify-center px-4 sm:px-6 lg:px-8 py-16 sm:py-24 lg:py-40 scroll-mt-24"
             style={{
-                backgroundColor: 'var(--background-about)',
+                backgroundColor: 'var(--background)',
             }}
         >
-            {/* Ambient Transition Glow */}
+            {/* Seamless Ambient Transition Glow from Hero */}
             <div
-                className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-4xl h-32 pointer-events-none"
+                className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-4xl h-48 pointer-events-none"
                 style={{
-                    background: 'radial-gradient(ellipse at 50% 0%, rgba(39, 203, 206, 0.12) 0%, transparent 70%)'
-                }}
-            />
-            {/* Solid background to cover hero section */}
-            <div className="absolute inset-0" style={{ backgroundColor: 'var(--background-about)' }} />
-
-            {/* Top gradient for smooth overlay transition without heavy box-shadow raster stalls */}
-            <div
-                className="absolute top-0 left-0 right-0 h-32 sm:h-24 pointer-events-none z-[1]"
-                style={{
-                    background: 'linear-gradient(to bottom, rgba(5,8,16,0.8) 0%, rgba(5,8,16,0.3) 50%, transparent 100%)',
+                    background: 'radial-gradient(ellipse at 50% 0%, rgba(39, 203, 206, 0.15) 0%, transparent 70%)'
                 }}
             />
 

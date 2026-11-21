@@ -696,14 +696,14 @@ body::-webkit-scrollbar {
   --font-mono: var(--font-geist-mono);
 
   /* Enhanced Premium Dark + Turquoise Theme */
-  /* Base Background Colors */
-  --background: #0A0E1A;
-  --background-hero: #0F1419;
-  --background-about: #0A0E1A;
-  --background-skills: #0F1419;
-  --background-experience: #0A0E1A;
-  --background-projects: #0A0E1A;
-  --background-contact: #0F1419;
+  /* Base Background Colors - Unified Deep Obsidian Canvas */
+  --background: #050810;
+  --background-hero: #050810;
+  --background-about: #050810;
+  --background-skills: #050810;
+  --background-experience: #050810;
+  --background-projects: #050810;
+  --background-contact: #050810;
 
   /* Surface Colors with Turquoise Tint */
   --surface: rgba(15, 20, 25, 0.8);
@@ -783,12 +783,12 @@ body::-webkit-scrollbar {
 
 .dark {
   --background: #050810;
-  --background-hero: #0A0E1A;
+  --background-hero: #050810;
   --background-about: #050810;
-  --background-skills: #0A0E1A;
+  --background-skills: #050810;
   --background-experience: #050810;
   --background-projects: #050810;
-  --background-contact: #0A0E1A;
+  --background-contact: #050810;
   --surface: rgba(10, 14, 26, 0.8);
   --surface-elevated: rgba(15, 20, 30, 0.9);
   --surface-glow: rgba(39, 203, 206, 0.1);

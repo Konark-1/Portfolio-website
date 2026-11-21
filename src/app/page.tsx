@@ -40,12 +40,12 @@ export default function HomePage() {
               sheen={0.5}
               depth={0.5}
               glow={0.3}
-              noiseIntensity={1.2}
+              noiseIntensity={0.25}
             />
           </div>
 
-          {/* Enhanced gradient overlay with turquoise tint */}
-          <div className="absolute inset-0 z-[1] bg-gradient-to-b from-transparent via-transparent to-[rgba(10,14,26,0.4)] pointer-events-none" />
+          {/* Enhanced gradient overlay seamlessly dissolving into unified obsidian base */}
+          <div className="absolute inset-0 z-[1] bg-gradient-to-b from-transparent via-transparent to-[#050810] pointer-events-none" />
 
           {/* Subtle turquoise ambient glow */}
           <div className="absolute inset-0 z-[1] bg-[radial-gradient(circle_at_50%_50%,rgba(39,203,206,0.08),transparent_70%)] pointer-events-none" />
@@ -80,6 +80,12 @@ export default function HomePage() {
                   borderRadius={50}
                   backgroundOpacity={0.1}
                   blur={12}
+                  onClick={() => {
+                    const a = document.createElement('a');
+                    a.href = '/KONARK_PARIHAR.pdf';
+                    a.download = 'KONARK_PARIHAR.pdf';
+                    a.click();
+                  }}
                 >
                   <span className="px-6 py-3 text-text-primary font-semibold w-full h-full text-sm sm:text-base tracking-wide flex items-center justify-center gap-2 font-sans uppercase">
                     <Download className="h-4 w-4 sm:h-5 sm:w-5" />
@@ -98,15 +104,17 @@ export default function HomePage() {
                   const performScroll = () => {
                     const element = document.getElementById('projects');
                     if (element) {
-                      element.scrollIntoView({ behavior: 'smooth' });
-                    } else {
-                      setTimeout(() => {
-                        document.getElementById('projects')?.scrollIntoView({ behavior: 'smooth' });
-                      }, 60);
+                      const headerOffset = 76;
+                      const elementPosition = element.getBoundingClientRect().top;
+                      const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
+                      window.scrollTo({
+                        top: Math.max(0, offsetPosition),
+                        behavior: 'smooth'
+                      });
                     }
                   };
                   performScroll();
-                  requestAnimationFrame(performScroll);
+                  setTimeout(performScroll, 80);
                 }}
               >
                 <GlassButton
@@ -115,6 +123,26 @@ export default function HomePage() {
                   borderRadius={50}
                   backgroundOpacity={0.1}
                   blur={12}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    if (typeof window !== 'undefined') {
+                      window.dispatchEvent(new CustomEvent('mount-section', { detail: 'projects' }));
+                    }
+                    const performScroll = () => {
+                      const element = document.getElementById('projects');
+                      if (element) {
+                        const headerOffset = 76;
+                        const elementPosition = element.getBoundingClientRect().top;
+                        const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
+                        window.scrollTo({
+                          top: Math.max(0, offsetPosition),
+                          behavior: 'smooth'
+                        });
+                      }
+                    };
+                    performScroll();
+                    setTimeout(performScroll, 80);
+                  }}
                 >
                   <span className="px-6 py-3 text-text-primary font-semibold w-full h-full text-sm sm:text-base tracking-wide flex items-center justify-center gap-2 font-sans uppercase">
                     My Portfolio

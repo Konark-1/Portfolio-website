@@ -121,19 +121,24 @@ function Header() {
       window.dispatchEvent(new CustomEvent('mount-section', { detail: sectionId }));
     }
 
-    // 2. Perform smooth scroll respecting CSS scroll-margin-top
+    // 2. Perform smooth scroll respecting header height offset
     const performScroll = () => {
       const element = document.getElementById(sectionId);
       if (element) {
-        element.scrollIntoView({ behavior: 'smooth' });
+        const headerOffset = 76;
+        const elementPosition = element.getBoundingClientRect().top;
+        const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
+        window.scrollTo({
+          top: Math.max(0, offsetPosition),
+          behavior: 'smooth'
+        });
         // Close mobile menu after navigation
         setIsMobileMenuOpen(false);
       }
     };
 
     performScroll();
-    requestAnimationFrame(performScroll);
-    setTimeout(performScroll, 60);
+    setTimeout(performScroll, 80);
   }, []);
 
   const scrollToTop = useCallback(() => {
@@ -167,7 +172,7 @@ function Header() {
         <div
           className={`mx-auto flex items-center justify-between transition-all duration-300 ease-in-out ${
             isScrolled
-              ? 'w-full max-w-5xl px-4 sm:px-6 py-2 rounded-full bg-white/10 backdrop-blur-md border border-white/15 shadow-[0_4px_24px_-4px_rgba(0,0,0,0.25)]'
+              ? 'w-full max-w-5xl px-4 sm:px-6 py-2 rounded-full bg-[#050810]/85 md:bg-white/10 backdrop-blur-md border border-white/15 shadow-[0_4px_24px_-4px_rgba(0,0,0,0.35)]'
               : 'w-full bg-transparent border border-transparent'
           }`}
         >

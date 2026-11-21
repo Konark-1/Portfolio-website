@@ -582,14 +582,8 @@ const Silk = ({
       wake();
     };
 
-    let cachedRect: DOMRect | null = null;
-    const updateRect = () => {
-      if (container) cachedRect = container.getBoundingClientRect();
-    };
-
     const locate = (event: PointerEvent) => {
-      if (!cachedRect) updateRect();
-      const rect = cachedRect || container.getBoundingClientRect();
+      const rect = container.getBoundingClientRect();
       const x = event.clientX - rect.left;
       const y = event.clientY - rect.top;
       return { x, y, inside: x >= 0 && y >= 0 && x <= rect.width && y <= rect.height };
@@ -624,7 +618,6 @@ const Silk = ({
     };
 
     const resizeObserver = new ResizeObserver(() => {
-      updateRect();
       resize();
     });
     resizeObserver.observe(container);
@@ -634,17 +627,20 @@ const Silk = ({
       if (visible) {
         last = 0;
         wake();
+      } else {
+        if (raf) {
+          cancelAnimationFrame(raf);
+          raf = 0;
+        }
       }
-    }, { rootMargin: '100px 0px', threshold: 0 });
+    }, { rootMargin: '0px', threshold: 0 });
     intersection.observe(container);
 
     window.addEventListener('pointermove', onPointerMove, { passive: true });
     window.addEventListener('pointerdown', onPointerDown, { passive: true });
-    window.addEventListener('scroll', updateRect, { passive: true });
     document.documentElement.addEventListener('pointerleave', onPointerLeave);
     document.addEventListener('visibilitychange', onVisibility);
 
-    updateRect();
     resize();
 
     let lastDpr = settingsRef.current.dpr;
@@ -666,7 +662,6 @@ const Silk = ({
       intersection.disconnect();
       window.removeEventListener('pointermove', onPointerMove);
       window.removeEventListener('pointerdown', onPointerDown);
-      window.removeEventListener('scroll', updateRect);
       document.documentElement.removeEventListener('pointerleave', onPointerLeave);
       document.removeEventListener('visibilitychange', onVisibility);
       gl.deleteTexture(texture);
@@ -702,29 +697,27 @@ const Silk = ({
         }}
       />
 
-      {/* Non-WebGL Animated Rich Silk Ribbon Fallback */}
+      {/* Non-WebGL High-Fidelity Silk Waves Fallback */}
       {!hasWebGL && (
         <div
           className="absolute inset-0 pointer-events-none overflow-hidden"
           style={{
             background: `
-              radial-gradient(ellipse 75% 45% at 30% 40%, ${cleanColor}33 0%, transparent 65%),
-              radial-gradient(ellipse 65% 40% at 75% 60%, ${cleanSheenColor}26 0%, transparent 60%),
-              linear-gradient(135deg, rgba(5, 8, 16, 0.85) 0%, rgba(10, 35, 48, 0.35) 50%, rgba(5, 8, 16, 0.95) 100%)
+              radial-gradient(ellipse 80% 50% at 30% 40%, ${cleanColor}40 0%, transparent 70%),
+              radial-gradient(ellipse 70% 45% at 75% 60%, ${cleanSheenColor}30 0%, transparent 65%),
+              radial-gradient(circle at 50% 50%, rgba(10, 35, 48, 0.4) 0%, rgba(5, 8, 16, 0.95) 100%)
             `,
           }}
         >
-          {/* Animated diagonal silk wave sheen for non-WebGL browsers */}
+          {/* Flowing Organic Silk Curtains for non-WebGL */}
           <div
-            className="absolute inset-0 silk-fallback-sheen motion-reduce:animate-none"
+            className="absolute -inset-10 silk-fallback-flow motion-reduce:animate-none opacity-60"
             style={{
-              backgroundImage: `repeating-linear-gradient(
-                -45deg,
-                transparent,
-                transparent 45px,
-                ${cleanColor}18 45px,
-                ${cleanColor}18 90px
-              )`,
+              background: `
+                radial-gradient(ellipse 60% 30% at 40% 40%, ${cleanColor}33 0%, transparent 60%),
+                radial-gradient(ellipse 50% 35% at 65% 60%, ${cleanSheenColor}25 0%, transparent 60%)
+              `,
+              filter: 'blur(30px)',
             }}
           />
         </div>

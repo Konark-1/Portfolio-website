@@ -614,8 +614,7 @@ function MobileProjectsView() {
     <section
       id="projects-section-content"
       aria-labelledby="projects-heading-mobile"
-      className="relative py-14 px-4 sm:px-6 bg-[#050810] text-slate-100 overflow-hidden border-t scroll-mt-24"
-      style={{ borderColor: 'var(--border-color)' }}
+      className="relative py-14 px-4 sm:px-6 bg-[#050810] text-slate-100 overflow-hidden scroll-mt-24"
     >
       {/* Ambient glow */}
       <div
@@ -978,8 +977,7 @@ function DesktopProjectsView() {
     <section
       id="projects-section-content"
       aria-labelledby="projects-heading"
-      className="relative py-20 lg:py-28 px-4 sm:px-6 lg:px-8 bg-[#050810] text-slate-100 overflow-hidden border-t scroll-mt-24"
-      style={{ borderColor: 'var(--border-color)' }}
+      className="relative py-20 lg:py-28 px-4 sm:px-6 lg:px-8 bg-[#050810] text-slate-100 overflow-hidden scroll-mt-24"
     >
       {/* Subtle Ambient Glow */}
       <div

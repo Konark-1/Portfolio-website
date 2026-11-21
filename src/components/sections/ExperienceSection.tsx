@@ -200,10 +200,9 @@ export default function ExperienceSection() {
     <section 
       id="experience" 
       ref={experienceRef}
-      className="relative z-20 text-foreground border-t" 
+      className="relative z-20 text-foreground scroll-mt-24" 
       style={{
-        backgroundColor: 'var(--background-experience)',
-        borderColor: 'var(--border-color)'
+        backgroundColor: 'var(--background)',
       }}
     >
       {/* Subtle turquoise gradient overlay */}

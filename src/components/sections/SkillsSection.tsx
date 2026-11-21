@@ -120,9 +120,8 @@ function SkillCard({ icon: Icon, title, level, description }: SkillCardProps): R
 
 export default function SkillsSection() {
   return (
-    <section id="skills" className="relative z-20 text-foreground border-t" style={{
-      backgroundColor: 'var(--background-skills)',
-      borderColor: 'var(--border-color)'
+    <section id="skills" className="relative z-20 text-foreground scroll-mt-24" style={{
+      backgroundColor: 'var(--background)',
     }}>
       {/* Subtle gradient overlay */}
       <div className="absolute inset-0 bg-gradient-to-br from-[rgba(39,203,206,0.03)] via-transparent to-transparent pointer-events-none" />
